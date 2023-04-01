@@ -1,0 +1,9 @@
+{
+  "projects": {
+    "default": "staging-promise-ph",
+    "staging": "staging-promise-ph",
+    "production": "promise-ph"
+  },
+  "targets": {},
+  "etags": {}
+}
