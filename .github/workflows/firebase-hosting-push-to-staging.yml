@@ -15,6 +15,6 @@ jobs:
       - name: GitHub Action for Firebase
         uses: w9jds/firebase-action@master
         with:
-          args: deploy --only hosting
+          args: deploy -P staging --only hosting
         env:
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN_STAGING }}
