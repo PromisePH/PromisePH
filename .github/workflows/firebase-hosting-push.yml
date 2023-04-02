@@ -12,39 +12,33 @@ jobs:
       - uses: actions/setup-node@v1
         with:
           node-version: '18.14.2'
-      - name: Set environment variables
-        run: |
-          if [ "${{ github.ref }}" == "refs/heads/main" ]; then
-            export FIREBASE_TOKEN="${{ secrets.FIREBASE_TOKEN_PRODUCTION }}"
-            export VITE_FIREBASE_API_KEY="${{ secrets.REACT_APP_FIREBASE_API_KEY_PRODUCTION }}"
-            export VITE_FIREBASE_AUTH_DOMAIN="${{ secrets.REACT_APP_FIREBASE_AUTH_DOMAIN_PRODUCTION }}"
-            export VITE_FIREBASE_PROJECT_ID="${{ secrets.REACT_APP_FIREBASE_PROJECT_ID_PRODUCTION }}"
-            export VITE_FIREBASE_STORAGE_BUCKET="${{ secrets.REACT_APP_FIREBASE_STORAGE_BUCKET_PRODUCTION }}"
-            export VITE_FIREBASE_MESSAGING_SENDER_ID="${{ secrets.REACT_APP_FIREBASE_MESSAGING_SENDER_ID_PRODUCTION }}"
-            export VITE_FIREBASE_APP_ID="${{ secrets.REACT_APP_FIREBASE_APP_ID_PRODUCTION }}"
-            export VITE_FIREBASE_MEASUREMENT_ID="${{ secrets.REACT_APP_FIREBASE_MEASUREMENT_ID_PRODUCTION }}"
-          elif [ "${{ github.ref }}" == "refs/heads/staging" ]; then
-            export FIREBASE_TOKEN="${{ secrets.FIREBASE_TOKEN_STAGING }}"
-            export VITE_FIREBASE_API_KEY="${{ secrets.REACT_APP_FIREBASE_API_KEY_STAGING }}"
-            export VITE_FIREBASE_AUTH_DOMAIN="${{ secrets.REACT_APP_FIREBASE_AUTH_DOMAIN_STAGING }}"
-            export VITE_FIREBASE_PROJECT_ID="${{ secrets.REACT_APP_FIREBASE_PROJECT_ID_STAGING }}"
-            export VITE_FIREBASE_STORAGE_BUCKET="${{ secrets.REACT_APP_FIREBASE_STORAGE_BUCKET_STAGING }}"
-            export VITE_FIREBASE_MESSAGING_SENDER_ID="${{ secrets.REACT_APP_FIREBASE_MESSAGING_SENDER_ID_STAGING }}"
-            export VITE_FIREBASE_APP_ID="${{ secrets.REACT_APP_FIREBASE_APP_ID_STAGING }}"
-            export VITE_FIREBASE_MEASUREMENT_ID="${{ secrets.REACT_APP_FIREBASE_MEASUREMENT_ID_STAGING }}"
-          fi
       - run: npm ci && npm run build
 
-      - name: Deploy to Firebase Hosting
+      - name: Staging GitHub Action for Firebase
         uses: w9jds/firebase-action@master
         with:
-          args: deploy --only hosting
+          args: deploy -P staging --only hosting
         env:
-          FIREBASE_TOKEN: ${{ env.FIREBASE_TOKEN }}
-          VITE_FIREBASE_API_KEY: ${{ env.VITE_FIREBASE_API_KEY }}
-          VITE_FIREBASE_AUTH_DOMAIN: ${{ env.VITE_FIREBASE_AUTH_DOMAIN }}
-          VITE_FIREBASE_PROJECT_ID: ${{ env.VITE_FIREBASE_PROJECT_ID }}
-          VITE_FIREBASE_STORAGE_BUCKET: ${{ env.VITE_FIREBASE_STORAGE_BUCKET }}
-          VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ env.VITE_FIREBASE_MESSAGING_SENDER_ID }}
-          VITE_FIREBASE_APP_ID: ${{ env.VITE_FIREBASE_APP_ID }}
-          VITE_FIREBASE_MEASUREMENT_ID: ${{ env.VITE_FIREBASE_MEASUREMENT_ID }}
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN_STAGING }}
+          VITE_FIREBASE_API_KEY: ${{ secrets.REACT_APP_FIREBASE_API_KEY_STAGING }}
+          VITE_FIREBASE_AUTH_DOMAIN: ${{ secrets.REACT_APP_FIREBASE_AUTH_DOMAIN_STAGING }}
+          VITE_FIREBASE_PROJECT_ID: ${{ secrets.REACT_APP_FIREBASE_PROJECT_ID_STAGING }}
+          VITE_FIREBASE_STORAGE_BUCKET: ${{ secrets.REACT_APP_FIREBASE_STORAGE_BUCKET_STAGING }}
+          VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.REACT_APP_FIREBASE_MESSAGING_SENDER_ID_STAGING }}
+          VITE_FIREBASE_APP_ID: ${{ secrets.REACT_APP_FIREBASE_APP_ID_STAGING }}
+          VITE_FIREBASE_MEASUREMENT_ID: ${{ secrets.REACT_APP_FIREBASE_MEASUREMENT_ID_STAGING }}
+
+      - name: Production GitHub Action for Firebase
+        if: github.ref == 'refs/heads/main'
+        uses: w9jds/firebase-action@master
+        with:
+          args: deploy -P production --only hosting
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN_PRODUCTION }}
+          VITE_FIREBASE_API_KEY: ${{ secrets.REACT_APP_FIREBASE_API_KEY_PRODUCTION }}
+          VITE_FIREBASE_AUTH_DOMAIN: ${{ secrets.REACT_APP_FIREBASE_AUTH_DOMAIN_PRODUCTION }}
+          VITE_FIREBASE_PROJECT_ID: ${{ secrets.REACT_APP_FIREBASE_PROJECT_ID_PRODUCTION }}
+          VITE_FIREBASE_STORAGE_BUCKET: ${{ secrets.REACT_APP_FIREBASE_STORAGE_BUCKET_PRODUCTION }}
+          VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.REACT_APP_FIREBASE_MESSAGING_SENDER_ID_PRODUCTION }}
+          VITE_FIREBASE_APP_ID: ${{ secrets.REACT_APP_FIREBASE_APP_ID_PRODUCTION }}
+          VITE_FIREBASE_MEASUREMENT_ID: ${{ secrets.REACT_APP_FIREBASE_MEASUREMENT_ID_PRODUCTION }}
