@@ -15,11 +15,7 @@ dist-ssr
 *.local
 
 # Editor directories and files
-.vscode/*
-!.vscode/snippets
-!.vscode/launch.json
-!.vscode/settings.json
-!.vscode/extensions.json
+.vscode
 
 .firebase/*
 __generated__
@@ -30,3 +26,5 @@ __generated__
 *.njsproj
 *.sln
 *.sw?
+.env
+.env.production

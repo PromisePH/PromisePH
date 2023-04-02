@@ -1,94 +1,26 @@
-import { useState, useEffect } from "react";
-import { db } from "./firebase";
 import {
-	collection,
-	addDoc,
-	onSnapshot,
-	serverTimestamp,
-	orderBy,
-	query,
-	doc,
-	updateDoc,
-	deleteDoc,
-} from "firebase/firestore";
-import "./App.css";
+	BrowserRouter as Router,
+	Routes,
+	Route,
+	Navigate,
+} from "react-router-dom";
+import { useAuthState } from "react-firebase-hooks/auth";
 
-// Your task is to add the functionality to add, toggle, and delete todos. Goodluck!
-// The name of the collection is "todos". You can rename it if you want. 
-// Just make sure to change it in the App.jsx file as well.
+import { db, auth } from "./firebase/firebase";
 
 function App() {
-	const [todos, setTodos] = useState([]);
-	const [input, setInput] = useState("");
-
-	async function addTodo(event) {
-		event.preventDefault();
-
-		// ... code goes here
-
-		setInput("");
-	}
-
-	async function toggleComplete(id, completed) {
-		// ... code goes here
-	}
-
-	async function deleteTodo(id) {
-		// ... code goes here
-	}
-
-	useEffect(() => {
-		const sortedTodos = query(
-			collection(db, "todos"),
-			orderBy("timestamp", "desc")
-		);
-
-		const unsubscribe = onSnapshot(sortedTodos, (snapshot) => {
-			setTodos(
-				snapshot.docs.map((doc) => ({
-					id: doc.id,
-					todo: doc.data().todo,
-					completed: doc.data().completed,
-				}))
-			);
-		});
-
-		return unsubscribe;
-	}, []);
+	const [user] = useAuthState(auth);
 
 	return (
-		<div className="container">
-			<form>
-				<input
-					value={input}
-					onChange={(event) => setInput(event.target.value)}
-					className="todo-input"
-				/>
-				<button type="submit" onClick={addTodo} className="add-todo">
-					Add Todo
-				</button>
-			</form>
-
-			<ul className="todo-list">
-				{todos.map((todo) => (
-					<li key={todo.id}>
-						<div>
-							<input
-								type="checkbox"
-								checked={todo.completed}
-								onChange={() => toggleComplete(todo.id, todo.completed)}
-							/>
-							<span className={todo.completed ? "completed" : ""}>
-								{todo.todo}
-							</span>
-						</div>
-						<button onClick={() => deleteTodo(todo.id)} className="delete">
-							Delete
-						</button>
-					</li>
-				))}
-			</ul>
-		</div>
+		<Router>
+			<div className="App">
+				<Routes>
+					<Route path="/" element={<Home />}></Route>
+					<Route path="/login" element={<Login />}></Route>
+					<Route path="*" element={<Navigate to="/" />}></Route>
+				</Routes>
+			</div>
+		</Router>
 	);
 }
 
