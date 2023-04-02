@@ -1,26 +1,15 @@
-import React, { useState, useEffect } from 'react';
-import { signInWithEmailAndPassword } from 'firebase/auth';
-import { useNavigate } from "react-router-dom";
-import { useAuthState } from "react-firebase-hooks/auth";
-
+import React, { useState } from 'react';
+import { createUserWithEmailAndPassword, updateProfile, sendEmailVerification } from 'firebase/auth';
 import { auth } from '../../firebase/firebase';
 
-function Login() {
-    const [user] = useAuthState(auth);
-
-    const navigate = useNavigate();
-    useEffect(() => {
-        if (user) {
-            navigate('/');
-        }
-    }, [user]);
-
+function Signup() {
     const [formData, setFormData] = useState({
+        email: '',
         password: '',
         username: ''
     });
 
-    const { email, password } = formData;
+    const { email, password, username } = formData;
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -33,7 +22,9 @@ function Login() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            await signInWithEmailAndPassword(auth, email, password);
+            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+            await updateProfile(userCredential.user, { displayName: username });
+            await sendEmailVerification(userCredential.user);
         } catch (error) {
             const errorCode = error.code;
             const errorMessage = error.message;
@@ -46,12 +37,16 @@ function Login() {
             <h1>Login</h1>
             <form onSubmit={handleSubmit}>
                 <div>
+                    <label htmlFor="username">Username</label>
+                    <input type="text" id="username" name="username" value={username} onChange={handleChange} />
+                </div>
+                <div>
                     <label htmlFor="email">Email</label>
-                    <input type="email" id="email" name="email" onChange={handleChange} />
+                    <input type="email" id="email" name="email" value={email} onChange={handleChange} />
                 </div>
                 <div>
                     <label htmlFor="password">Password</label>
-                    <input type="password" id="password" name="password" onChange={handleChange} />
+                    <input type="password" id="password" name="password" value={password} onChange={handleChange} />
                 </div>
                 <button type="submit">Login</button>
             </form>
@@ -59,4 +54,4 @@ function Login() {
     );
 }
 
-export default Login;
+export default Signup;
