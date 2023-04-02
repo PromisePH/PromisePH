@@ -7,6 +7,8 @@ import {
 import { useAuthState } from "react-firebase-hooks/auth";
 
 import { db, auth } from "./firebase/firebase";
+import Home from "./pages/Home";
+import Login from "./pages/Login";
 
 function App() {
 	const [user] = useAuthState(auth);

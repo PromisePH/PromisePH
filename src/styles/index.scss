@@ -1,11 +1,36 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap");
 :root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+  --nav-idle: #808080;
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  --dark-group-1: #000000;
+  --dark-group-2: #ffffff;
+  --dark-group-3: #1e1e1e;
+  --dark-group-4: #303030;
+  --dark-text-color: #bbbbbb;
+  --dark-bg-color: #121212;
+  --dark-nav: #2a2a2a;
+  --dark-isBlocked: rgba(55, 55, 55, 0.5);
+
+  --light-group-1: #ffffff;
+  --light-group-2: #000000;
+  --light-group-3: #dedede;
+  --light-group-4: #cbcbcb;
+  --light-text-color: #303030;
+  --light-bg-color: #ffffff;
+  --light-nav: #f1f1f1;
+  --light-isBlocked: rgba(35, 35, 35, 0.4);
+
+  --color-group-1: var(--dark-group-1);
+  --color-group-2: var(--dark-group-2);
+  --color-group-3: var(--dark-group-3);
+  --color-group-4: var(--dark-group-4);
+  --text-color: var(--dark-text-color);
+  --bg-color: var(--dark-bg-color);
+  --nav-color: var(--dark-nav);
+  --isBlocked-color: var(--dark-isBlocked);
+
+  color: var(--text-color);
+  background: var(--bg-color);
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -14,56 +39,47 @@
   -webkit-text-size-adjust: 100%;
 }
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
+* {
+  box-sizing: border-box;
+  user-select: none;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+
+  -webkit-user-select: none; /* Safari */
+  -khtml-user-select: none; /* Konqueror HTML */
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* Internet Explorer/Edge */
+  -webkit-tap-highlight-color: transparent;
 }
 
-body {
+body,
+html {
+  font-family: "Poppins";
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  width: 100%;
   margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
+  padding: 0;
 }
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+::-webkit-scrollbar {
+  width: 5px;
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgb(171, 171, 171);
+  -webkit-border-radius: 2ex;
 }
 
 button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
   cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
+input,
+textarea {
+  -webkit-user-select: text; /* Chrome, Opera, Safari */
+  -moz-user-select: text; /* Firefox 2+ */
+  -ms-user-select: text; /* IE 10+ */
+  user-select: text; /* Standard syntax */
 }
