@@ -19,7 +19,7 @@ jobs:
         with:
           args: deploy -P ${{ env.FIREBASE_PROJECT }} --only hosting
         env:
-          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+          FIREBASE_TOKEN: ${{ env.FIREBASE_TOKEN }}
           VITE_FIREBASE_API_KEY: ${{ env.VITE_FIREBASE_API_KEY }}
           VITE_FIREBASE_AUTH_DOMAIN: ${{ env.VITE_FIREBASE_AUTH_DOMAIN }}
           VITE_FIREBASE_PROJECT_ID: ${{ env.VITE_FIREBASE_PROJECT_ID }}
@@ -29,6 +29,7 @@ jobs:
           VITE_FIREBASE_MEASUREMENT_ID: ${{ env.VITE_FIREBASE_MEASUREMENT_ID }}
 
     env:
+      FIREBASE_TOKEN: ${{ github.ref == 'refs/heads/main' && secrets.FIREBASE_TOKEN_PRODUCTION || secrets.FIREBASE_TOKEN_STAGING }}
       FIREBASE_PROJECT: ${{ github.ref == 'refs/heads/main' && 'production' || 'staging' }}
       VITE_FIREBASE_API_KEY: ${{ github.ref == 'refs/heads/main' && secrets.VITE_FIREBASE_API_KEY_PRODUCTION || secrets.VITE_FIREBASE_API_KEY_STAGING }}
       VITE_FIREBASE_AUTH_DOMAIN: ${{ github.ref == 'refs/heads/main' && secrets.VITE_FIREBASE_AUTH_DOMAIN_PRODUCTION || secrets.VITE_FIREBASE_AUTH_DOMAIN_STAGING }}
