@@ -1,11 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { EditorState } from 'draft-js';
+import { EditorState, convertToRaw } from 'draft-js';
 import { Editor } from 'react-draft-wysiwyg';
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
 import { convertToHTML } from 'draft-convert';
-import DOMPurify from 'dompurify';
+import draftToHtml from 'draftjs-to-html';
+
+import { db, auth } from '../../firebase/firebase';
+import { setDoc, doc, collection } from 'firebase/firestore';
+import { useAuthState } from "react-firebase-hooks/auth";
 
 function PostForm() {
+    const [user] = useAuthState(auth);
     const [editorState, setEditorState] = useState(
         () => EditorState.createEmpty(),
     );
@@ -16,18 +21,38 @@ function PostForm() {
         setConvertedContent(html);
     }, [editorState]);
 
-    function createMarkup(html) {
-        return {
-            __html: DOMPurify.sanitize(html)
-        }
+    function createMarkup() {
+        const contentState = editorState.getCurrentContent();
+        const rawContentState = convertToRaw(contentState);
+        const markup = draftToHtml(rawContentState);
+        return { __html: markup };
     }
 
-    const handleSubmit = (event) => {
+    const handleSubmit = async (event) => {
         event.preventDefault();
+        const description = convertToRaw(editorState.getCurrentContent());
+        const postsRef = doc(collection(db, "posts"))
+        await setDoc(postsRef, {
+            title: 'title',
+            description: description,
+            posterId: user.uid,
+            entityId: 'entityId',
+            images: [],
+            sources: [],
+            upvotes: null,
+            createdAt: null,
+            updatedAt: null,
+            comments: null,
+            flags: null,
+            verifiedUpvotes: null,
+            isMallicious: null,
+            isFake: null
+        });
+        console.log(`${postsRef.id} created successfully}`);
     }
 
     return (
-        <div onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit}>
             <Editor
                 editorState={editorState}
                 onEditorStateChange={setEditorState}
@@ -54,7 +79,9 @@ function PostForm() {
                 className="preview"
                 dangerouslySetInnerHTML={createMarkup(convertedContent)}>
             </div>
-        </div>
+            <br />
+            <button type="submit">Submit</button>
+        </form>
     );
 }
 
