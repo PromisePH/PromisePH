@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuthState } from "react-firebase-hooks/auth";
 
 import { auth } from '../../firebase/firebase';
+import PostForm from '../../components/PostForm';
 
 function Home() {
     const [user] = useAuthState(auth);
@@ -29,6 +30,7 @@ function Home() {
     return (
         <main>
             <h1>Home</h1>
+            <PostForm />
             <button onClick={handleLogout}>
                 Logout
             </button>
