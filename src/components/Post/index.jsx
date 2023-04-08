@@ -1,3 +1,4 @@
+import React from 'react';
 import draftToHtml from 'draftjs-to-html';
 
 function Post(post) {

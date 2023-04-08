@@ -13,7 +13,7 @@ function Home() {
     const [posts, setPosts] = useState([])
     useEffect(() => {
         const q = query(collection(db, CollectionsEnum.POSTS), orderBy("createdAt", "desc"));
-        const unsubscribe = onSnapshot(q, doc => {
+        onSnapshot(q, doc => {
             setPosts(doc.docs.map(
                 doc => {
                     return {
@@ -31,7 +31,6 @@ function Home() {
             await signOut(auth);
         }
         catch (error) {
-            const errorCode = error.code;
             const errorMessage = error.message;
             alert(errorMessage);
         }
