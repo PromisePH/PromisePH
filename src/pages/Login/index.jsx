@@ -10,9 +10,8 @@ function Login() {
 
     const navigate = useNavigate();
     useEffect(() => {
-        if (user) {
+        if (user)
             navigate('/');
-        }
     }, [user]);
 
     const [formData, setFormData] = useState({

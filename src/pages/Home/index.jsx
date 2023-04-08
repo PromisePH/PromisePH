@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react'
 import { signOut } from 'firebase/auth';
-import { useNavigate } from "react-router-dom";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { db, auth } from '../../firebase/firebase';
 import { collection, onSnapshot, query, orderBy } from "firebase/firestore";
@@ -12,11 +11,7 @@ import Post from '../../components/Post';
 function Home() {
     const [user] = useAuthState(auth);
     const [posts, setPosts] = useState([])
-    const navigate = useNavigate();
     useEffect(() => {
-        if (!user)
-            navigate('/login');
-
         const q = query(collection(db, CollectionsEnum.POSTS), orderBy("createdAt", "desc"));
         const unsubscribe = onSnapshot(q, doc => {
             setPosts(doc.docs.map(
@@ -45,7 +40,9 @@ function Home() {
     return (
         <main>
             <h1>Home</h1>
-            <PostForm />
+            {
+                user ? <PostForm /> : null 
+            }
             {
                 posts.map(post =>
                     <Post key={post.id} {...post} />
