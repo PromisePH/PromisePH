@@ -1,37 +1,24 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { EditorState, convertToRaw } from 'draft-js';
 import { Editor } from 'react-draft-wysiwyg';
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
-import { convertToHTML } from 'draft-convert';
-import draftToHtml from 'draftjs-to-html';
 
 import { db, auth } from '../../firebase/firebase';
 import { setDoc, doc, collection } from 'firebase/firestore';
 import { useAuthState } from "react-firebase-hooks/auth";
+import CollectionsEnum from '../../constants/collections';
 
 function PostForm() {
     const [user] = useAuthState(auth);
     const [editorState, setEditorState] = useState(
         () => EditorState.createEmpty(),
     );
-    const [convertedContent, setConvertedContent] = useState(null);
 
-    useEffect(() => {
-        let html = convertToHTML(editorState.getCurrentContent());
-        setConvertedContent(html);
-    }, [editorState]);
-
-    function createMarkup() {
-        const contentState = editorState.getCurrentContent();
-        const rawContentState = convertToRaw(contentState);
-        const markup = draftToHtml(rawContentState);
-        return { __html: markup };
-    }
-
+    // Form submission handler
     const handleSubmit = async (event) => {
         event.preventDefault();
         const description = convertToRaw(editorState.getCurrentContent());
-        const postsRef = doc(collection(db, "posts"))
+        const postsRef = doc(collection(db, CollectionsEnum.POSTS))
         await setDoc(postsRef, {
             title: 'title',
             description: description,
@@ -39,14 +26,14 @@ function PostForm() {
             entityId: 'entityId',
             images: [],
             sources: [],
-            upvotes: null,
-            createdAt: null,
-            updatedAt: null,
-            comments: null,
-            flags: null,
-            verifiedUpvotes: null,
-            isMallicious: null,
-            isFake: null
+            upvotes: 0,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            comments: [],
+            flags: [],
+            verifiedUpvotes: [],
+            isMallicious: false,
+            isFake: false
         });
         console.log(`${postsRef.id} created successfully}`);
     }
@@ -69,17 +56,8 @@ function PostForm() {
                 mention={{
                     separator: ' ',
                     trigger: '@',
-                    suggestions: [
-                        { text: 'JavaScript', value: 'javascript', url: 'js' },
-                        { text: 'Golang', value: 'golang', url: 'go' },
-                    ],
                 }}
             />
-            <div
-                className="preview"
-                dangerouslySetInnerHTML={createMarkup(convertedContent)}>
-            </div>
-            <br />
             <button type="submit">Submit</button>
         </form>
     );
