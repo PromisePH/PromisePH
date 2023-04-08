@@ -6,7 +6,7 @@ import RouterConfig from "./navigation/RouterConfig";
 function App() {
 	return (
 		<Router>
-			<div className="App">
+			<div className="App font-poppins">
 				<RouterConfig />
 			</div>
 		</Router>
