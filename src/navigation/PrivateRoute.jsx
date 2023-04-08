@@ -1,25 +1,19 @@
-import React from "react";
-import { Route, useNavigate } from "react-router-dom";
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { auth } from '../firebase/firebase';
 import { useAuthState } from "react-firebase-hooks/auth";
 
-function PrivateRoute({ children, ...rest }) {
+function PrivateRoute({ children }) {
     const [currentUser] = useAuthState(auth);
     const navigate = useNavigate();
-    if (!currentUser) {
-        navigate('/login');
-        return null;
-    }
+    useEffect(() => {
+        if (!currentUser) {
+            navigate('/login');
+        }
+    }, [currentUser, navigate]);
     return (
-        <Route {...rest}
-            render={({ location }) => (
-                <>
-                    {children}
-                </>
-            )}
-        />
+        children ? currentUser : null
     );
-
 }
 
 export default PrivateRoute;
