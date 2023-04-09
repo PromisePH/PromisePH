@@ -40,7 +40,7 @@ function Home() {
         <main>
             <h1>Home</h1>
             {
-                user ? <PostForm /> : null 
+                user ? <PostForm /> : null
             }
             {
                 posts.map(post =>

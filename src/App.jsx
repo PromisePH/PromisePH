@@ -3,13 +3,17 @@ import {
 	BrowserRouter as Router,
 } from "react-router-dom";
 import RouterConfig from "./navigation/RouterConfig";
+import NavBar from "./components/NavBar";
 
 function App() {
 	return (
 		<Router>
-			<div className="App font-poppins">
-				<RouterConfig />
-			</div>
+			<main className="bg-black-pearl text-white font-poppins">
+				<NavBar />
+				<div className="App font-poppins pt-16">
+					<RouterConfig />
+				</div>
+			</main>
 		</Router>
 	);
 }
