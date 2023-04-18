@@ -59,20 +59,16 @@ function NavBar() {
                         size={'md'}
                         icon={isOpen ? <CloseIcon /> : <HamburgerIcon />}
                         aria-label={'Open Menu'}
-                        display={{ md: 'none' }}
+                        display={{ lg: 'none' }}
                         onClick={isOpen ? onClose : onOpen}
                     />
-                    <HStack spacing={8} alignItems={'center'}>
-                        <Box>
-                            <a href='/' className='flex flex-row items-center'>
-                                <img src={Logo} alt="PromisePH Logo" className="h-10 w-10" />
-                                <span className='text-center ml-2 text-orange-red font-extrabold text-2xl'>PromisePH</span>
-                            </a>
-                        </Box>
-                        <HStack
-                            as={'nav'}
-                            spacing={4}
-                            display={{ base: 'none', md: 'flex' }}>
+                    <Box>
+                        <a href='/' className='flex flex-row items-center'>
+                            <img src={Logo} alt="PromisePH Logo" className="h-10 w-10" />
+                            <span className='text-center ml-2 text-orange-red font-extrabold text-2xl'>PromisePH</span>
+                        </a>
+                    </Box>
+                    <HStack spacing={8}  as={'nav'} alignItems={'center'} display={{ base: 'none', lg: 'flex' }}>
                             <IconLink>
                                 <Icon as={AiFillHome} boxSize={6} />
                             </IconLink>
@@ -82,20 +78,22 @@ function NavBar() {
                             <IconLink>
                                 <Icon as={MdOutlinePeopleAlt} boxSize={6} />
                             </IconLink>
-                            <InputGroup>
+                            <InputGroup >
                                 <InputLeftElement
                                     pointerEvents='none'
-                                    children={<Search2Icon color='gray.300' />}
-                                />
+                                >
+                                    <Search2Icon color='gray.300' />
+                                </InputLeftElement>
                                 <Input type='search' placeholder='Search' />
                             </InputGroup>
-                        </HStack>
                     </HStack>
 
-                    <HStack >
-                        <IconLink>
-                            <BellIcon boxSize={6} />
-                        </IconLink>
+                    <HStack spacing={4}>
+                        <Box display={{ base: 'none', lg: 'block' }}>
+                            <IconLink >
+                                <BellIcon boxSize={6} />
+                            </IconLink>
+                        </Box>
                         <Flex alignItems={'center'}>
                             <Menu>
                                 <MenuButton
@@ -119,7 +117,9 @@ function NavBar() {
                                 </MenuList>
                             </Menu>
                         </Flex>
-
+                        <Box display={{ base: 'none', lg: 'block' }}>
+                            User Name
+                        </Box>
                     </HStack>
                 </Flex>
 
@@ -133,7 +133,7 @@ function NavBar() {
                     </Box>
                 ) : null}
             </Box>
-        </div>
+        </div >
     );
 }
 
