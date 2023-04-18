@@ -47,9 +47,9 @@ function Home() {
                     <Post key={post.id} {...post} />
                 )
             }
-            <button onClick={handleLogout}>
-                Logout
-            </button>
+            {
+                user ? <button onClick={handleLogout}>Logout</button> : null
+                }
         </main>
     );
 }
