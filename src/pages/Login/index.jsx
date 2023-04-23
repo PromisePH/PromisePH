@@ -15,7 +15,7 @@ import { Link as RouteLink } from 'react-router-dom';
 
 import { auth } from '../../firebase/firebase';
 import Logo from "../../assets/img/PromisePH_logo.png";
-import PoliticianCards from '../../assets/svg/landing_politicians.svg'
+import PoliticianCards from '../../components/PoliticianCards';
 
 function Login() {
     const [user] = useAuthState(auth);
@@ -105,9 +105,7 @@ function Login() {
                 </div>
             </section>
 
-            <section className='fixed right-0'>
-                <img src={PoliticianCards} alt="politician cards" className='max-w-6xl' />
-            </section>
+            <PoliticianCards />
         </main>
     );
 }

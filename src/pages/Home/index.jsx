@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react'
-import { signOut } from 'firebase/auth';
 import { useAuthState } from "react-firebase-hooks/auth";
 import { db, auth } from '../../firebase/firebase';
 import { collection, onSnapshot, query, orderBy } from "firebase/firestore";
@@ -28,16 +27,6 @@ function Home() {
 
     }, [user]);
 
-    const handleLogout = async () => {
-        try {
-            await signOut(auth);
-        }
-        catch (error) {
-            const errorMessage = error.message;
-            alert(errorMessage);
-        }
-    };
-
     return (
         <>
             <NavBar />
@@ -50,9 +39,6 @@ function Home() {
                     posts.map(post =>
                         <Post key={post.id} {...post} />
                     )
-                }
-                {
-                    user ? <button onClick={handleLogout}>Logout</button> : null
                 }
             </main>
             <BottomNav />
