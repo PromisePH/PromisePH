@@ -66,7 +66,7 @@ function NavBar() {
                 <div className='h-16 flex items-center justify-between md:justify-center md:gap-x-20'>
                     <Link as={RouteLink} to='/' style={{ textDecoration: 'none' }}>
                         <div className='no-underline flex flex-row items-center min-w-fit'>
-                            <img src={Logo} alt="PromisePH Logo" className="h-10 w-10" />
+                            <img src={Logo} alt="PromisePH Logo" className="h-10 min-w-fit" />
                             <span className='text-center ml-2 text-orange-red font-extrabold text-2xl hidden md:block'>PromisePH</span>
                         </div>
                     </Link>
