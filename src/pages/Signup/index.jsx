@@ -70,7 +70,7 @@ function Signup() {
 
     return (
         <main className='min-h-screen bg-black-pearl flex'>
-            <section className='flex justify-center items-center gap-5 md:px-12 px-5 md:w-1/2 w-full z-10'>
+            <section className='flex justify-center items-center gap-5 md:px-12 px-5 md:w-3/5 w-full z-10'>
                 <div className='rounded-lg bg-black-pearl flex flex-col justify-center items-center gap-5 p-5 w-full'>
                     <div className='no-underline flex flex-row items-center'>
                         <img src={Logo} alt="PromisePH Logo" className="h-12 w-12" />

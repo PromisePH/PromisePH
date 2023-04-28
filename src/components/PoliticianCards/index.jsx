@@ -3,7 +3,7 @@ import PoliticianCardsSVG from '../../assets/svg/landing_politicians.svg'
 function PoliticianCards() {
     return (
         <section className='fixed right-0'>
-            <img src={PoliticianCardsSVG} alt="politician cards" className='max-w-6xl' />
+            <img src={PoliticianCardsSVG} alt="politician cards" className='h-screen w-auto max-w-none' />
         </section>
     );
 }
