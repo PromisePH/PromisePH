@@ -8,6 +8,7 @@ import PostForm from '../../components/PostForm';
 import Post from '../../components/Post';
 import NavBar from "../../components/NavBar";
 import BottomNav from "../../components/BottomNav";
+import Avatar from '../../components/Avatar';
 
 function Home() {
     const [user] = useAuthState(auth);
@@ -30,16 +31,21 @@ function Home() {
     return (
         <>
             <NavBar />
-            <main className='py-16 md:pb-0'>
-                <h1>Home</h1>
-                {
-                    user ? <PostForm /> : null
-                }
-                {
-                    posts.map(post =>
-                        <Post key={post.id} {...post} />
-                    )
-                }
+            <main className='px-4 py-16 md:pb-0 flex flex-col items-center w-full'>
+                <section className='md:w-1/2 w-full'>
+                    <div className='flex w-full gap-2 p-3 my-2 rounded-lg bg-bunker'>
+                        <Avatar name={user.displayName} />
+                        <button className='w-full bg-midnight p-2 text-left text-periwinkle text-xs rounded-md'>Share a promise a politician has said</button>
+                    </div>
+                    {/* {
+                        user ? <PostForm /> : null
+                    } */}
+                    {
+                        posts.map(post =>
+                            <Post key={post.id} {...post} />
+                        )
+                    }
+                </section>
             </main>
             <BottomNav />
         </>

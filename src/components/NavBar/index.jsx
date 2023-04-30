@@ -4,7 +4,6 @@ import Logo from "../../assets/img/PromisePH_logo.png";
 import {
     Box,
     Flex,
-    Avatar,
     HStack,
     Link,
     Icon,
@@ -31,6 +30,7 @@ import { FaCalendarAlt } from 'react-icons/fa';
 import { MdOutlinePeopleAlt } from 'react-icons/md';
 
 import IconLink from '../IconLink';
+import Avatar from '../Avatar';
 
 const Links = ['Dashboard', 'Projects', 'Team'];
 
@@ -70,7 +70,7 @@ function NavBar() {
                             <span className='text-center ml-2 text-orange-red font-extrabold text-2xl hidden md:block'>PromisePH</span>
                         </div>
                     </Link>
-                    <div className='flex flex-row gap-x-5'>
+                    <div className='flex flex-row gap-x-1 md:gap-x-5'>
                         <HStack spacing={8} as={'nav'} alignItems={'center'}>
                             <HStack spacing={8} as={'nav'} alignItems={'center'} display={{ base: 'none', md: 'flex' }}>
                                 <IconLink>
@@ -109,14 +109,20 @@ function NavBar() {
                                                 variant={'link'}
                                                 cursor={'pointer'}
                                                 minW={0}>
-                                                <Avatar
-                                                    size={'sm'}
-                                                    src={
-                                                        'https://images.unsplash.com/photo-1493666438817-866a91353ca9?ixlib=rb-0.3.5&q=80&fm=jpg&crop=faces&fit=crop&h=200&w=200&s=b616b2c5b373a80ffc9636ba24f7a4a9'
-                                                    }
-                                                />
+                                                <div className='flex flex-row gap-2 items-center justify-center no-underline'>
+                                                    <Avatar
+                                                        name={user.displayName}
+                                                    />
+                                                    <span className='hidden md:inline-block'>
+                                                        {user.displayName}
+                                                    </span>
+                                                </div>
                                             </MenuButton>
                                             <MenuList>
+                                                <div className='block md:hidden'>
+                                                    <MenuItem>{user.displayName}</MenuItem>
+                                                    <MenuDivider />
+                                                </div>
                                                 <MenuItem>Link 1</MenuItem>
                                                 <MenuItem>Link 2</MenuItem>
                                                 <MenuDivider />
@@ -124,9 +130,6 @@ function NavBar() {
                                             </MenuList>
                                         </Menu>
                                     </Flex>
-                                    <Box display={{ base: 'none', md: 'block' }}>
-                                        User Name
-                                    </Box>
                                 </HStack>
                                 :
                                 <Link as={RouteLink} to='/login'>
