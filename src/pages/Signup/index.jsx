@@ -1,23 +1,23 @@
 import React, { useState, useEffect } from 'react';
-import { signInWithEmailAndPassword } from 'firebase/auth';
+import { createUserWithEmailAndPassword, updateProfile, sendEmailVerification } from 'firebase/auth';
+import { auth } from '../../firebase/firebase';
 import { useNavigate } from "react-router-dom";
 import { useAuthState } from "react-firebase-hooks/auth";
+import { Link as RouteLink } from 'react-router-dom';
 import {
     FormControl,
     FormLabel,
     Input,
-    Button,
-    Divider,
     Link,
+    Divider,
+    Button,
     useToast
 } from '@chakra-ui/react';
-import { Link as RouteLink } from 'react-router-dom';
 
-import { auth } from '../../firebase/firebase';
-import Logo from "../../assets/img/PromisePH_logo.png";
 import PoliticianCards from '../../components/PoliticianCards';
+import Logo from "../../assets/img/PromisePH_logo.png";
 
-function Login() {
+function Signup() {
     const [user] = useAuthState(auth);
 
     const navigate = useNavigate();
@@ -29,11 +29,12 @@ function Login() {
 
     const toast = useToast()
     const [formData, setFormData] = useState({
+        email: '',
         password: '',
         username: ''
     });
 
-    const { email, password } = formData;
+    const { email, password, username } = formData;
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -46,17 +47,20 @@ function Login() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            await signInWithEmailAndPassword(auth, email, password);
+            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+            await updateProfile(userCredential.user, { displayName: username });
+            await sendEmailVerification(userCredential.user);
             toast({
-                title: "Login Successful.",
+                title: "Signup Successful.",
                 position: 'bottom-left',
                 status: 'success',
                 isClosable: true
             })
         } catch (error) {
-            console.error(error.message);
+            const errorMessage = error.message;
+            console.error(errorMessage);
             toast({
-                title: "Login Failed. Incorrect email or password.",
+                title: "Signup Failed. Incorrect email or password.",
                 position: 'bottom-left',
                 status: 'error',
                 isClosable: true
@@ -78,6 +82,10 @@ function Login() {
                         </span>
                     </div>
                     <form onSubmit={handleSubmit} className='flex flex-col justify-center gap-5 w-full'>
+                        <FormControl id="username">
+                            <FormLabel>Username</FormLabel>
+                            <Input type="username" name='username' isRequired={true} focusBorderColor='orange.600' value={username} onChange={handleChange} />
+                        </FormControl>
                         <FormControl id="email">
                             <FormLabel>Email address</FormLabel>
                             <Input type="email" name='email' isRequired={true} focusBorderColor='orange.600' value={email} onChange={handleChange} />
@@ -90,16 +98,16 @@ function Login() {
                             colorScheme="gray"
                             type='submit'
                         >
-                            Login
+                            Signup
                         </Button>
                     </form>
                     <Divider orientation='horizontal' />
-                    <Link as={RouteLink} to='/signup' className='w-full' colorScheme="gray">
+                    <Link as={RouteLink} to='/login' className='w-full' colorScheme="gray">
                         <Button
                             className='w-full'
                             type='submit'
                         >
-                            Signup
+                            Login
                         </Button>
                     </Link>
                 </div>
@@ -110,4 +118,4 @@ function Login() {
     );
 }
 
-export default Login;
+export default Signup;

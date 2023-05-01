@@ -1,9 +1,15 @@
 import React from 'react';
+import NavBar from "../../components/NavBar";
+import BottomNav from "../../components/BottomNav";
+
 function Settings() {
     return (
-        <section>
-
-        </section>
+        <>
+            <NavBar />
+            <section>
+            </section>
+            <BottomNav />
+        </>
     );
 }
 

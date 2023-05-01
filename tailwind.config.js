@@ -1,5 +1,9 @@
 /** @type {import('tailwindcss').Config} */
 export default {
+<<<<<<< Updated upstream
+=======
+  important: true,
+>>>>>>> Stashed changes
   mode: 'jit',
   content: [
     "./index.html",
@@ -19,6 +23,7 @@ export default {
         'bunker': '#262D34',
         'midnight': '#2C353D',
         'orange-red': '#FF4401',
+        'burning-orange': '#FF6934',
         'periwinkle': '#C5D0E6',
       },
     }
