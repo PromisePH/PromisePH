@@ -1,9 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 export default {
-<<<<<<< Updated upstream
-=======
   important: true,
->>>>>>> Stashed changes
   mode: 'jit',
   content: [
     "./index.html",
