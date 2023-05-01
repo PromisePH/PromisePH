@@ -19,6 +19,7 @@ export default {
         'midnight': '#2C353D',
         'orange-red': '#FF4401',
         'periwinkle': '#C5D0E6',
+        'Caribbean-green': '#00CC8D',
       },
     }
   },

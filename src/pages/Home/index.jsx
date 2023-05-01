@@ -42,11 +42,21 @@ function Home() {
             {
                 user ? <PostForm /> : null
             }
-            {
+            {/* {
                 posts.map(post =>
                     <Post key={post.id} {...post} />
                 )
-            }
+            } */}
+            <Post />
+            <Post />
+            <Post />
+            <Post />
+            <Post />
+            <Post />
+            <Post />
+            <Post />
+            <Post />
+            <Post />
             {
                 user ? <button onClick={handleLogout}>Logout</button> : null
                 }
