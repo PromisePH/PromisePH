@@ -1,5 +1,7 @@
 /** @type {import('tailwindcss').Config} */
 export default {
+  important: true,
+  mode: 'jit',
   content: [
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
@@ -18,6 +20,7 @@ export default {
         'bunker': '#262D34',
         'midnight': '#2C353D',
         'orange-red': '#FF4401',
+        'burning-orange': '#FF6934',
         'periwinkle': '#C5D0E6',
         'Caribbean-green': '#00CC8D',
       },
