@@ -61,7 +61,7 @@ function NavBar() {
         }
     };
     return (
-        <div className='bg-bunker fixed w-full h-15'>
+        <div className='bg-bunker fixed w-full h-15 z-10'>
             <Box bg={useColorModeValue('white', 'bunker')} px={4}>
                 <div className='h-16 flex items-center justify-between md:justify-center md:gap-x-20'>
                     <Link as={RouteLink} to='/' style={{ textDecoration: 'none' }}>

@@ -92,7 +92,7 @@ function Home() {
         <>
             <NavBar />
             <main className='px-4 py-16 md:pb-0 flex flex-col items-center w-full'>
-                <section className='md:w-1/2 w-full'>
+                <section className=''>
                     {
                         user ?
                             <div className='flex w-full gap-2 p-3 my-2 rounded-lg bg-bunker'>
