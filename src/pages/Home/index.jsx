@@ -32,14 +32,24 @@ function Home() {
             <NavBar />
             <main className='py-16 md:pb-0'>
                 <h1>Home</h1>
-                {
+                <Post />
+                <Post />
+                <Post />
+                <Post />
+                <Post />
+                <Post />
+                <Post />
+                <Post />
+                <Post />
+                <Post />
+                {/* {
                     user ? <PostForm /> : null
                 }
                 {
                     posts.map(post =>
                         <Post key={post.id} {...post} />
                     )
-                }
+                } */}
             </main>
             <BottomNav />
         </>

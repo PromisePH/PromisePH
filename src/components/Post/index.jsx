@@ -14,91 +14,91 @@ function Post(post) {
   const [isLiked, setIsLiked] = useState(false);
   const [isActive, setIsActive] = useState(false);
   return (
-    <main>
-      {/* {
-                user ? <PostForm /> : null
-            }
-            {
-                posts.map(post =>
-                    <Post key={post.id} {...post} />
-                )
-            }
-      {
-                user ? <button onClick={handleLogout}>Logout</button> : null
-                } */}
-      <div class="max-w-3xl mx-auto bg-bunker shadow-md rounded-lg p-4 mb-4 flex flex-col md:flex-row">
+    <section className="max-w-3xl mx-auto bg-bunker shadow-md rounded-lg p-4 mb-4">
+      <div className="flex md:hidden flex-row items-center">
+        <div className="flex items-center">
+          <span className="text-white text-1xs md:text-sm font-bold">Pavel Gvay</span>
+          <button
+            onClick={() => setIsActive(!isActive)}
+            className=""
+          >
+            {isActive ? <RxDotFilled /> : <RxDot />}
+          </button>
+        </div>
+        <span className="text-white text-1xs md:text-sm">1 day ago</span>
+      </div>
+      <div className="flex flex-row">
         {/* <!-- Image div--> */}
-        <a href={window.location.href} target="_blank" class="w-1/5">
-          <div>
+        <div className="flex flex-col justify-between w-1/5">
+          <a href={window.location.href} rel="opener" className="w-full">
             <img src={SampleIcon} alt="sample" />
-          </div>
-        </a>
-
+          </a>
+        </div>
         {/* <!-- Content div--> */}
-        <div class="w-4/5 pl-4 ml-2 md:pl-0">
+        <div className="w-4/5 ml-1">
 
           {/* <!-- Header div--> */}
-          <div class="mb-2">
-            <div class="flex flex-row items-center justify-between mb-2">
-              <a href="#" class="text-2xl font-bold flex-grow mr-2">
+          <div className="">
+            <div className="flex flex-row items-center justify-between">
+              <a href="#" className="text-lg md:text-2xl font-bold flex-grow">
                 Duterte vows to end criminality in 3 months
               </a>
               <button
                 onClick={() => setIsLiked(!isLiked)}
-                class="text-orange-red text-2xl transform hover:scale-110"
+                className="text-orange-red text-2xl transform hover:scale-110"
               >
                 {isLiked ? <AiFillHeart /> : <AiOutlineHeart />}
               </button>
             </div>
 
-            <div class="flex flex-row">
-              <div class="bg-Caribbean-green border-radius-full rounded-full text-black text-xs text-center font-bold inline-block py-2 px-2 mr-4 transform hover:scale-110">
-                Verified by ABS-CBN
+            <div className="flex flex-row mt-1 items-center">
+              <div className="bg-caribbean-green border-radius-full rounded-full text-black text-1xs md:text-xs text-center font-bold p-2 mr-1 md:p-3 md:mr-4 transform hover:scale-110">
+                ABS-CBN
               </div>
-              <ul class="list-unstyled text-sm text-gray-500 flex flex-wrap">
-                <li class="bg-midnight border-radius-full rounded-full text-black font-bold text-xs inline-block text-center px-2 py-1 mb-2 mr-2  transform hover:scale-110">
-                  <span class="text-white">finance</span>
+              <ul className="list-unstyled text-sm text-gray-500 flex flex-wrap">
+                <li className="bg-midnight border-radius-full rounded-full text-black font-bold text-1xs md:text-xs inline-block text-center px-2 py-1 mb-2 mr-1 md:mr-2 transform hover:scale-110">
+                  <span className="text-white">finance</span>
                 </li>
-                <li class="bg-midnight border-radius-full rounded-full text-black font-bold text-xs inline-block text-center px-2 py-1 mb-2 mr-2  transform hover:scale-110">
-                  <span class="text-white">crime</span>
+                <li className="bg-midnight border-radius-full rounded-full text-black font-bold text-1xs md:text-xs inline-block text-center px-2 py-1 mb-2 mr-1 md:mr-2 transform hover:scale-110">
+                  <span className="text-white">crime</span>
                 </li>
-                <li class="bg-midnight border-radius-full rounded-full text-black font-bold text-xs inline-block text-center px-2 py-1 mb-2 mr-2  transform hover:scale-110">
-                  <span class="text-white">duterte</span>
+                <li className="bg-midnight border-radius-full rounded-full text-black font-bold text-1xs md:text-xs inline-block text-center px-2 py-1 mb-2 mr-1 md:mr-2 transform hover:scale-110">
+                  <span className="text-white">duterte</span>
                 </li>
               </ul>
             </div>
           </div>
 
           {/* <!-- Footer div--> */}
-          <div class="flex flex-row items-center mt-5">
-            <div class="flex flex-row items-center mr-6">
-              <a href={window.location.href} target="_blank">
-                <img src={SampleAvatar} alt="sample" class="w-8 h-8 rounded-full mr-2" />
+          <div className="flex flex-row items-center mt-6">
+            <div className="hidden md:flex flex-row items-center mr-6">
+              <a href={window.location.href} rel="opener">
+                <img src={SampleAvatar} alt="sample" className="w-8 h-8 rounded-full mr-2" />
               </a>
 
-              <div class="flex flex-col">
-                <div class="flex items-center">
-                  <span class="text-white text-sm font-bold">Pavel Gvay</span>
+              <div className="flex flex-col">
+                <div className="flex items-center">
+                  <span className="text-white text-sm font-bold">Pavel Gvay</span>
                   <button
                     onClick={() => setIsActive(!isActive)}
-                    class=""
+                    className=""
                   >
                     {isActive ? <RxDotFilled /> : <RxDot />}
                   </button>
                 </div>
-                <span class="text-white text-sm">1 day ago</span>
+                <span className="text-white text-sm">1 day ago</span>
               </div>
             </div>
-            <div class="flex flex-row items-center gap-12">
-              <span class="text-white text-sm">651,324 Views</span>
-              <span class="text-white text-sm">36,6545 Likes</span>
-              <span class="text-white text-sm">56 Comments</span>
+            <div className="flex flex-row items-center gap-12">
+              <span className="text-white text-xs md:text-sm">651,324 Views</span>
+              <span className="text-white text-xs md:text-sm">36,6545 Likes</span>
+              <span className="text-white text-xs md:text-sm">56 Comments</span>
             </div>
           </div>
         </div>
       </div>
 
-    </main>
+    </section>
   );
 }
 
