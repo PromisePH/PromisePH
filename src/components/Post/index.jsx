@@ -16,7 +16,7 @@ function Post(post) {
   return (
     <section className="max-w-3xl mx-auto bg-bunker shadow-md rounded-lg p-4 mb-4">
       <div className="flex md:hidden flex-row items-center">
-        <div className="flex items-center">
+        <a href={window.location.href} target="_blank" rel="noopener" className="flex items-center">
           <span className="text-white text-1xs md:text-sm font-bold">Pavel Gvay</span>
           <button
             onClick={() => setIsActive(!isActive)}
@@ -24,13 +24,13 @@ function Post(post) {
           >
             {isActive ? <RxDotFilled /> : <RxDot />}
           </button>
-        </div>
+        </a>
         <span className="text-white text-1xs md:text-sm">1 day ago</span>
       </div>
       <div className="flex flex-row">
         {/* <!-- Image div--> */}
         <div className="flex flex-col justify-between w-1/5">
-          <a href={window.location.href} rel="opener" className="w-full">
+          <a href={window.location.href} target="_blank" rel="noopener" className="w-full">
             <img src={SampleIcon} alt="sample" />
           </a>
         </div>
@@ -40,7 +40,7 @@ function Post(post) {
           {/* <!-- Header div--> */}
           <div className="">
             <div className="flex flex-row items-center justify-between">
-              <a href="#" className="text-lg md:text-2xl font-bold flex-grow">
+              <a href="#" target="_blank" rel="noopener" className="text-lg md:text-2xl font-bold flex-grow">
                 Duterte vows to end criminality in 3 months
               </a>
               <button
@@ -70,11 +70,11 @@ function Post(post) {
           </div>
 
           {/* <!-- Footer div--> */}
-          <div className="flex flex-row items-center mt-6">
-            <div className="hidden md:flex flex-row items-center mr-6">
-              <a href={window.location.href} rel="opener">
-                <img src={SampleAvatar} alt="sample" className="w-8 h-8 rounded-full mr-2" />
-              </a>
+          <div className="hidden md:flex flex-row items-center mt-6">
+            <a href={window.location.href} target="_blank" rel="noopener" className="hidden md:flex flex-row items-center mr-6">
+
+              <img src={SampleAvatar} alt="sample" className="w-8 h-8 rounded-full mr-2" />
+
 
               <div className="flex flex-col">
                 <div className="flex items-center">
@@ -88,16 +88,21 @@ function Post(post) {
                 </div>
                 <span className="text-white text-sm">1 day ago</span>
               </div>
-            </div>
+            </a>
             <div className="flex flex-row items-center gap-12">
               <span className="text-white text-xs md:text-sm">651,324 Views</span>
               <span className="text-white text-xs md:text-sm">36,6545 Likes</span>
               <span className="text-white text-xs md:text-sm">56 Comments</span>
             </div>
           </div>
+
         </div>
       </div>
-
+      <div className="flex md:hidden flex-row items-center pt-3 gap-12">
+        <span className="text-white text-xs md:text-sm">651,324 Views</span>
+        <span className="text-white text-xs md:text-sm">36,6545 Likes</span>
+        <span className="text-white text-xs md:text-sm">56 Comments</span>
+      </div>
     </section>
   );
 }
