@@ -16,3 +16,11 @@ a {
   -ms-user-select: none;
   user-select: none;
 }
+
+.search-bg{
+  background-color: #1a1a1b;
+}
+
+.focus-color:focus-within{
+  background-color: white;
+}

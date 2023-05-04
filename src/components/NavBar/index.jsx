@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Logo from "../../assets/img/PromisePH_logo.png";
 
 import {
@@ -6,6 +6,7 @@ import {
     Flex,
     Avatar,
     HStack,
+    VStack,
     Link,
     Icon,
     Button,
@@ -20,6 +21,20 @@ import {
     InputGroup,
     InputLeftElement,
     Input,
+    Popover,
+    PopoverTrigger,
+    PopoverContent,
+    PopoverHeader,
+    PopoverBody,
+    PopoverFooter,
+    PopoverArrow,
+    PopoverCloseButton,
+    PopoverAnchor,
+    List,
+    ListItem,
+    ListIcon,
+    OrderedList,
+    UnorderedList,
 } from '@chakra-ui/react';
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from '../../firebase/firebase';
@@ -29,8 +44,9 @@ import { Search2Icon, BellIcon } from '@chakra-ui/icons';
 import { AiFillHome } from 'react-icons/ai';
 import { FaCalendarAlt } from 'react-icons/fa';
 import { MdOutlinePeopleAlt } from 'react-icons/md';
-
+import { useNavigate } from 'react-router-dom';
 import IconLink from '../IconLink';
+import SearchList from '../Search/index';
 
 const Links = ['Dashboard', 'Projects', 'Team'];
 
@@ -49,8 +65,11 @@ const NavLink = ({ children }) => (
 );
 
 function NavBar() {
+    const [searchInput, searchInputUpdate] = useState('');
+    const [inputIsActive, setInputStatus] = useState(false);
     const [user] = useAuthState(auth);
     const { isOpen } = useDisclosure();
+    const navigate = useNavigate();
     const handleLogout = async () => {
         try {
             await signOut(auth);
@@ -60,6 +79,9 @@ function NavBar() {
             console.error(errorMessage)
         }
     };
+    function handleSearchSubmit(data) {
+        navigate(`searchmenu/${data}`);
+    }
     return (
         <div className='bg-bunker fixed w-full h-15'>
             <Box bg={useColorModeValue('white', 'bunker')} px={4}>
@@ -83,14 +105,35 @@ function NavBar() {
                                     <Icon as={MdOutlinePeopleAlt} boxSize={6} />
                                 </IconLink>
                             </HStack>
-                            <InputGroup >
-                                <InputLeftElement
-                                    pointerEvents='none'
-                                >
-                                    <Search2Icon color='gray.300' />
-                                </InputLeftElement>
-                                <Input type='search' placeholder='Search' />
-                            </InputGroup>
+                            <VStack align="stretch">
+                                <form onSubmit={(e) => { e.preventDefault; handleSearchSubmit(searchInput); }}>
+                                    <InputGroup>
+                                        <InputLeftElement
+                                            pointerEvents='none'
+                                        >
+                                            <Search2Icon color='gray.300' />
+                                        </InputLeftElement>
+
+                                        <Input
+                                            type='search'
+                                            placeholder='Search'
+                                            value={searchInput}
+                                            onChange={(e) => {
+                                                searchInputUpdate(e.target.value);
+                                            }}
+                                            onFocus={() => {
+                                                setInputStatus(true);
+                                            }}
+                                            onBlur={() => {
+                                                setInputStatus(false);
+                                            }}
+                                            on
+                                        />
+                                    </InputGroup>
+                                </form>
+
+                                <SearchList val={searchInput.toLowerCase()} visible={inputIsActive} />
+                            </VStack>
                         </HStack>
 
                         {
