@@ -54,7 +54,7 @@ function Home() {
     const [description, setDescription] = useState('')
     const [sources, setSources] = useState([])
 
-    const [posts, setPosts] = useState([])
+    // Post UI state
     const { onClose } = useDisclosure()
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [isAlertOpen, setIsAlertOpen] = useState(false)
@@ -64,9 +64,13 @@ function Home() {
         index: 0,
         count: steps.length,
     })
+
+    // Home state
+    const [posts, setPosts] = useState([])
     const toast = useToast()
 
     useEffect(() => {
+        // Realtime listener for posts
         const q = query(collection(db, CollectionsEnum.POSTS), orderBy("createdAt", "desc"));
         onSnapshot(q, doc => {
             setPosts(doc.docs.map(
@@ -81,6 +85,7 @@ function Home() {
     }, [user]);
 
     const closePostFormModal = () => {
+        // Reset the post form onClose
         setPoliticalEntity(null)
         setTitle('')
         setDescription('')
@@ -92,8 +97,14 @@ function Home() {
         setIsModalOpen(false);
     }
 
+    const previousStep = () => {
+        setStep(step - 1);
+        setActiveStep(activeStep - 1);
+    }
+
 
     const nextStep = () => {
+        // Validate form before next step
         if (step == 1 && politicalEntity == null) {
             toast({
                 title: "Please select a political entity",
@@ -125,7 +136,7 @@ function Home() {
         setActiveStep(activeStep + 1);
     }
 
-    const submit = () => {
+    const submitPromisePost = () => {
         setStep(1);
         setActiveStep(0);
         toast({
@@ -179,16 +190,28 @@ function Home() {
                                 </Text>
                             </ModalHeader>
                             <ModalBody>
-                                {step === 1 ? <Form1 setPoliticalEntity={setPoliticalEntity} /> : step === 2 ? <Form2 /> : <Form3 />}
+                                {
+                                    step === 1 ? <Form1 setPoliticalEntity={setPoliticalEntity} /> :
+                                        step === 2 ? <Form2 politicalEntity={politicalEntity} setTitle={setTitle} setDescription={setDescription} /> :
+                                            <Form3 />
+                                }
                             </ModalBody>
                             <ModalFooter>
+                                {
+                                    step > 1 ?
+                                        <Button colorScheme='gray' mr={3} onClick={previousStep}>
+                                            Previous
+                                        </Button>
+                                        :
+                                        null
+                                }
                                 {
                                     step < 3 ?
                                         <Button colorScheme='blue' mr={3} onClick={nextStep}>
                                             Next
                                         </Button>
                                         :
-                                        <Button colorScheme='blue' mr={3} onClick={submit}>
+                                        <Button colorScheme='blue' mr={3} onClick={submitPromisePost}>
                                             Submit
                                         </Button>
                                 }

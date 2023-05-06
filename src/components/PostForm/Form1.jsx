@@ -1,8 +1,13 @@
 import React, { useState } from 'react';
-import { collection, query, orderBy, setDoc, doc, getDocs } from "firebase/firestore";
+
+import { collection, query, orderBy, setDoc, doc, getDocs, where } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { db, storage } from '../../firebase/firebase';
+
 import CollectionsEnum from '../../constants/collections';
+import EntityCollectionEnum from '../../constants/entity';
+import SearchItem from '../PostForm/SearchItem'
+
 import {
     Button,
     Input,
@@ -16,8 +21,6 @@ import {
 } from '@chakra-ui/react'
 import { Search2Icon } from '@chakra-ui/icons';
 
-import SearchItem from '../PostForm/SearchItem'
-
 function Form1({ setPoliticalEntity }) {
     const [isCreateMode, setIsCreateMode] = useState(false)
     const [politicalEntities, setPoliticalEntities] = useState([])
@@ -28,17 +31,23 @@ function Form1({ setPoliticalEntity }) {
     const toast = useToast()
 
     const setSelectedEntity = (result) => {
+        // Set the political entity to be displayed and posted
         setPoliticalEntity(result)
         setPoliticalEntities([result])
     }
 
     const handleSearchChange = async (e) => {
         setFilter(e.target.value);
+        // Guard clause for empty search
         if (filter.length == 0) {
             return
         }
-        const q = query(collection(db, CollectionsEnum.ENTITY), orderBy("createdAt", "desc"));
+
+        // Query all entities
+        const q = query(collection(db, CollectionsEnum.ENTITY), orderBy(EntityCollectionEnum.CREATED_AT, "desc"));
         const querySnapshot = await getDocs(q);
+
+        // Filter the entities
         setPoliticalEntities([])
         querySnapshot.forEach((doc) => {
             const entity = {
@@ -83,32 +92,48 @@ function Form1({ setPoliticalEntity }) {
 
     const createNewEntity = async (e) => {
         e.preventDefault();
-        if (
-            name.length == 0 ||
-            currentPosition.length == 0 ||
-            imageFile == null
-        ) {
-            setIsError(true);
-            return
-        }
 
         try {
+            // Check if the entity already exists
+            const q = query(collection(db, CollectionsEnum.ENTITY), where(EntityCollectionEnum.NAME, "==", name));
+            const querySnapshot = await getDocs(q);
+            if (
+                name.length == 0 ||
+                querySnapshot.docs.length > 0
+            ) {
+                toast({
+                    title: "Entity Already Exists.",
+                    position: 'bottom-left',
+                    status: 'error',
+                    isClosable: true
+                })
+                setIsError(true);
+                return
+            }
+
+            // Create the entity
             setIsCreatingEntity(true)
 
+            // Upload the entity image to cloud storage
             const storageRef = ref(storage, `images/${imageFile.name}`);
             await uploadBytes(storageRef, imageFile);
             const imageURL = await getDownloadURL(storageRef);
 
+
+            // Add the entity to the database
             const entityRef = doc(collection(db, CollectionsEnum.ENTITY))
             const entityData = {
                 ...formData,
-                id: entityRef.id,
                 imageURL: imageURL
             }
 
             await setDoc(entityRef, entityData);
 
-            setSelectedEntity(entityData)
+            // Set the selected entity
+            setSelectedEntity({
+                ...entityData,
+                id: entityRef.id
+            })
             toast({
                 title: "Entity Creation Successful.",
                 position: 'bottom-left',
@@ -139,22 +164,19 @@ function Form1({ setPoliticalEntity }) {
                     <FormLabel>Name</FormLabel>
                     <Input type='text' name='name' value={name} onChange={handleEntityFormChange} />
                     {isError ?
-                        <FormErrorMessage>First Name is required.</FormErrorMessage>
+                        <FormErrorMessage>Entity Name already exists.</FormErrorMessage>
                         :
                         <FormHelperText>
-                            Enter the First Name of the Political Entity
+                            Enter the Entity Name of the Political Entity
                         </FormHelperText>}
                 </FormControl>
 
-                <FormControl isInvalid={isError} isRequired>
+                <FormControl isRequired>
                     <FormLabel>Current Position</FormLabel>
                     <Input type='text' name='currentPosition' value={currentPosition} onChange={handleEntityFormChange} />
-                    {isError ?
-                        <FormErrorMessage>Current positionis required.</FormErrorMessage>
-                        :
-                        <FormHelperText>
-                            Enter the Current Position of the Political Entity
-                        </FormHelperText>}
+                    <FormHelperText>
+                        Enter the Current Position of the Political Entity
+                    </FormHelperText>
                 </FormControl>
 
                 <FormControl isRequired>
