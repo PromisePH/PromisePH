@@ -30,7 +30,13 @@ import {
     StepStatus,
     Stepper,
     useSteps,
-    Text
+    Text,
+    AlertDialog,
+    AlertDialogBody,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogContent,
+    AlertDialogOverlay,
 } from '@chakra-ui/react'
 
 const steps = [
@@ -49,13 +55,17 @@ function Home() {
     const [sources, setSources] = useState([])
 
     const [posts, setPosts] = useState([])
-    const { isOpen, onOpen, onClose } = useDisclosure()
+    const { onClose } = useDisclosure()
+    const [isModalOpen, setIsModalOpen] = useState(false)
+    const [isAlertOpen, setIsAlertOpen] = useState(false)
+    const cancelRef = React.useRef()
     const [step, setStep] = useState(1);
     const { activeStep, setActiveStep } = useSteps({
         index: 0,
         count: steps.length,
     })
     const toast = useToast()
+
     useEffect(() => {
         const q = query(collection(db, CollectionsEnum.POSTS), orderBy("createdAt", "desc"));
         onSnapshot(q, doc => {
@@ -70,7 +80,47 @@ function Home() {
         });
     }, [user]);
 
+    const closePostFormModal = () => {
+        setPoliticalEntity(null)
+        setTitle('')
+        setDescription('')
+        setSources([])
+        setStep(1);
+        setActiveStep(0);
+
+        setIsAlertOpen(false);
+        setIsModalOpen(false);
+    }
+
+
     const nextStep = () => {
+        if (step == 1 && politicalEntity == null) {
+            toast({
+                title: "Please select a political entity",
+                position: 'bottom-left',
+                status: 'error',
+                isClosable: true
+            })
+            return
+        }
+        if (step == 2 && ((title == '') || (description == ''))) {
+            toast({
+                title: "Please enter a title and description",
+                position: 'bottom-left',
+                status: 'error',
+                isClosable: true
+            })
+            return
+        }
+        if (step == 3 && sources.length == 0) {
+            toast({
+                title: "Please add at least one source",
+                position: 'bottom-left',
+                status: 'error',
+                isClosable: true
+            })
+            return
+        }
         setStep(step + 1);
         setActiveStep(activeStep + 1);
     }
@@ -87,17 +137,18 @@ function Home() {
         onClose()
     }
 
+
     const activeStepText = steps[activeStep].description
     return (
         <>
             <NavBar />
-            <main className='px-4 py-16 md:pb-0 flex flex-col items-center w-full'>
-                <section className=''>
+            <main className='px-4 py-20 md:pb-0 flex flex-col items-center w-full'>
+                <section>
                     {
                         user ?
                             <div className='flex w-full gap-2 p-3 my-2 rounded-lg bg-bunker'>
                                 <Avatar name={user.displayName} />
-                                <button onClick={onOpen} className='w-full bg-midnight p-2 text-left text-periwinkle text-xs rounded-md cursor-text'>
+                                <button onClick={() => setIsModalOpen(true)} className='w-full bg-midnight p-2 text-left text-periwinkle text-xs rounded-md cursor-text'>
                                     Share a promise a politician has said
                                 </button>
                             </div>
@@ -108,9 +159,9 @@ function Home() {
                             <Post key={post.id} {...post} />
                         )
                     }
-                    <Modal isOpen={isOpen} onClose={onClose} size='5xl' isCentered>
+                    <Modal isOpen={isModalOpen} onClose={() => setIsAlertOpen(true)} closeOnOverlayClick={false} size='5xl'>
                         <ModalOverlay />
-                        <ModalContent className='bg-bunker py-7'>
+                        <ModalContent className='bg-bunker py-7 mx-5'>
                             <ModalCloseButton />
                             <ModalHeader>
                                 <Stepper size='sm' index={activeStep} gap='0'>
@@ -144,6 +195,36 @@ function Home() {
                             </ModalFooter>
                         </ModalContent>
                     </Modal>
+                    <AlertDialog
+                        isOpen={isAlertOpen}
+                        leastDestructiveRef={cancelRef}
+                        onClose={onClose}
+                    >
+                        <AlertDialogOverlay>
+                            <AlertDialogContent>
+                                <AlertDialogHeader fontSize='lg' fontWeight='bold'>
+                                    Quit Promise Post
+                                </AlertDialogHeader>
+
+                                <AlertDialogBody>
+                                    Are you sure? You cannot undo this action afterwards.
+                                </AlertDialogBody>
+
+                                <AlertDialogFooter>
+                                    <Button ref={cancelRef} onClick={() => setIsAlertOpen(false)}>
+                                        Cancel
+                                    </Button>
+                                    <Button
+                                        className='bg-orange-red'
+                                        onClick={closePostFormModal}
+                                        ml={3}
+                                    >
+                                        Quit
+                                    </Button>
+                                </AlertDialogFooter>
+                            </AlertDialogContent>
+                        </AlertDialogOverlay>
+                    </AlertDialog>
                 </section>
             </main>
             <BottomNav />

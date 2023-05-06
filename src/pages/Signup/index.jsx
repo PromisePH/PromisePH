@@ -60,7 +60,7 @@ function Signup() {
             const errorMessage = error.message;
             console.error(errorMessage);
             toast({
-                title: "Signup Failed. Incorrect email or password.",
+                title: "Signup Failed.",
                 position: 'bottom-left',
                 status: 'error',
                 isClosable: true

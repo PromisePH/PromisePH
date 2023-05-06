@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import draftToHtml from "draftjs-to-html";
 import SampleIcon from "../../assets/img/Sample_Icon.png";
 import SampleAvatar from "../../assets/img/Sample_Avtr.png";
 import { AiOutlineHeart } from "react-icons/ai";
@@ -8,9 +7,6 @@ import { RxDot } from "react-icons/rx";
 import { RxDotFilled } from "react-icons/rx";
 
 function Post(post) {
-  const createMarkup = (raw) => {
-    return { __html: draftToHtml(raw) };
-  };
   const [isLiked, setIsLiked] = useState(false);
   const [isActive, setIsActive] = useState(false);
   return (
@@ -40,7 +36,7 @@ function Post(post) {
           {/* <!-- Header div--> */}
           <div className="">
             <div className="flex flex-row items-center justify-between">
-              <a href="#" target="_blank" rel="noopener" className="text-lg md:text-2xl font-bold flex-grow">
+              <a href="#" target="_blank" rel="noopener" className="text-lg md:text-xl font-bold flex-grow">
                 Duterte vows to end criminality in 3 months
               </a>
               <button
