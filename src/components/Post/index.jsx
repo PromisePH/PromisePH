@@ -22,6 +22,7 @@ function Post({ post, user }) {
       setIsLiked(false)
       return
     }
+
     if (post.upvotes && post.upvotes.includes(user.uid)) {
       setIsLiked(true)
     }
