@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 import { collection, query, orderBy, setDoc, doc, getDocs, where } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
@@ -21,8 +21,9 @@ import {
 } from '@chakra-ui/react'
 import { Search2Icon } from '@chakra-ui/icons';
 
-function Form1({ setPoliticalEntity }) {
+function Form1({ politicalEntity, setPoliticalEntity }) {
     const [isCreateMode, setIsCreateMode] = useState(false)
+    const [allPoliticalEntities, setAllPoliticalEntities] = useState([])
     const [politicalEntities, setPoliticalEntities] = useState([])
     const [filter, setFilter] = useState('')
     const [isError, setIsError] = useState(false)
@@ -30,17 +31,13 @@ function Form1({ setPoliticalEntity }) {
     const [isCreatingEntity, setIsCreatingEntity] = useState(false)
     const toast = useToast()
 
-    const setSelectedEntity = (result) => {
-        // Set the political entity to be displayed and posted
-        setPoliticalEntity(result)
-        setPoliticalEntities([result])
-    }
+    useEffect(() => {
+        initializeEntities();
+    }, []);
 
-    const handleSearchChange = async (e) => {
-        setFilter(e.target.value);
-        // Guard clause for empty search
-        if (filter.length == 0) {
-            return
+    const initializeEntities = async () => {
+        if (politicalEntity) {
+            setPoliticalEntities([politicalEntity])
         }
 
         // Query all entities
@@ -48,12 +45,36 @@ function Form1({ setPoliticalEntity }) {
         const querySnapshot = await getDocs(q);
 
         // Filter the entities
-        setPoliticalEntities([])
+        setAllPoliticalEntities([])
         querySnapshot.forEach((doc) => {
             const entity = {
                 id: doc.id,
                 ...doc.data()
             }
+            setAllPoliticalEntities(prevEntities => [...prevEntities, entity])
+        });
+
+        if (!politicalEntity) {
+            setPoliticalEntities(allPoliticalEntities)
+        }
+    }
+
+    const setSelectedEntity = (result) => {
+        // Set the political entity to be displayed and posted
+        setPoliticalEntity(result)
+        setPoliticalEntities([result])
+    }
+
+    const handleSearchChange = (e) => {
+        setFilter(e.target.value);
+        // Guard clause for empty search
+        if (filter.length == 0) {
+            return
+        }
+
+        // Filter the entities
+        setPoliticalEntities([])
+        allPoliticalEntities.forEach((entity) => {
             if (entity.name.toLowerCase().includes(filter.toLowerCase())) {
                 setPoliticalEntities(prevEntities => [...prevEntities, entity]);
             }
@@ -221,7 +242,7 @@ function Form1({ setPoliticalEntity }) {
                 <Input type='search' placeholder='Search' value={filter} onChange={handleSearchChange} />
             </InputGroup>
             {
-                (filter.length != 0) ?
+                (filter.length != 0) || (politicalEntity) ?
                     (politicalEntities && politicalEntities.length > 0) ?
                         politicalEntities.map((result) => (
                             <SearchItem key={result.id} result={result} setSelectedEntity={setSelectedEntity} />

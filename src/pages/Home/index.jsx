@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import { useAuthState } from "react-firebase-hooks/auth";
-import { db, auth } from '../../firebase/firebase';
-import { collection, onSnapshot, query, orderBy } from "firebase/firestore";
+import { db, auth, storage } from '../../firebase/firebase';
+import { collection, onSnapshot, query, orderBy, setDoc, doc, arrayUnion } from "firebase/firestore";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 import CollectionsEnum from '../../constants/collections';
 import Post from '../../components/Post';
@@ -42,7 +43,7 @@ import {
 const steps = [
     { title: 'First', description: 'Political Entity' },
     { title: 'Second', description: 'Promise Details' },
-    { title: 'Third', description: 'Sources' },
+    { title: 'Third', description: 'Provide Credible Sources' },
 ]
 
 function Home() {
@@ -52,7 +53,9 @@ function Home() {
     const [politicalEntity, setPoliticalEntity] = useState(null)
     const [title, setTitle] = useState('')
     const [description, setDescription] = useState('')
-    const [sources, setSources] = useState([])
+    const [sources, setSources] = useState([''])
+    const [tags, setTags] = useState([])
+    const [imageFile, setImageFile] = useState(null)
 
     // Post UI state
     const { onClose } = useDisclosure()
@@ -64,6 +67,7 @@ function Home() {
         index: 0,
         count: steps.length,
     })
+    const [isSubmitting, setIsSubmitting] = useState(false)
 
     // Home state
     const [posts, setPosts] = useState([])
@@ -89,7 +93,9 @@ function Home() {
         setPoliticalEntity(null)
         setTitle('')
         setDescription('')
-        setSources([])
+        setImageFile(null)
+        setSources([''])
+        setTags([])
         setStep(1);
         setActiveStep(0);
 
@@ -114,18 +120,28 @@ function Home() {
             })
             return
         }
-        if (step == 2 && ((title == '') || (description == ''))) {
-            toast({
-                title: "Please enter a title and description",
-                position: 'bottom-left',
-                status: 'error',
-                isClosable: true
-            })
-            return
+        if (step == 2) {
+            const errors = {
+                '': 'Please enter a title.',
+                [description]: 'Please enter a description.',
+                [tags.length === 0]: 'Please add at least one tag.',
+                [imageFile === null]: 'Please upload an image.',
+            };
+
+            const errorMessage = errors[true];
+            if (errorMessage) {
+                toast({
+                    title: errorMessage,
+                    position: 'bottom-left',
+                    status: 'error',
+                    isClosable: true
+                });
+                return;
+            }
         }
-        if (step == 3 && sources.length == 0) {
+        if (step == 3 && (sources.length == 0 || tags.length == 0)) {
             toast({
-                title: "Please add at least one source",
+                title: "Please add at least one credible source",
                 position: 'bottom-left',
                 status: 'error',
                 isClosable: true
@@ -136,16 +152,75 @@ function Home() {
         setActiveStep(activeStep + 1);
     }
 
-    const submitPromisePost = () => {
-        setStep(1);
-        setActiveStep(0);
-        toast({
-            title: "Promise Posted Successfully",
-            position: 'bottom-left',
-            status: 'success',
-            isClosable: true
-        })
-        onClose()
+    const submitPromisePost = async () => {
+        try {
+            setIsSubmitting(true)
+            setStep(step + 1);
+
+            // Remove empty sources
+            setSources(sources.filter(source => source !== ''))
+
+            // Upload the entity image to cloud storage
+            const storageRef = ref(storage, `images/${imageFile.name}`);
+            await uploadBytes(storageRef, imageFile);
+            const imageURL = await getDownloadURL(storageRef);
+
+            // Add the post to the database
+            const userData = {
+                id: user.uid,
+                name: user.displayName,
+            }
+
+            const postRef = doc(collection(db, CollectionsEnum.POSTS))
+            const postData = {
+                title: title,
+                description: description,
+                image: imageURL,
+                upvotes: [],
+                views: 0,
+                verifiedUpvotes: [],
+                createdAt: new Date(),
+                updatedAt: new Date(),
+                poster: userData,
+                comments: [],
+                entityId: politicalEntity.id,
+                sources: sources,
+                tags: tags,
+                isMallicious: false,
+                isFake: false,
+            }
+            await setDoc(postRef, postData);
+
+            // Save tags in the promise
+            for (const tag of tags) {
+                const tagRef = doc(db, CollectionsEnum.TAGS, tag)
+                const tagData = {
+                    posts: arrayUnion(postRef.id),
+                    createdAt: new Date(),
+                }
+                await setDoc(tagRef, tagData);
+            }
+
+            // Close modal and show toast
+            closePostFormModal()
+            toast({
+                title: "Promise Posted Successfully",
+                position: 'bottom-left',
+                status: 'success',
+                isClosable: true
+            })
+        }
+        catch (error) {
+            toast({
+                title: "Promise Post Failed",
+                position: 'bottom-left',
+                status: 'error',
+                isClosable: true
+            })
+        }
+        finally {
+            setIsSubmitting(false)
+        }
     }
 
 
@@ -157,7 +232,7 @@ function Home() {
                 <section>
                     {
                         user ?
-                            <div className='flex w-full gap-2 p-3 my-2 rounded-lg bg-bunker'>
+                            <div className='flex w-full gap-2 p-3 mb-2 rounded-lg bg-bunker'>
                                 <Avatar name={user.displayName} />
                                 <button onClick={() => setIsModalOpen(true)} className='w-full bg-midnight p-2 text-left text-periwinkle text-xs rounded-md cursor-text'>
                                     Share a promise a politician has said
@@ -167,13 +242,13 @@ function Home() {
                     }
                     {
                         posts.map(post =>
-                            <Post key={post.id} {...post} />
+                            <Post key={post.id} post={post} user={user}/>
                         )
                     }
                     <Modal isOpen={isModalOpen} onClose={() => setIsAlertOpen(true)} closeOnOverlayClick={false} size='5xl'>
                         <ModalOverlay />
                         <ModalContent className='bg-bunker py-7 mx-5'>
-                            <ModalCloseButton />
+                            <ModalCloseButton isDisabled={isSubmitting}/>
                             <ModalHeader>
                                 <Stepper size='sm' index={activeStep} gap='0'>
                                     {steps.map((step, index) => (
@@ -191,15 +266,24 @@ function Home() {
                             </ModalHeader>
                             <ModalBody>
                                 {
-                                    step === 1 ? <Form1 setPoliticalEntity={setPoliticalEntity} /> :
-                                        step === 2 ? <Form2 politicalEntity={politicalEntity} setTitle={setTitle} setDescription={setDescription} /> :
-                                            <Form3 />
+                                    step === 1 ? <Form1 politicalEntity={politicalEntity} setPoliticalEntity={setPoliticalEntity} /> :
+                                        step === 2 ? <Form2
+                                            politicalEntity={politicalEntity}
+                                            title={title}
+                                            setTitle={setTitle}
+                                            description={description}
+                                            tags={tags}
+                                            setTags={setTags}
+                                            setDescription={setDescription}
+                                            setImageFile={setImageFile}
+                                        /> :
+                                            <Form3 sources={sources} setSources={setSources} />
                                 }
                             </ModalBody>
                             <ModalFooter>
                                 {
                                     step > 1 ?
-                                        <Button colorScheme='gray' mr={3} onClick={previousStep}>
+                                        <Button isDisabled={isSubmitting} colorScheme='gray' mr={3} onClick={previousStep}>
                                             Previous
                                         </Button>
                                         :
@@ -211,7 +295,7 @@ function Home() {
                                             Next
                                         </Button>
                                         :
-                                        <Button colorScheme='blue' mr={3} onClick={submitPromisePost}>
+                                        <Button isLoading={isSubmitting} loadingText='Posting' colorScheme='blue' mr={3} onClick={submitPromisePost}>
                                             Submit
                                         </Button>
                                 }
@@ -224,7 +308,7 @@ function Home() {
                         onClose={onClose}
                     >
                         <AlertDialogOverlay>
-                            <AlertDialogContent>
+                            <AlertDialogContent className='bg-bunker mx-5'>
                                 <AlertDialogHeader fontSize='lg' fontWeight='bold'>
                                     Quit Promise Post
                                 </AlertDialogHeader>

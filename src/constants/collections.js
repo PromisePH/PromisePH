@@ -3,5 +3,6 @@ const CollectionsEnum = {
     USERS: 'users',
     COMMENTS: 'comments',
     ENTITY: 'entity',
+    TAGS: 'tags',
 }
 export default CollectionsEnum;

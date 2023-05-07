@@ -17,7 +17,7 @@ function SearchItem({ result, setSelectedEntity }) {
 
     return (
         <button onClick={() => { setSelectedEntity(result) }} className='w-full flex flex-col md:flex-row items-center justify-between my-2 py-2 px-5 bg-black-pearl focus:bg-midnight rounded-lg cursor-pointer'>
-            <Image src={result.imageURL} alt={result.name} className='w-20 h-20 object-cover' fallbackSrc={FallbackImage} />
+            <Image src={result.imageURL} alt={result.name} className='w-20 h-20 object-cover rounded-md' fallbackSrc={FallbackImage} />
             <h2 className='text-2xl font-extrabold'>{result.name}</h2>
             <p className='text-md'>{result.currentPosition}</p>
             <p className='text-md md:block hidden'>-</p>
