@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 import { db } from '../../firebase/firebase';
 import { doc, arrayUnion, arrayRemove, updateDoc } from "firebase/firestore";
@@ -15,14 +16,24 @@ import { RxDotFilled } from "react-icons/rx";
 function Post({ post, user }) {
   const [isLiked, setIsLiked] = useState(false);
   const [isActive, setIsActive] = useState(false);
-
+  const navigate = useNavigate();
   useEffect(() => {
+    if (user == null) {
+      setIsLiked(false)
+      return
+    }
+
     if (post.upvotes && post.upvotes.includes(user.uid)) {
       setIsLiked(true)
     }
   }, [post]);
 
   const likePost = async () => {
+    if (user == null) {
+      navigate('/login');
+      return
+    }
+
     const postRef = doc(db, CollectionsEnum.POSTS, post.id)
     if (isLiked) {
       setIsLiked(false);
