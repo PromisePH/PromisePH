@@ -59,7 +59,7 @@ function Post({ post, user }) {
         {/* <!-- Content div--> */}
         <div className="w-4/5">
           {/* <!-- Header div--> */}
-          <div className="flex flex-col justify-between">
+          <div className="flex flex-col gap-1">
             <div className="flex flex-row items-center justify-between">
               <a href="#" target="_blank" rel="noopener" className="text-lg md:text-xl font-bold flex-grow">
                 {post.title}
