@@ -54,12 +54,12 @@ function Post({ post, user }) {
       <div className="flex flex-row gap-3">
         {/* <!-- Image div--> */}
         <a href={window.location.href} target="_blank" rel="noreferrer" >
-          <Image src={post.image} alt={post.title} className='w-36 h-36 object-cover rounded-md' fallbackSrc={FallbackImage} />
+          <Image src={post.image} alt={post.title} className='sm:w-36 sm:h-36 w-28 h-28 object-cover rounded-md' fallbackSrc={FallbackImage} />
         </a>
         {/* <!-- Content div--> */}
         <div className="w-4/5">
           {/* <!-- Header div--> */}
-          <div className="">
+          <div className="flex flex-col justify-between">
             <div className="flex flex-row items-center justify-between">
               <a href="#" target="_blank" rel="noopener" className="text-lg md:text-xl font-bold flex-grow">
                 {post.title}
@@ -72,7 +72,7 @@ function Post({ post, user }) {
               </button>
             </div>
 
-            <div className="flex flex-row mt-1 items-center">
+            <div className="flex flex-row items-center">
               {
                 post.verifiedUpvotes ?
                   post.verifiedUpvotes.map((upvote) =>
