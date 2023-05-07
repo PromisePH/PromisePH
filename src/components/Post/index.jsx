@@ -106,5 +106,4 @@ function Post(post) {
     </section>
   );
 }
-
 export default Post;

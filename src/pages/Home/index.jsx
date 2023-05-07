@@ -8,6 +8,7 @@ import PostForm from '../../components/PostForm';
 import Post from '../../components/Post';
 import NavBar from "../../components/NavBar";
 import BottomNav from "../../components/BottomNav";
+import Profile from "../../components/Profile";
 
 function Home() {
     const [user] = useAuthState(auth);
@@ -32,16 +33,7 @@ function Home() {
             <NavBar />
             <main className='py-16 md:pb-0'>
                 <h1>Home</h1>
-                <Post />
-                <Post />
-                <Post />
-                <Post />
-                <Post />
-                <Post />
-                <Post />
-                <Post />
-                <Post />
-                <Post />
+                <Profile />
                 {/* {
                     user ? <PostForm /> : null
                 }
