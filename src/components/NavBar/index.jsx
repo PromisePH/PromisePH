@@ -26,7 +26,7 @@ import { Link as RouteLink } from 'react-router-dom';
 import { signOut } from 'firebase/auth';
 import { Search2Icon, BellIcon } from '@chakra-ui/icons';
 import { AiFillHome } from 'react-icons/ai';
-import { FaCalendarAlt } from 'react-icons/fa';
+// import { FaCalendarAlt } from 'react-icons/fa';
 import { MdOutlinePeopleAlt } from 'react-icons/md';
 
 import IconLink from '../IconLink';
@@ -75,9 +75,9 @@ function NavBar() {
                             <IconLink>
                                 <Icon as={AiFillHome} boxSize={6} />
                             </IconLink>
-                            <IconLink>
+                            {/* <IconLink>
                                 <Icon as={FaCalendarAlt} boxSize={6} />
-                            </IconLink>
+                            </IconLink> */}
                             <IconLink>
                                 <Icon as={MdOutlinePeopleAlt} boxSize={6} />
                             </IconLink>
@@ -95,11 +95,9 @@ function NavBar() {
                     {
                         user ?
                             <HStack spacing={4}>
-                                <Box>
-                                    <IconLink >
-                                        <BellIcon boxSize={6} />
-                                    </IconLink>
-                                </Box>
+                                <IconLink >
+                                    <BellIcon boxSize={6} />
+                                </IconLink>
                                 <Flex alignItems={'center'}>
                                     <Menu>
                                         <MenuButton
@@ -118,12 +116,7 @@ function NavBar() {
                                             </div>
                                         </MenuButton>
                                         <MenuList>
-                                            <div className='block md:hidden'>
-                                                <MenuItem>{user.displayName}</MenuItem>
-                                                <MenuDivider />
-                                            </div>
-                                            <MenuItem>Link 1</MenuItem>
-                                            <MenuItem>Link 2</MenuItem>
+                                            <MenuItem>{user.displayName}</MenuItem>
                                             <MenuDivider />
                                             <MenuItem onClick={handleLogout}>Logout</MenuItem>
                                         </MenuList>
