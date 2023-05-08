@@ -19,6 +19,7 @@ import PoliticianCards from '../../components/PoliticianCards';
 
 function Login() {
     const [user] = useAuthState(auth);
+    const [isLoading, setIsLoading] = useState(false);
 
     const navigate = useNavigate();
     useEffect(() => {
@@ -46,6 +47,7 @@ function Login() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
+            setIsLoading(true);
             await signInWithEmailAndPassword(auth, email, password);
             toast({
                 title: "Login Successful.",
@@ -61,6 +63,8 @@ function Login() {
                 status: 'error',
                 isClosable: true
             })
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -89,6 +93,7 @@ function Login() {
                         <Button
                             colorScheme="gray"
                             type='submit'
+                            isLoading={isLoading}
                         >
                             Login
                         </Button>
@@ -98,6 +103,7 @@ function Login() {
                         <Button
                             className='w-full'
                             type='submit'
+                            isLoading={isLoading}
                         >
                             Signup
                         </Button>
