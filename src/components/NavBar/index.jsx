@@ -1,6 +1,6 @@
 import React from 'react';
 import Logo from "../../assets/img/PromisePH_logo.png";
-
+import { useNavigate } from "react-router-dom";
 import {
     Box,
     Flex,
@@ -51,6 +51,7 @@ const NavLink = ({ children }) => (
 function NavBar() {
     const [user] = useAuthState(auth);
     const { isOpen } = useDisclosure();
+    const navigate = useNavigate();
     const handleLogout = async () => {
         try {
             await signOut(auth);
@@ -119,10 +120,8 @@ function NavBar() {
                                                 </div>
                                             </MenuButton>
                                             <MenuList>
-                                                <div className='block md:hidden'>
-                                                    <MenuItem>{user.displayName}</MenuItem>
-                                                    <MenuDivider />
-                                                </div>
+                                                <MenuItem onClick={()=>{navigate("/profile")}}>{user.displayName}</MenuItem>
+                                                <MenuDivider />
                                                 <MenuItem>Link 1</MenuItem>
                                                 <MenuItem>Link 2</MenuItem>
                                                 <MenuDivider />
