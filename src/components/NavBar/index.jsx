@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import Logo from "../../assets/img/PromisePH_logo.png";
-
 import {
     Box,
     Flex,
@@ -21,20 +20,6 @@ import {
     InputGroup,
     InputLeftElement,
     Input,
-    Popover,
-    PopoverTrigger,
-    PopoverContent,
-    PopoverHeader,
-    PopoverBody,
-    PopoverFooter,
-    PopoverArrow,
-    PopoverCloseButton,
-    PopoverAnchor,
-    List,
-    ListItem,
-    ListIcon,
-    OrderedList,
-    UnorderedList,
 } from '@chakra-ui/react';
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from '../../firebase/firebase';
@@ -127,7 +112,6 @@ function NavBar() {
                                             onBlur={() => {
                                                 setInputStatus(false);
                                             }}
-                                            on
                                         />
                                     </InputGroup>
                                 </form>

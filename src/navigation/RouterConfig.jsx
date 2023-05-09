@@ -12,7 +12,7 @@ import Settings from "../pages/Settings";
 import Menu from "../components/Search/menu";
 import IndivPost from '../components/Search/IndivPost'
 import PrivateRoute from "./PrivateRoute";
-
+import Promise from "../pages/Promise";
 const RouterConfig = () => {
 	return (
 		<Routes>
@@ -24,9 +24,9 @@ const RouterConfig = () => {
 			</Route>
 			<Route path="searchmenu/:pID" element={<Menu/>}/>
 			<Route path="post/:postID" element={<IndivPost/>}/>
+			<Route path="promise/:promiseID" element={<Promise />}/>
 			<Route path="*" element={<Navigate to="/" />}></Route>
 		</Routes>
 	);
 }
-
 export default RouterConfig;

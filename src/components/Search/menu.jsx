@@ -1,13 +1,13 @@
+import React from "react";
 import { useParams } from "react-router-dom";
 import { db } from "../../firebase/firebase";
 import { collection, getDocs } from "firebase/firestore";
-import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-// import SearchPostList from "./sample";
+import { Spinner } from '@chakra-ui/react'
+import Post from "../Post";
 function Menu() {
-    const [postsData, setPostsData] = useState([]);
+    const [postsData, setPostsData] = useState("initial");
     const params = useParams();
-    const navigate = useNavigate();
     const promiseID = params.pID;
     useEffect(() => {
         async function fetchData() {
@@ -25,23 +25,28 @@ function Menu() {
 
         fetchData();
     }, []);
-    return (
+    return postsData === "initial" ?
         <>
-            <main className='py-16 md:pb-0'>
-                {
-                    postsData.map((i) => {
-                        return (
-                            <a onClick={() => {
-                                navigate(`post/${i.id}`)
-                            }}>
-                                {i.title}
-                            </a>
-                        );
-                    })
-                }
-            </main>
+            <div className='py-16 flex justify-center'>
+                <div className="m-10"><Spinner /></div>
+            </div>
         </>
-    );
+        :
+        postsData.length > 0 ?
+            <>
+                <main className='py-16 md:pb-0'>
+                    {
+                        postsData.map((i) => {
+                            return <Post info={i} key={i.id} />
+                        })
+                    }
+                </main>
+            </>
+            :
+            <>
+                <div className='py-16 flex justify-center'>
+                    <div className="m-10">NO PROMISE FOUND</div>
+                </div>
+            </>
 }
-
 export default Menu;
