@@ -61,7 +61,6 @@ function Post({ post, user }) {
           <span className="text-white text-1xs md:text-sm font-bold">{post.poster.name}</span>
           <button
             onClick={() => setIsActive(!isActive)}
-            className=""
           >
             {isActive ? <RxDotFilled /> : <RxDot />}
           </button>
