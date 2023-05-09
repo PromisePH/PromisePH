@@ -19,6 +19,7 @@ import Logo from "../../assets/img/PromisePH_logo.png";
 
 function Signup() {
     const [user] = useAuthState(auth);
+    const [isLoading, setIsLoading] = useState(false);
 
     const navigate = useNavigate();
     useEffect(() => {
@@ -44,9 +45,29 @@ function Signup() {
         }));
     };
 
+    const mapAuthCodeToMessage = (authCode) => {
+        switch (authCode) {
+            case "auth/invalid-password":
+                return "Password provided is not corrected";
+            case "auth/invalid-email":
+                return "Email provided is invalid";
+            case "auth/email-already-in-use":
+                return "Email provided is already in use";
+            case "auth/credential-already-in-use":
+                return "Email provided is already in use";
+            case "auth/weak-password":
+                return "Password must be at least 6 characters";
+            case "auth/user-not-found":
+                return "User account has been disabled";
+            default:
+                return "Please try again.";
+        }
+    }
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
+            setIsLoading(true);
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
             await updateProfile(userCredential.user, { displayName: username });
             await sendEmailVerification(userCredential.user);
@@ -57,14 +78,17 @@ function Signup() {
                 isClosable: true
             })
         } catch (error) {
-            const errorMessage = error.message;
-            console.error(errorMessage);
+            console.error(error.message);
+            const errorMessage = mapAuthCodeToMessage(error.code);
             toast({
-                title: "Signup Failed. Incorrect email or password.",
+                title: `Signup Failed. ${errorMessage}`,
                 position: 'bottom-left',
                 status: 'error',
                 isClosable: true
             })
+        }
+        finally {
+            setIsLoading(false);
         }
     };
 
@@ -97,6 +121,7 @@ function Signup() {
                         <Button
                             colorScheme="gray"
                             type='submit'
+                            isLoading={isLoading}
                         >
                             Signup
                         </Button>
@@ -104,6 +129,7 @@ function Signup() {
                     <Divider orientation='horizontal' />
                     <Link as={RouteLink} to='/login' className='w-full' colorScheme="gray">
                         <Button
+                            isLoading={isLoading}
                             className='w-full'
                             type='submit'
                         >

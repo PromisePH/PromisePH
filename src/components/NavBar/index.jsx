@@ -3,7 +3,6 @@ import Logo from "../../assets/img/PromisePH_logo.png";
 import {
     Box,
     Flex,
-    Avatar,
     HStack,
     VStack,
     Link,
@@ -27,11 +26,12 @@ import { Link as RouteLink } from 'react-router-dom';
 import { signOut } from 'firebase/auth';
 import { Search2Icon, BellIcon } from '@chakra-ui/icons';
 import { AiFillHome } from 'react-icons/ai';
-import { FaCalendarAlt } from 'react-icons/fa';
+// import { FaCalendarAlt } from 'react-icons/fa';
 import { MdOutlinePeopleAlt } from 'react-icons/md';
 import { useNavigate } from 'react-router-dom';
 import IconLink from '../IconLink';
 import SearchList from '../Search/index';
+import Avatar from '../Avatar';
 
 const Links = ['Dashboard', 'Projects', 'Team'];
 
@@ -65,119 +65,110 @@ function NavBar() {
         }
     };
     function handleSearchSubmit(data) {
-        navigate(`searchmenu/${data}`);
+        navigate(`/searchmenu/${data}`);
     }
     return (
-        <div className='bg-bunker fixed w-full h-15 z-10'>
-            <Box bg={useColorModeValue('white', 'bunker')} px={4}>
-                <div className='h-16 flex items-center justify-between md:justify-center md:gap-x-20'>
-                    <Link as={RouteLink} to='/' style={{ textDecoration: 'none' }}>
-                        <div className='no-underline flex flex-row items-center min-w-fit'>
-                            <img src={Logo} alt="PromisePH Logo" className="h-10 min-w-fit" />
-                            <span className='text-center ml-2 text-orange-red font-extrabold text-2xl hidden md:block'>PromisePH</span>
-                        </div>
-                    </Link>
-                    <div className='flex flex-row gap-x-5'>
-                        <HStack spacing={8} as={'nav'} alignItems={'center'}>
-                            <HStack spacing={8} as={'nav'} alignItems={'center'} display={{ base: 'none', md: 'flex' }}>
-                                <IconLink>
-                                    <Icon as={AiFillHome} boxSize={6} />
-                                </IconLink>
-                                <IconLink>
-                                    <Icon as={FaCalendarAlt} boxSize={6} />
-                                </IconLink>
-                                <IconLink>
-                                    <Icon as={MdOutlinePeopleAlt} boxSize={6} />
-                                </IconLink>
-                            </HStack>
-                            <VStack align="stretch">
-                                <form onSubmit={(e) => { e.preventDefault; handleSearchSubmit(searchInput); }}>
-                                    <InputGroup>
-                                        <InputLeftElement
-                                            pointerEvents='none'
-                                        >
-                                            <Search2Icon color='gray.300' />
-                                        </InputLeftElement>
-
-                                        <Input
-                                            type='search'
-                                            placeholder='Search'
-                                            value={searchInput}
-                                            onChange={(e) => {
-                                                searchInputUpdate(e.target.value);
-                                            }}
-                                            onFocus={() => {
-                                                setInputStatus(true);
-                                            }}
-                                            onBlur={() => {
-                                                setInputStatus(false);
-                                            }}
-                                        />
-                                    </InputGroup>
-                                </form>
-
-                                <SearchList val={searchInput.toLowerCase()} visible={inputIsActive} />
-                            </VStack>
-                        </HStack>
-
-                        {
-                            user ?
-                                <HStack spacing={4}>
-                                    <Box>
-                                        <IconLink >
-                                            <BellIcon boxSize={6} />
-                                        </IconLink>
-                                    </Box>
-                                    <Flex alignItems={'center'}>
-                                        <Menu>
-                                            <MenuButton
-                                                as={Button}
-                                                rounded={'full'}
-                                                variant={'link'}
-                                                cursor={'pointer'}
-                                                minW={0}>
-                                                <Avatar
-                                                    size={'sm'}
-                                                    src={
-                                                        'https://images.unsplash.com/photo-1493666438817-866a91353ca9?ixlib=rb-0.3.5&q=80&fm=jpg&crop=faces&fit=crop&h=200&w=200&s=b616b2c5b373a80ffc9636ba24f7a4a9'
-                                                    }
-                                                />
-                                            </MenuButton>
-                                            <MenuList>
-                                                <MenuItem>Link 1</MenuItem>
-                                                <MenuItem>Link 2</MenuItem>
-                                                <MenuDivider />
-                                                <MenuItem onClick={handleLogout}>Logout</MenuItem>
-                                            </MenuList>
-                                        </Menu>
-                                    </Flex>
-                                    <Box display={{ base: 'none', md: 'block' }}>
-                                        User Name
-                                    </Box>
-                                </HStack>
-                                :
-                                <Link as={RouteLink} to='/login'>
-                                    <button className='no-underline bg-orange-red hover:bg-burning-orange text-white font-bold rounded-lg py-2 px-3'>
-                                        Login
-                                    </button>
-                                </Link>
-                        }
+        <Box bg={useColorModeValue('white', 'bunker')} className='bg-bunker fixed w-full h-16 z-10 flex gap-2'>
+            <div className='h-full w-full flex items-center justify-between md:justify-center md:gap-x-20 gap-2 px-2'>
+                <Link as={RouteLink} to='/' style={{ textDecoration: 'none' }} className='min-w-fit'>
+                    <div className='no-underline flex flex-row items-center min-w-fit'>
+                        <img src={Logo} alt="PromisePH Logo" className="h-10 min-w-fit" />
+                        <span className='text-center ml-2 text-orange-red font-extrabold text-2xl hidden md:block'>PromisePH</span>
                     </div>
+                </Link>
+                <div className='flex flex-row gap-1 md:gap-5'>
+                    <div className='flex flex-row items-center gap-5 w-3/4'>
+                        <div className='flex-row items-center gap-5 hidden md:flex'>
+                            <IconLink>
+                                <Icon as={AiFillHome} boxSize={6} />
+                            </IconLink>
+                            {/* <IconLink>
+                                <Icon as={FaCalendarAlt} boxSize={6} />
+                            </IconLink> */}
+                            <IconLink>
+                                <Icon as={MdOutlinePeopleAlt} boxSize={6} />
+                            </IconLink>
+                        </div>
+                        <VStack align="stretch">
+                            <form onSubmit={(e) => { e.preventDefault(); handleSearchSubmit(searchInput); }}>
+                                <InputGroup className='m-0'>
+                                    <InputLeftElement
+                                        pointerEvents='none'
+                                    >
+                                        <Search2Icon color='gray.300' />
+                                    </InputLeftElement>
+                                    <Input
+                                        type='search'
+                                        placeholder='Search'
+                                        value={searchInput}
+                                        onChange={(e) => {
+                                            searchInputUpdate(e.target.value);
+                                        }}
+                                        onFocus={() => {
+                                            setInputStatus(true);
+                                        }}
+                                        onBlur={() => {
+                                            setInputStatus(false);
+                                        }}
+                                    />
+                                </InputGroup>
+                            </form>
+                            <SearchList val={searchInput.toLowerCase()} visible={inputIsActive} />
+                        </VStack>
+                    </div>
+
+                    {
+                        user ?
+                            <HStack spacing={4}>
+                                <IconLink >
+                                    <BellIcon boxSize={6} />
+                                </IconLink>
+                                <Flex alignItems={'center'}>
+                                    <Menu>
+                                        <MenuButton
+                                            as={Button}
+                                            rounded={'full'}
+                                            variant={'link'}
+                                            cursor={'pointer'}
+                                            minW={0}>
+                                            <div className='flex flex-row gap-2 items-center justify-center no-underline'>
+                                                <Avatar
+                                                    name={user.displayName}
+                                                />
+                                                <span className='hidden lg:inline-block'>
+                                                    {user.displayName}
+                                                </span>
+                                            </div>
+                                        </MenuButton>
+                                        <MenuList>
+                                            <MenuItem>{user.displayName}</MenuItem>
+                                            <MenuDivider />
+                                            <MenuItem onClick={handleLogout}>Logout</MenuItem>
+                                        </MenuList>
+                                    </Menu>
+                                </Flex>
+                            </HStack>
+                            :
+                            <Link as={RouteLink} to='/login'>
+                                <button className='no-underline bg-orange-red hover:bg-burning-orange text-white font-bold rounded-lg py-2 px-3'>
+                                    Login
+                                </button>
+                            </Link>
+                    }
                 </div>
+            </div>
 
-                {isOpen ? (
-                    <Box pb={4} display={{ md: 'none' }}>
-                        <Stack as={'nav'} spacing={4}>
-                            {Links.map((link) => (
-                                <NavLink key={link}>{link}</NavLink>
-                            ))}
+            {isOpen ? (
+                <Box pb={4} display={{ md: 'none' }}>
+                    <Stack as={'nav'} spacing={4}>
+                        {Links.map((link) => (
+                            <NavLink key={link}>{link}</NavLink>
+                        ))}
 
-
-                        </Stack>
-                    </Box>
-                ) : null}
-            </Box>
-        </div >
+                    </Stack>
+                </Box>
+            ) : null}
+        </Box>
     );
 }
 

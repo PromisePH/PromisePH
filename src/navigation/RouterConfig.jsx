@@ -9,8 +9,7 @@ import Home from "../pages/Home";
 import Signup from "../pages/Signup";
 import Login from "../pages/Login";
 import Settings from "../pages/Settings";
-import Menu from "../components/Search/menu";
-import IndivPost from '../components/Search/IndivPost'
+import Menu from "../pages/SearchMenu/Menu";
 import PrivateRoute from "./PrivateRoute";
 import Promise from "../pages/Promise";
 const RouterConfig = () => {
@@ -22,9 +21,8 @@ const RouterConfig = () => {
 			<Route exact path='/settings' element={<PrivateRoute />}>
 				<Route path="/settings" element={<Settings />}></Route>
 			</Route>
-			<Route path="searchmenu/:pID" element={<Menu/>}/>
-			<Route path="post/:postID" element={<IndivPost/>}/>
-			<Route path="promise/:promiseID" element={<Promise />}/>
+			<Route exact path="/searchmenu/:pID" element={<Menu/>}/>
+			<Route exact path="/promise/:promiseID" element={<Promise />}/>
 			<Route path="*" element={<Navigate to="/" />}></Route>
 		</Routes>
 	);

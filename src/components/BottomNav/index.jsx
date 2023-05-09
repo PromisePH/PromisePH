@@ -2,7 +2,7 @@ import React from 'react';
 import IconLink from '../IconLink';
 
 import { AiFillHome } from 'react-icons/ai';
-import { FaCalendarAlt } from 'react-icons/fa';
+// import { FaCalendarAlt } from 'react-icons/fa';
 import { MdOutlinePeopleAlt } from 'react-icons/md';
 import { Icon } from '@chakra-ui/react';
 function BottomNav() {
@@ -11,9 +11,9 @@ function BottomNav() {
             <IconLink>
                 <Icon as={AiFillHome} boxSize={6} />
             </IconLink>
-            <IconLink>
+            {/* <IconLink>
                 <Icon as={FaCalendarAlt} boxSize={6} />
-            </IconLink>
+            </IconLink> */}
             <IconLink>
                 <Icon as={MdOutlinePeopleAlt} boxSize={6} />
             </IconLink>

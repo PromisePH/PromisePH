@@ -10,9 +10,6 @@ import { useParams } from "react-router-dom";
 import Comment from "../../components/Comment";
 import { Spinner } from '@chakra-ui/react';
 function Promise() {
-    const refreshPage = () => {
-        window.location.reload();
-    };
     const [data, setPromiseData] = useState('empty');
     const [isLiked, setIsLiked] = useState(false);
     const [isActive, setIsActive] = useState(false);
@@ -31,7 +28,7 @@ function Promise() {
             });
         }
         fetchData();
-    }, []);
+    }, [params.promiseID]);
     console.log(data);
     return data === 'empty' ? (
         <>
@@ -111,7 +108,7 @@ function Promise() {
                         </div>
                     </div>
                 </main>
-                <Comment id={data.id}/>
+                <Comment id={params.promiseID}/>
             </>
         )
     //     [["1st Comment", 
