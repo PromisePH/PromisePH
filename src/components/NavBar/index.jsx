@@ -1,10 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Logo from "../../assets/img/PromisePH_logo.png";
-
 import {
     Box,
     Flex,
     HStack,
+    VStack,
     Link,
     Icon,
     Button,
@@ -28,8 +28,9 @@ import { Search2Icon, BellIcon } from '@chakra-ui/icons';
 import { AiFillHome } from 'react-icons/ai';
 // import { FaCalendarAlt } from 'react-icons/fa';
 import { MdOutlinePeopleAlt } from 'react-icons/md';
-
+import { useNavigate } from 'react-router-dom';
 import IconLink from '../IconLink';
+import SearchList from '../Search/index';
 import Avatar from '../Avatar';
 
 const Links = ['Dashboard', 'Projects', 'Team'];
@@ -49,8 +50,11 @@ const NavLink = ({ children }) => (
 );
 
 function NavBar() {
+    const [searchInput, searchInputUpdate] = useState('');
+    const [inputIsActive, setInputStatus] = useState(false);
     const [user] = useAuthState(auth);
     const { isOpen } = useDisclosure();
+    const navigate = useNavigate();
     const handleLogout = async () => {
         try {
             await signOut(auth);
@@ -60,6 +64,9 @@ function NavBar() {
             console.error(errorMessage)
         }
     };
+    function handleSearchSubmit(data) {
+        navigate(`/searchmenu/${data}`);
+    }
     return (
         <Box bg={useColorModeValue('white', 'bunker')} className='bg-bunker fixed w-full h-16 z-10 flex gap-2'>
             <div className='h-full w-full flex items-center justify-between md:justify-center md:gap-x-20 gap-2 px-2'>
@@ -82,14 +89,32 @@ function NavBar() {
                                 <Icon as={MdOutlinePeopleAlt} boxSize={6} />
                             </IconLink>
                         </div>
-                        <InputGroup className='m-0 '>
-                            <InputLeftElement
-                                pointerEvents='none'
-                            >
-                                <Search2Icon color='gray.300' />
-                            </InputLeftElement>
-                            <Input type='search' placeholder='Search' className='' />
-                        </InputGroup>
+                        <VStack align="stretch">
+                            <form onSubmit={(e) => { e.preventDefault(); handleSearchSubmit(searchInput); }}>
+                                <InputGroup className='m-0'>
+                                    <InputLeftElement
+                                        pointerEvents='none'
+                                    >
+                                        <Search2Icon color='gray.300' />
+                                    </InputLeftElement>
+                                    <Input
+                                        type='search'
+                                        placeholder='Search'
+                                        value={searchInput}
+                                        onChange={(e) => {
+                                            searchInputUpdate(e.target.value);
+                                        }}
+                                        onFocus={() => {
+                                            setInputStatus(true);
+                                        }}
+                                        onBlur={() => {
+                                            setInputStatus(false);
+                                        }}
+                                    />
+                                </InputGroup>
+                            </form>
+                            <SearchList val={searchInput.toLowerCase()} visible={inputIsActive} />
+                        </VStack>
                     </div>
 
                     {

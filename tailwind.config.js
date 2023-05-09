@@ -23,6 +23,8 @@ export default {
         'burning-orange': '#FF6934',
         'periwinkle': '#C5D0E6',
         'caribbean-green': '#00CC8D',
+        'black-russian': '#1A1A1B',
+        'aluminium': '#818384',
       },
       fontSize: {
         '1xs': ['0.625em', '0.75rem'], /* 10px */
