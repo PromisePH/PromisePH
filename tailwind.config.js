@@ -28,10 +28,6 @@ export default {
         '1xs': ['0.625em', '0.75rem'], /* 10px */
         '2xs': ['0.50em', '0.50rem'], /* 8px */
       },
-      gap: {
-        '2px': '0.125rem', /* 2px */
-        '6px': '0.378rem' /* 6px */
-      }
     }
   },
   plugins: [],

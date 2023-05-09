@@ -39,7 +39,6 @@ function Post({ post, user }) {
       navigate('/login');
       return
     }
-
     const postRef = doc(db, CollectionsEnum.POSTS, post.id)
     if (isLiked) {
       setIsLiked(false);
@@ -53,7 +52,6 @@ function Post({ post, user }) {
       });
     }
   }
-
   return (
     <section className="max-w-3xl mx-auto bg-bunker shadow-md rounded-lg p-4 mb-4">
       <div className="flex md:hidden flex-row items-center">
@@ -80,8 +78,8 @@ function Post({ post, user }) {
               <a href="#" target="_blank" rel="noopener" className="text-lg md:text-xl font-bold flex-grow">
                 {post.title}
               </a>
-              <div className="text-2xl flex flex-col items-center">
-              <button>
+              <div className="text-2xl flex flex-col items-center gap-1">
+              <button className="hover:bg-gray-700 px-1 rounded-full">
                 {
                   isPoster ?
                     <GoKebabHorizontal />
@@ -96,7 +94,6 @@ function Post({ post, user }) {
               </button>
               </div>
             </div>
-
             <div className="flex flex-row items-center">
               {
                 post.verifiedUpvotes ?
@@ -121,20 +118,17 @@ function Post({ post, user }) {
               
             </div>
           </div>
-
           {/* <!-- Footer div--> */}
           <div className="hidden sm:flex flex-row items-center mt-6">
             <a href={window.location.href} target="_blank" rel="noreferrer" className="hidden md:flex flex-row items-center mr-6">
               <div className="min-w-8 h-8 rounded-full mr-2">
                 <Avatar name={post.poster.name} alt={post.poster.name} />
               </div>
-
               <div className="flex flex-col">
                 <div className="flex items-center">
                   <span className="text-white text-sm font-bold">{post.poster.name}</span>
                   <button
                     onClick={() => setIsActive(!isActive)}
-                    className=""
                   >
                     {isActive ? <RxDotFilled /> : <RxDot />}
                   </button>

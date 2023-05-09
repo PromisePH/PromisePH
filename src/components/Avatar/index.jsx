@@ -18,6 +18,7 @@ function Avatar({ name }) {
         }).toDataUriSync();
     }, []);
     return (
+        
         <img src={avatar} alt={name} className='rounded-lg min-w-fit' />
     );
 }
