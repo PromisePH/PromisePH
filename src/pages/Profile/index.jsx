@@ -100,7 +100,7 @@ function Profile() {
     return (
         <>
             <NavBar />
-            <main className='px-4 py-20 md:pb-0 flex flex-col items-center w-full gap-5'>
+            <main className='px-4 py-20 md:pb-0 flex flex-col items-center w-full'>
                 <section className="bg-bunker p-5 rounded-lg w-full max-w-3xl flex flex-col gap-1">
                     {/* Page Title */}
                     <h1 className='text-2xl font-bold text-center'>Profile</h1>
@@ -139,8 +139,8 @@ function Profile() {
                         </div>
                     </div>
                 </section>
-                <Tabs className="w-full max-w-3xl" defaultIndex={0} align="center" variant='unstyled'>
-                    <TabList className="md:gap-24 font-semibold flex-wrap">
+                <Tabs className="w-full max-w-3xl" defaultIndex={0} align="center" variant='unstyled' >
+                    <TabList className="md:gap-24 font-semibold flex-wrap bg-bunker p-1">
                         <Tab className="border-b-4 rounded-sm border-transparent hover:border-orange-500 focus:border-orange-red">Posts</Tab>
                         <Tab className="border-b-4 rounded-sm border-transparent hover:border-orange-500 focus:border-orange-red">Comments</Tab>
                         <Tab className="border-b-4 rounded-sm border-transparent hover:border-orange-500 focus:border-orange-red">Upvotes</Tab>
