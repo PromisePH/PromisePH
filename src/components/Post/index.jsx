@@ -19,6 +19,12 @@ function Post({ post, user }) {
   const [isPoster, setIsPoster] = useState(false);
   const [isActive, setIsActive] = useState(false);
   const navigate = useNavigate();
+  const d1 = post.createdAt.toDate();
+  const d2 = new Date();
+  const diffDays = Math.round((d2.getTime() - d1.getTime()) / (1000 * 60 * 60 * 24));
+  const yearDiff = d2.getFullYear() - d1.getFullYear();
+  const monthDiff = d2.getMonth() - d1.getMonth();
+  const totalMonthDiff = yearDiff * 12 + monthDiff;
   useEffect(() => {
     if (user == null || post == null) {
       setIsLiked(false)
@@ -63,7 +69,13 @@ function Post({ post, user }) {
             {isActive ? <RxDotFilled /> : <RxDot />}
           </button>
         </a>
-        <span className="text-white text-1xs md:text-sm">1 day ago</span>
+        <span className="text-white text-1xs md:text-sm">
+          {diffDays <= 31 ? diffDays + " Day/s ago"
+            : yearDiff > 0 ? yearDiff + " Year/s ago"
+              : totalMonthDiff <= 12 && totalMonthDiff != 0 ? totalMonthDiff + " Month/s ago"
+                : diffDays + "Day/s ago"
+          }
+        </span>
       </div>
       <div className="flex flex-row gap-3">
         {/* <!-- Image div--> */}
@@ -133,7 +145,13 @@ function Post({ post, user }) {
                     {isActive ? <RxDotFilled /> : <RxDot />}
                   </button>
                 </div>
-                <span className="text-white text-sm">1 day ago</span>
+                <span className="text-white text-sm">
+                  {diffDays <= 31 ? diffDays + " dy. ago"
+                    : yearDiff > 0 ? yearDiff + " yr. ago"
+                      : totalMonthDiff <= 12 && totalMonthDiff != 0 ? totalMonthDiff + " mo. ago"
+                        : diffDays + "dy. ago"
+                  }
+                </span>
               </div>
             </a>
             <div className="flex flex-row items-center gap-12">
