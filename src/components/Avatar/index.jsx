@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { createAvatar } from '@dicebear/core';
 import { bigSmile } from '@dicebear/collection';
-function Avatar({ name }) {
+function Avatar({ name, styles }) {
     const avatar = useMemo(() => {
         return createAvatar(bigSmile, {
             size: 32,
@@ -18,8 +18,7 @@ function Avatar({ name }) {
         }).toDataUriSync();
     }, []);
     return (
-        
-        <img src={avatar} alt={name} className='rounded-lg min-w-fit' />
+        <img src={avatar} alt={name} className={styles} />
     );
 }
 

@@ -110,6 +110,7 @@ function NavBar() {
                                             <div className='flex flex-row gap-2 items-center justify-center no-underline'>
                                                 <Avatar
                                                     name={user.displayName}
+                                                    styles='rounded-lg min-w-fit'
                                                 />
                                                 <span className='hidden lg:inline-block'>
                                                     {user.displayName}

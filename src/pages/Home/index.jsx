@@ -229,11 +229,11 @@ function Home() {
         <>
             <NavBar /> 
                 <main className='px-4 py-20 md:pb-0 flex flex-col items-center w-full'>      
-                    <section>
+                    <section className='max-w-3xl w-full'>
                         {
                             user ?
                                 <div className='flex w-full gap-2 p-3 mb-2 rounded-lg bg-bunker'>
-                                    <Avatar name={user.displayName} />
+                                    <Avatar name={user.displayName} styles='rounded-lg min-w-fit' />
                                     <button onClick={() => setIsModalOpen(true)} className='w-full bg-midnight p-2 text-left text-periwinkle text-xs rounded-md cursor-text'>
                                         Share a promise a politician has said
                                     </button>

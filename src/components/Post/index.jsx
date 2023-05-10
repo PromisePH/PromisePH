@@ -79,7 +79,7 @@ function Post({ post, user }) {
                 {post.title}
               </a>
               <div className="text-2xl flex flex-col items-center gap-1">
-              <button className="hover:bg-gray-700 px-1 rounded-full">
+              <button className="hover:bg-gray-700 p-1 rounded-full">
                 {
                   isPoster ?
                     <GoKebabHorizontal />
@@ -122,7 +122,7 @@ function Post({ post, user }) {
           <div className="hidden sm:flex flex-row items-center mt-6">
             <a href={window.location.href} target="_blank" rel="noreferrer" className="hidden md:flex flex-row items-center mr-6">
               <div className="min-w-8 h-8 rounded-full mr-2">
-                <Avatar name={post.poster.name} alt={post.poster.name} />
+                <Avatar name={post.poster.name}  styles='rounded-lg min-w-fit' alt={post.poster.name} />
               </div>
               <div className="flex flex-col">
                 <div className="flex items-center">
