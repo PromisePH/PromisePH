@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { updateProfile } from 'firebase/auth';
 import { collection, onSnapshot, query, orderBy } from "firebase/firestore";
 import { db, auth } from '../../firebase/firebase';
+import { useNavigate } from "react-router-dom";
 
 import NavBar from "../../components/NavBar";
 import BottomNav from "../../components/BottomNav";
@@ -62,9 +63,11 @@ function Profile() {
     const [user] = useAuthState(auth);
     const [posts, setPosts] = useState([])
     const [name, setName] = useState('')
+    const navigate = useNavigate();
     useEffect(() => {
         // Realtime listener for posts
         if (!user) {
+            navigate('/login')
             return;
         }
 
