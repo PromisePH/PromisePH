@@ -12,9 +12,11 @@ import { AiOutlineHeart } from "react-icons/ai";
 import { AiFillHeart } from "react-icons/ai";
 import { RxDot } from "react-icons/rx";
 import { RxDotFilled } from "react-icons/rx";
+import { GoKebabHorizontal } from "react-icons/go";
 
 function Post({ post, user }) {
   const [isLiked, setIsLiked] = useState(false);
+  const [isPoster, setIsPoster] = useState(false);
   const [isActive, setIsActive] = useState(false);
   const navigate = useNavigate();
   const d1 = post.createdAt.toDate();
@@ -24,9 +26,13 @@ function Post({ post, user }) {
   const monthDiff = d2.getMonth() - d1.getMonth();
   const totalMonthDiff = yearDiff * 12 + monthDiff;
   useEffect(() => {
-    if (user == null) {
+    if (user == null || post == null) {
       setIsLiked(false)
       return
+    }
+
+    if (user.uid === post.poster.id) {
+      setIsPoster(true)
     }
 
     if (post.upvotes && post.upvotes.includes(user.uid)) {
@@ -39,7 +45,6 @@ function Post({ post, user }) {
       navigate('/login');
       return
     }
-
     const postRef = doc(db, CollectionsEnum.POSTS, post.id)
     if (isLiked) {
       setIsLiked(false);
@@ -53,7 +58,6 @@ function Post({ post, user }) {
       });
     }
   }
-
   return (
     <section className="max-w-3xl mx-auto bg-bunker shadow-md rounded-lg p-4 mb-4">
       <div className="flex md:hidden flex-row items-center">
@@ -61,7 +65,6 @@ function Post({ post, user }) {
           <span className="text-white text-1xs md:text-sm font-bold">{post.poster.name}</span>
           <button
             onClick={() => setIsActive(!isActive)}
-            className=""
           >
             {isActive ? <RxDotFilled /> : <RxDot />}
           </button>
@@ -87,14 +90,22 @@ function Post({ post, user }) {
               <a href="#" target="_blank" rel="noopener" className="text-lg md:text-xl font-bold flex-grow">
                 {post.title}
               </a>
+              <div className="text-2xl flex flex-col items-center gap-1">
+              <button className="hover:bg-gray-700 p-1 rounded-full">
+                {
+                  isPoster ?
+                    <GoKebabHorizontal />
+                    : null
+                }
+              </button>
               <button
                 onClick={likePost}
                 className="text-orange-red text-2xl transform hover:scale-110"
               >
                 {isLiked ? <AiFillHeart /> : <AiOutlineHeart />}
               </button>
+              </div>
             </div>
-
             <div className="flex flex-row items-center">
               {
                 post.verifiedUpvotes ?
@@ -116,22 +127,20 @@ function Post({ post, user }) {
                     : null
                 }
               </div>
+              
             </div>
           </div>
-
           {/* <!-- Footer div--> */}
           <div className="hidden sm:flex flex-row items-center mt-6">
             <a href={window.location.href} target="_blank" rel="noreferrer" className="hidden md:flex flex-row items-center mr-6">
               <div className="min-w-8 h-8 rounded-full mr-2">
-                <Avatar name={post.poster.displayName} alt={post.poster.displayName} />
+                <Avatar name={post.poster.name}  styles='rounded-lg min-w-fit' alt={post.poster.name} />
               </div>
-
               <div className="flex flex-col">
                 <div className="flex items-center">
                   <span className="text-white text-sm font-bold">{post.poster.name}</span>
                   <button
                     onClick={() => setIsActive(!isActive)}
-                    className=""
                   >
                     {isActive ? <RxDotFilled /> : <RxDot />}
                   </button>
@@ -151,7 +160,6 @@ function Post({ post, user }) {
               <span className="text-white text-xs md:text-sm">{post.comments.length} Comments</span>
             </div>
           </div>
-
         </div>
       </div>
       <div className="flex sm:hidden flex-row items-center pt-3 gap-12">
@@ -162,5 +170,4 @@ function Post({ post, user }) {
     </section>
   );
 }
-
 export default Post;
