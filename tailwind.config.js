@@ -30,6 +30,10 @@ export default {
         '1xs': ['0.625em', '0.75rem'], /* 10px */
         '2xs': ['0.50em', '0.50rem'], /* 8px */
       },
+      maxWidth: {
+        '1xs': '13rem', /* 208px */
+        '2xs': '10rem', /* 160px */
+      },
     }
   },
   plugins: [],
