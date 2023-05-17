@@ -3,17 +3,18 @@ import { AiOutlineHeart } from "react-icons/ai";
 import { AiFillHeart } from "react-icons/ai";
 import { RxDot } from "react-icons/rx";
 import { RxDotFilled } from "react-icons/rx";
-import { db,auth } from "../../firebase/firebase";
+import { db, auth } from "../../firebase/firebase";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { collection, doc, getDoc, getDocs, updateDoc, arrayRemove, arrayUnion } from "firebase/firestore";
 import { useNavigate, useParams } from "react-router-dom";
 import Comment from "../../components/Comment";
+import NavBar from "../../components/NavBar";
 function Promise() {
     const [user] = useAuthState(auth);
     const [data, setPromiseData] = useState('empty');
     const [isLiked, setIsLiked] = useState(false);
     const [isActive, setIsActive] = useState(false);
-    const [likeCount,setLikeCount] = useState(0);
+    const [likeCount, setLikeCount] = useState(0);
     const navigate = useNavigate();
     // const diffDays = Math.round((d2.getTime() - d1.getTime()) / (1000 * 60 * 60 * 24));
     // const yearDiff = d2.getFullYear() - d1.getFullYear();
@@ -29,12 +30,13 @@ function Promise() {
             setPromiseData({
                 id: docSnap.id,
                 ...docSnap.data(),
-                comments:[commentsSnap.docs.map(doc =>({
-                    id : doc.id,
-                    ...doc.data()}))
-                    .filter((e)=>{
-                    return e.postId.includes(params.promiseID); 
-                }).length]
+                comments: [commentsSnap.docs.map(doc => ({
+                    id: doc.id,
+                    ...doc.data()
+                }))
+                    .filter((e) => {
+                        return e.postId.includes(params.promiseID);
+                    }).length]
             });
             if (user) {
                 setIsLiked(docSnap.data().upvotes.includes(user.uid) ? true : false);
@@ -42,35 +44,35 @@ function Promise() {
             else {
                 setIsActive(false);
             }
-            setLikeCount(()=>{
+            setLikeCount(() => {
                 const temp = docSnap.data();
                 const vote = { upvotes: temp.upvotes };
                 return vote.upvotes ? vote.upvotes.length : 0;
             })
         }
         fetchData();
-    }, [params.promiseID,data.comments,user]);
-    function updatePostLike(liked){
-        if(liked){
-        const postRef = doc(db, "posts", params.promiseID);
-        const update = async () => await updateDoc(postRef, { upvotes: arrayUnion(user.uid) });
-        update();
-        }else{
+    }, [params.promiseID, data.comments, user]);
+    function updatePostLike(liked) {
+        if (liked) {
+            const postRef = doc(db, "posts", params.promiseID);
+            const update = async () => await updateDoc(postRef, { upvotes: arrayUnion(user.uid) });
+            update();
+        } else {
             const postRef = doc(db, "posts", params.promiseID);
             const update = async () => await updateDoc(postRef, { upvotes: arrayRemove(user.uid) });
             update();
         }
     }
-    function handleLike(){
-        if(user){
+    function handleLike() {
+        if (user) {
             updatePostLike(!isLiked);
             setIsLiked(!isLiked);
-        }else{
+        } else {
             navigate("/login");
         }
-        
+
     }
-    return data === 'empty' ? (
+    return <><NavBar /> {data === 'empty' ? (
         <>
             <div className="py-16 md:pb-0">Loading...</div>
         </>
@@ -149,82 +151,11 @@ function Promise() {
                         </div>
                     </div>
                 </main>
-                <Comment id={params.promiseID}/>
+                <Comment id={params.promiseID} />
             </>
         )
-    //     [["1st Comment", 
-    //     [
-    //      ["1st Comment N1", 
-    //         ["1st Comment N11",[]]],
-    //      ["2nd Comment N1",
-    //         ["2nd Comment N11",[]]]
-    //     ]
-    //  ], 
-    //  ["2nd Comment",
-    //     [
-    //      ["2nd Comment N1",
-    //         ["2nd Comment N11",[]]]
-    //     ],
-    //  ["3rd Comment",[]]]
-    // ]
-    // {"1st Comment Reply.1": [
-    //     {"1st Comment Reply.1.1": []},
-    //     {"1st Comment Reply.1.2": []},
-    //     {"1st Comment Reply.1.3": []}
-    // ]},
-    // {"1st Comment Reply.2": [
-    //     {"1st Comment Reply.2.1": [
-    //         {"1st Comment Reply.2.1.1" :[]},
-    //         {"1st Comment Reply.2.1.2" :[]}
-    //     ]},
-    //     {"1st Comment Reply.2.2": []},
-    //     {"1st Comment Reply.2.3": []}
-    // ]
-    // }    
-
-
-
-
-    // [
-    //     {
-    //         "details": "1st Comment",
-    //         "commentId": "123",
-    //         "commentorId": "1234",
-    //         "createdAt": new Date(),
-    //         "upvotes": [],
-    //         "postId": "1",
-    //         "replies": [
-    //             {
-    //                 "details": "1st Comment Reply.1",
-    //                 "commentId": "123",
-    //                 "commentorId": "1234",
-    //                 "createdAt": new Date(),
-    //                 "upvotes": [],
-    //                 "postId": "1",
-    //                 "replies": [
-    //                     {
-    //                         "details": "1st Comment Reply.1.1",
-    //                         "commentId": "123",
-    //                         "commentorId": "1234",
-    //                         "createdAt": new Date(),
-    //                         "upvotes": [],
-    //                         "postId": "1",
-    //                         "replies": []
-    //                     },
-    //                     {
-    //                         "details": "1st Comment Reply.1.2",
-    //                         "commentId": "123",
-    //                         "commentorId": "1234",
-    //                         "createdAt": new Date(),
-    //                         "upvotes": [],
-    //                         "postId": "1",
-    //                         "replies": []
-    //                     }
-    //                 ]
-    //             }
-    //         ]
-    //     }
-    // ]
+    }
+    </>
 
 }
 export default Promise;

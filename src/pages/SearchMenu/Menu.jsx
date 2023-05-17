@@ -6,6 +6,7 @@ import { collection, getDocs } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { Spinner } from '@chakra-ui/react'
 import Post from "../../components/Post";
+import NavBar from "../../components/NavBar";
 function Menu() {
     const [postsData, setPostsData] = useState([]);
     const [isLoading, setIsLoading] = useState(false)
@@ -31,22 +32,27 @@ function Menu() {
 
         fetchData();
     }, [location]);
-    return isLoading ?
-        <div className='py-20 flex justify-center'>
-            <div className="m-10"><Spinner /></div>
-        </div>
-        :
-        postsData.length > 0 ?
-                <main className='py-20 md:pb-0'>
-                    {
-                        postsData.map((i) => {
-                            return <Post key={i.id} post={i} user={user} />
-                        })
-                    }
-                </main>
-            :
-            <div className='py-20 flex justify-center'>
-                <div className="m-10">No Promises Found</div>
-            </div>
+    return <>
+        <NavBar />
+        {
+            isLoading ?
+                <div className='py-20 flex justify-center'>
+                    <div className="m-10"><Spinner /></div>
+                </div>
+                :
+                postsData.length > 0 ?
+                    <main className='py-20 md:pb-0'>
+                        {
+                            postsData.map((i) => {
+                                return <Post key={i.id} post={i} user={user} />
+                            })
+                        }
+                    </main>
+                    :
+                    <div className='py-20 flex justify-center'>
+                        <div className="m-10">No Promises Found</div>
+                    </div>
+        }
+    </>
 }
 export default Menu;
