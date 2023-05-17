@@ -21,7 +21,7 @@ const RouterConfig = () => {
 			<Route exact path='/settings' element={<PrivateRoute />}>
 				<Route path="/settings" element={<Settings />}></Route>
 			</Route>
-			<Route exact path="/searchmenu/:pID" element={<Menu/>}/>
+			<Route exact path="/search/:pID" element={<Menu/>}/>
 			<Route exact path="/promise/:promiseID" element={<Promise />}/>
 			<Route path="*" element={<Navigate to="/" />}></Route>
 		</Routes>

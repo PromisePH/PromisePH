@@ -1,18 +1,20 @@
 import React, { useEffect, useState } from "react";
-import SampleAvatar from "../../assets/img/Sample_Avtr.png";
 import { AiOutlineHeart } from "react-icons/ai";
 import { AiFillHeart } from "react-icons/ai";
 import { RxDot } from "react-icons/rx";
 import { RxDotFilled } from "react-icons/rx";
-import { db } from "../../firebase/firebase";
-import { doc, getDoc } from "firebase/firestore";
-import { useParams } from "react-router-dom";
+import { db,auth } from "../../firebase/firebase";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { collection, doc, getDoc, getDocs, updateDoc, arrayRemove, arrayUnion } from "firebase/firestore";
+import { useNavigate, useParams } from "react-router-dom";
 import Comment from "../../components/Comment";
-import { Spinner } from '@chakra-ui/react';
 function Promise() {
+    const [user] = useAuthState(auth);
     const [data, setPromiseData] = useState('empty');
     const [isLiked, setIsLiked] = useState(false);
     const [isActive, setIsActive] = useState(false);
+    const [likeCount,setLikeCount] = useState(0);
+    const navigate = useNavigate();
     // const diffDays = Math.round((d2.getTime() - d1.getTime()) / (1000 * 60 * 60 * 24));
     // const yearDiff = d2.getFullYear() - d1.getFullYear();
     // const monthDiff = d2.getMonth() - d1.getMonth();
@@ -21,15 +23,53 @@ function Promise() {
     useEffect(() => {
         async function fetchData() {
             const docRef = doc(db, "posts", params.promiseID);
+            const comRef = collection(db, "comment");
             const docSnap = await getDoc(docRef);
+            const commentsSnap = await getDocs(comRef);
             setPromiseData({
                 id: docSnap.id,
-                ...docSnap.data()
+                ...docSnap.data(),
+                comments:[commentsSnap.docs.map(doc =>({
+                    id : doc.id,
+                    ...doc.data()}))
+                    .filter((e)=>{
+                    return e.postId.includes(params.promiseID); 
+                }).length]
             });
+            if (user) {
+                setIsLiked(docSnap.data().upvotes.includes(user.uid) ? true : false);
+            }
+            else {
+                setIsActive(false);
+            }
+            setLikeCount(()=>{
+                const temp = docSnap.data();
+                const vote = { upvotes: temp.upvotes };
+                return vote.upvotes ? vote.upvotes.length : 0;
+            })
         }
         fetchData();
-    }, [params.promiseID]);
-    console.log(data);
+    }, [params.promiseID,data.comments,user]);
+    function updatePostLike(liked){
+        if(liked){
+        const postRef = doc(db, "posts", params.promiseID);
+        const update = async () => await updateDoc(postRef, { upvotes: arrayUnion(user.uid) });
+        update();
+        }else{
+            const postRef = doc(db, "posts", params.promiseID);
+            const update = async () => await updateDoc(postRef, { upvotes: arrayRemove(user.uid) });
+            update();
+        }
+    }
+    function handleLike(){
+        if(user){
+            updatePostLike(!isLiked);
+            setIsLiked(!isLiked);
+        }else{
+            navigate("/login");
+        }
+        
+    }
     return data === 'empty' ? (
         <>
             <div className="py-16 md:pb-0">Loading...</div>
@@ -41,10 +81,10 @@ function Promise() {
                 <main className="py-16 md:pb-0">
                     <div className="max-w-3xl mx-auto bg-bunker shadow-md rounded-lg p-4 mb-4 mt-5">
                         <div className="flex md:hidden flex-row items-center">
-                            <a href={window.location.href} target="_blank" rel="noopener" className="flex items-center">
+                            <a target="_blank" rel="noopener" className="flex items-center">
                                 <span className="text-white text-1xs md:text-sm font-bold">{data.poster.name}</span>
                                 <button
-                                    onClick={() => setIsActive(!isActive)}
+                                    onClick={() => handleLike()}
                                     className=""
                                 >
                                     {isActive ? <RxDotFilled /> : <RxDot />}
@@ -71,14 +111,14 @@ function Promise() {
                                     <div className="flex flex-row h-12 max-h-10 items-center space-x-2">
                                         <div className="">
                                             {data.verifiedUpvotes.map((verifiedBy) => {
-                                                return <div className="bg-caribbean-green border-radius-full rounded-full text-black text-1xs md:text-xs text-center font-bold p-2  transform hover:scale-110">
+                                                return <div className="bg-caribbean-green border-radius-full rounded-full text-black text-1xs md:text-xs text-center font-bold p-2  transform hover:scale-110" key={verifiedBy}>
                                                     {verifiedBy}
                                                 </div>
                                             })}
                                         </div>
                                         <div className="">
                                             {data.tags.map((tag) => {
-                                                return <li className="bg-midnight border-radius-full rounded-full text-black font-bold text-1xs md:text-xs inline-block text-center px-2 py-1 transform hover:scale-110">
+                                                return <li className="bg-midnight border-radius-full rounded-full text-black font-bold text-1xs md:text-xs inline-block text-center px-2 py-1 transform hover:scale-110" key={tag}>
                                                     <span className="text-white">{tag}</span>
                                                 </li>
                                             })}
@@ -96,11 +136,12 @@ function Promise() {
 
                         <div className="flex flex-wrap flex-row justify-evenly items-center pt-3 gap-12">
                             <span className="text-white text-xs md:text-sm">{data.views} Views</span>
-                            <span className="text-white text-xs md:text-sm">{data.verifiedUpvotes.length} Likes</span>
-                            <span className="text-white text-xs md:text-sm">{data.comments.length} Comments</span>
+                            <span className="text-white text-xs md:text-sm">{likeCount} Likes</span>
+                            <span className="text-white text-xs md:text-sm">{data.comments} Comments</span>
                             <span className="text-white text-xs md:text-sm underline cursor-pointer">View Sources</span>
                             <button
-                                onClick={() => setIsLiked(!isLiked)}
+                                onClick={() => handleLike()}
+                                // setIsLiked(!isLiked)
                                 className="text-orange-red text-2xl transform hover:scale-110"
                             >
                                 {isLiked ? <AiFillHeart /> : <AiOutlineHeart />}

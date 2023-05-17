@@ -65,7 +65,7 @@ function NavBar() {
         }
     };
     function handleSearchSubmit(data) {
-        navigate(`/searchmenu/${data}`);
+        navigate(`/search/${data}`);
     }
     return (
         <Box bg={useColorModeValue('white', 'bunker')} className='bg-bunker fixed w-full h-16 z-10 flex gap-2'>
