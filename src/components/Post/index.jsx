@@ -87,7 +87,8 @@ function Post({ post, user }) {
           {/* <!-- Header div--> */}
           <div className="flex flex-col gap-1">
             <div className="flex flex-row items-center justify-between">
-              <a href="#" target="_blank" rel="noopener" className="text-lg md:text-xl font-bold flex-grow">
+              <a target="_blank" rel="noopener" className="text-lg md:text-xl font-bold flex-grow cursor-pointer"
+                onMouseDown={()=>navigate(`promise/${post.id}`)}>
                 {post.title}
               </a>
               <div className="text-2xl flex flex-col items-center gap-1">

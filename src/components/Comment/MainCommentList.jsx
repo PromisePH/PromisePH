@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { doc, getDoc, addDoc, updateDoc, arrayUnion, collection, arrayRemove } from 'firebase/firestore';
+import { doc, addDoc, updateDoc, arrayUnion, collection, arrayRemove, onSnapshot } from 'firebase/firestore';
 import { db, auth } from '../../firebase/firebase';
 import { useAuthState } from "react-firebase-hooks/auth";
 import { Spinner } from "@chakra-ui/react";
@@ -23,28 +23,34 @@ function MainCommentList(com) {
     const params = useParams();
     const navigate = useNavigate();
     useEffect(() => {
-        async function fetchData() {
-            const commentsRef = doc(db, "comment", com.id);
-            const commentsSnapshot = await getDoc(commentsRef);
-            setCommentData({
-                id: commentsSnapshot.id,
-                ...commentsSnapshot.data()
-            });
+        const commentsRef = doc(db, "comment", com.id);
+        onSnapshot(commentsRef, (doc) => {
+            const temp = doc.data();
+            setCommentData(
+                { id: doc.id, ...temp }
+            );
             if (user) {
-                setActiveUpvote(commentsSnapshot.data().upvotes.includes(user.uid) ? true : false);
-                setActiveDownvote(commentsSnapshot.data().downvotes.includes(user.uid) ? true : false);
-            }
-            else {
-                setActiveUpvote(false);
-                setActiveDownvote(false);
+                if (temp.upvotes)
+                    if (temp.upvotes.includes(user.uid)) {
+                        setActiveUpvote(true)
+                        setActiveDownvote(false)
+                    }
+
+                if (temp.downvotes)
+                    if (temp.downvotes.includes(user.uid)) {
+                        setActiveUpvote(false)
+                        setActiveDownvote(true)
+                    }
+            } else {
+                setActiveUpvote(false)
+                setActiveDownvote(false)
             }
             setVoteCount(() => {
-                const temp = commentsSnapshot.data();
-                const vote = { upvotes: temp.upvotes, downvotes: temp.downvotes };
-                return vote.upvotes ? (vote.downvotes ? vote.upvotes.length - vote.downvotes.length : vote.upvotes.length) : 0
+                return temp.upvotes ? (temp.downvotes ? temp.upvotes.length - temp.downvotes.length : temp.upvotes.length) : 0
             })
-        } fetchData();
-    }, [updateComment,user]);
+        })
+    }
+        , [user, params.promiseID]);
 
     function updateRootComment(replyID) {
         const comRef = doc(db, "comment", com.id);
@@ -53,24 +59,24 @@ function MainCommentList(com) {
     }
 
     function handleReplySubmit(reply) {
-        if(user){
-        const replyRef = async () => {
-            const comRef = await addDoc(collection(db, "comment"), {
-                "commentorName": user.displayName,
-                "commentorID": user.uid,
-                "createdAt": new Date(),
-                "upvotes": [],
-                "downvotes": [],
-                "postId": params.promiseID,
-                "rootComment": "false",
-                "details": reply,
-                "replies": []
-            });
-            updateRootComment(comRef.id);
-            setUpdateComment(!updateComment);
-            setActiveReply(false);
-        }; replyRef();
-        }else{
+        if (user) {
+            const replyRef = async () => {
+                const comRef = await addDoc(collection(db, "comment"), {
+                    "commentorName": user.displayName,
+                    "commentorID": user.uid,
+                    "createdAt": new Date(),
+                    "upvotes": [],
+                    "downvotes": [],
+                    "postId": params.promiseID,
+                    "rootComment": "false",
+                    "details": reply,
+                    "replies": []
+                });
+                updateRootComment(comRef.id);
+                setUpdateComment(!updateComment);
+                setActiveReply(false);
+            }; replyRef();
+        } else {
             navigate("/login");
         }
 

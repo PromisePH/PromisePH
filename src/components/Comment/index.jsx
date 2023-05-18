@@ -1,77 +1,69 @@
 import React, { useEffect, useState } from 'react';
-import { collection, addDoc, getDocs } from 'firebase/firestore';
+import { collection, addDoc, onSnapshot } from 'firebase/firestore';
 import { useAuthState } from "react-firebase-hooks/auth";
 import { db, auth } from '../../firebase/firebase';
 import MainCommentList from './MainCommentList';
 import { useParams } from 'react-router';
-import { Spinner } from '@chakra-ui/react';
 import { useNavigate } from "react-router-dom";
 function Comment(com) {
     const [user] = useAuthState(auth);
     const [updateComment, setUpdateComment] = useState(0);
     const [userComment, setUserComment] = useState([]);
-    const [postComment, setPostComment] = useState([]);
-    const [isLoading, setIsLoading] = useState(false);
     const [commentAlert, setCommentAlert] = useState(false);
-    const [ commentLength, setCommentLength ] = useState(0);
+    const [commentData, setCommentData] = useState([]);
     const params = useParams();
     const navigate = useNavigate();
     useEffect(() => {
-        async function fetchData() {
-            setIsLoading(true);
-            const commentsRef = collection(db, "comment");
-            // const q = query(commentsRef, where("postId", "==", post.id), orderBy("upvotes"));
-            const commentsSnapshot = await getDocs(commentsRef);
-            const newData = commentsSnapshot.docs.map(doc => ({
-                id: doc.id,
-                ...doc.data()
-            }));
-            const result = newData.filter((e) => {
-                return e && e.rootComment.includes(true);
-            })
-            .filter((e)=>{
-                return e && e.postId.includes(com.id);
-            });
-            setPostComment(result);
-            setIsLoading(false);
-            setCommentLength(()=>{
-                const temp = result;
-                return temp ? temp.length : 0;
-            })
-        } fetchData();
-    }, [updateComment, params.promiseID, commentLength]);
-
+        const commentRef = collection(db, "comment");
+        onSnapshot(commentRef, doc => {
+            setCommentData(
+                doc.docs.map(
+                    doc => {
+                        return {
+                            id: doc.id,
+                            ...doc.data()
+                        }
+                    }
+                )
+                .filter((comment) => {
+                    return comment.postId.includes(com.id) && comment.rootComment.includes("true");
+                }
+                )
+            );
+        })
+    }, [user, params.promiseID])
     function handleRootCommentSubmit(comment) {
-        if(user){
-        const commentRef = async () => {
-            const comRef = await addDoc(collection(db, "comment"), {
-                "commentorName": user.displayName,
-                "commentorID": user.uid,
-                "createdAt": new Date(),
-                "upvotes": [],
-                "downvotes":[],
-                "postId": params.promiseID,
-                "rootComment": "true",
-                "details": comment,
-                "replies": []
-            });
-            setCommentAlert(false);
-            console.log(comRef.id);
-        };
-        if(comment.length > 0) {
-            commentRef()
-            setUpdateComment(updateComment + 1)
-            setUserComment([])
-        }else{ 
-            setCommentAlert(true);
-        }}else{
+        if (user) {
+            const commentRef = async () => {
+                const comRef = await addDoc(collection(db, "comment"), {
+                    "commentorName": user.displayName,
+                    "commentorID": user.uid,
+                    "createdAt": new Date(),
+                    "upvotes": [],
+                    "downvotes": [],
+                    "postId": params.promiseID,
+                    "rootComment": "true",
+                    "details": comment,
+                    "replies": []
+                });
+                setCommentAlert(false);
+                console.log(comRef.id);
+            };
+            if (comment.length > 0) {
+                commentRef()
+                setUpdateComment(updateComment + 1)
+                setUserComment([])
+            } else {
+                setCommentAlert(true);
+            }
+        } else {
             navigate("/login");
         }
     }
     return (
         <div className="flex justify-center w-full">
             <div className="max-w-3xl w-full flex flex-col p-4 bg-bunker rounded-lg">
-                <div className='w-full bg-midnight rounded-lg p-2' onBlur={()=>setCommentAlert(false)}>
+                <div className='w-full bg-midnight rounded-lg p-2' onBlur={() => setCommentAlert(false)}>
                     <textarea
                         value={userComment}
                         placeholder='What do you think of this promise...'
@@ -97,11 +89,13 @@ function Comment(com) {
                 <div className='pt-6'>
                     <div className='bg-midnight p-2 rounded-lg'>
                         {
-                            isLoading ? <Spinner /> : postComment.map((com) => {
+                            // commentLength ? isLoading ? <Spinner /> 
+                            commentData ? commentData.length > 0 ? commentData.map((com) => {
                                 return (
-                                    <MainCommentList key={com.id} id={com.id} /> 
+                                    <MainCommentList key={com.id} id={com.id} />
                                 )
-                            })
+                            }) : <div className="w-full flex justify-center my-5">No Comments Found . . .</div>
+                            : <div className="w-full flex justify-center my-5">No Comments Found . . .</div>
                         }
                     </div>
                 </div>
