@@ -15,15 +15,15 @@ function Filter() {
             {/* Desktop View */}
             <div className="hidden xl:flex fixed bg-bunker flex-col items-start justify-start rounded-2xl py-1 px-2 gap-1 left-0 ml-16">
                 {/* Newest and Recent Button */}
-                <button className="w-full flex flex-row justify-start p-2 rounded-sm hover:bg-gray-600">
+                <button className="w-full flex flex-row justify-start p-2 rounded-sm hover:bg-gray-600 gap-1">
                     <img className="pl-1 bg-midnight p-1 rounded-md border-radius my-auto" src={NewImage} alt="default"></img>
-                    <div className="flex flex-col items-start">
+                    <div className="flex flex-col items-start gap-1">
                         <span className="text-lg">Newest and Recent</span>
                         <span className="text-2xs opacity-40">Find the latest updates</span>
                     </div>
                 </button>
                 {/* Popular of the Day Button */}
-                <button className="w-full flex flex-row justify-start p-2 rounded-sm hover:bg-gray-600">
+                <button className="w-full flex flex-row justify-start p-2 rounded-sm hover:bg-gray-600 gap-1">
                     <img className="pl-1 bg-midnight p-1 rounded-md border-radius my-auto" src={PopularImage} alt="default"></img>
                     <div className="flex flex-col items-start">
                         <span className="text-lg">Popular of the Day</span>
@@ -31,28 +31,25 @@ function Filter() {
                     </div>
                 </button>
                 {/* Tags Button */}
-                <button className="w-full flex flex-row justify-start p-2 rounded-sm hover:bg-gray-600">
-                    <Menu>
-                        <MenuButton>
-                            <div className="flex flex-row">
-                                <img className=" bg-midnight p-1 rounded-md border-radius my-auto" src={TagImage} alt="default"></img>
-                                <div className="pl-1 flex flex-col items-start">
-                                    <div className="flex flex-row items-center">
-                                        <span className="text-lg">Tags</span>
-                                        <span className="bg-burning-orange rounded-sm text-1xs font-semibold">24</span>
-                                    </div>
-
-                                    <span className="text-2xs opacity-40">Explore Popular Topics</span>
+                <Menu>
+                    <MenuButton className="w-full flex flex-row justify-start p-2 rounded-sm hover:bg-gray-600">
+                        <div className="flex flex-row gap-1">
+                            <img className=" bg-midnight p-1 rounded-md border-radius my-auto" src={TagImage} alt="default"></img>
+                            <div className="pl-1 flex flex-col items-start">
+                                <div className="flex flex-row items-center gap-1">
+                                    <span className="text-lg">Tags</span>
+                                    <span className="bg-burning-orange rounded-sm text-1xs font-semibold">24</span>
                                 </div>
+                                <span className="text-2xs opacity-40">Explore Popular Topics</span>
                             </div>
-                        </MenuButton>
-                        <MenuList>
-                            <MenuItem>Help</MenuItem>
-                            <MenuItem>Finance</MenuItem>
-                            <MenuItem>Test</MenuItem>
-                        </MenuList>
-                    </Menu>
-                </button>
+                        </div>
+                    </MenuButton>
+                    <MenuList>
+                        <MenuItem>Help</MenuItem>
+                        <MenuItem>Finance</MenuItem>
+                        <MenuItem>Test</MenuItem>
+                    </MenuList>
+                </Menu>
             </div>
             {/* Mobile View */}
             <div className="flex xl:hidden flex-row justify-around bg-bunker w-full rounded-md">
