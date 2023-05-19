@@ -1,13 +1,16 @@
 import React, { useState, useEffect } from 'react'
 import { useAuthState } from "react-firebase-hooks/auth";
 import { db, auth, storage } from '../../firebase/firebase';
-import { collection, onSnapshot, query, orderBy, setDoc, doc, arrayUnion } from "firebase/firestore";
+import { collection, onSnapshot, query, orderBy, setDoc, doc, arrayUnion, where } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 import CollectionsEnum from '../../constants/collections';
+import EntityCollectionEnum from "../../constants/entity";
+import PostCollectionEnum from '../../constants/posts';
 import Post from '../../components/Post';
 import NavBar from "../../components/NavBar";
 import BottomNav from "../../components/BottomNav";
+import Filter from "../../components/Filter";
 import Avatar from '../../components/Avatar';
 import Form1 from '../../components/PostForm/Form1';
 import Form2 from '../../components/PostForm/Form2';
@@ -56,6 +59,7 @@ function Home() {
     const [sources, setSources] = useState([''])
     const [tags, setTags] = useState([])
     const [imageFile, setImageFile] = useState(null)
+    const [filter, setFilter] = useState(null)
 
     // Post UI state
     const { onClose } = useDisclosure()
@@ -75,7 +79,20 @@ function Home() {
 
     useEffect(() => {
         // Realtime listener for posts
-        const q = query(collection(db, CollectionsEnum.POSTS), orderBy("createdAt", "desc"));
+        let q;
+        if (filter == null) {
+            q = query(collection(db, CollectionsEnum.POSTS), orderBy(PostCollectionEnum.CREATED_AT, "desc"));
+        }
+        else if (filter == EntityCollectionEnum.POPULAR) {
+            q = query(collection(db, CollectionsEnum.POSTS), orderBy(PostCollectionEnum.VIEWS, "desc"));
+        }
+        else if (filter == EntityCollectionEnum.NEW) {
+            q = query(collection(db, CollectionsEnum.POSTS), orderBy(PostCollectionEnum.CREATED_AT, "desc"));
+        }
+        else {
+            q = query(collection(db, CollectionsEnum.POSTS), where(PostCollectionEnum.TAGS, "array-contains", filter));
+        }
+
         onSnapshot(q, doc => {
             setPosts(doc.docs.map(
                 doc => {
@@ -86,7 +103,7 @@ function Home() {
                 }
             ));
         });
-    }, [user]);
+    }, [user, filter]);
 
     const closePostFormModal = () => {
         // Reset the post form onClose
@@ -223,117 +240,123 @@ function Home() {
         }
     }
 
-
     const activeStepText = steps[activeStep].description
+
     return (
         <>
-            <NavBar /> 
-                <main className='px-4 py-20 md:pb-0 flex flex-col items-center w-full'>      
-                    <section className='max-w-3xl w-full'>
-                        {
-                            user ?
-                                <div className='flex w-full gap-2 p-3 mb-2 rounded-lg bg-bunker'>
-                                    <Avatar name={user.displayName} styles='rounded-lg min-w-fit' />
-                                    <button onClick={() => setIsModalOpen(true)} className='w-full bg-midnight p-2 text-left text-periwinkle text-xs rounded-md cursor-text'>
-                                        Share a promise a politician has said
-                                    </button>
-                                </div>
-                                : null
-                        }
-                        {
+            <NavBar />
+            <main className='px-4 py-20 md:pb-0 flex flex-col items-center w-full'>
+                <Filter setFilter={(filter) => { setFilter(filter) }} />
+                <section className='max-w-3xl w-full'>
+                    {
+                        user ?
+                            <div className='flex w-full gap-2 p-3 mb-2 rounded-lg bg-bunker'>
+                                <Avatar name={user.displayName} styles='rounded-lg min-w-fit' />
+                                <button onClick={() => setIsModalOpen(true)} className='w-full bg-midnight p-2 text-left text-periwinkle text-xs rounded-md cursor-text'>
+                                    Share a promise a politician has said
+                                </button>
+                            </div>
+                            : null
+                    }
+                    {
+                        posts.length > 0 ?
                             posts.map(post =>
-                                <Post key={post.id} post={post} user={user}/>
+                                <Post key={post.id} post={post} user={user} />
                             )
-                        }
-                        <Modal isOpen={isModalOpen} onClose={() => setIsAlertOpen(true)} closeOnOverlayClick={false} size='5xl'>
-                            <ModalOverlay />
-                            <ModalContent className='bg-bunker py-7 mx-5'>
-                                <ModalCloseButton isDisabled={isSubmitting}/>
-                                <ModalHeader>
-                                    <Stepper size='sm' index={activeStep} gap='0'>
-                                        {steps.map((step, index) => (
-                                            <Step key={index} gap='0'>
-                                                <StepIndicator>
-                                                    <StepStatus complete={<StepIcon />} />
-                                                </StepIndicator>
-                                                <StepSeparator _horizontal={{ ml: '0' }} />
-                                            </Step>
-                                        ))}
-                                    </Stepper>
-                                    <Text>
-                                        Step {activeStep + 1}: <b>{activeStepText}</b>
-                                    </Text>
-                                </ModalHeader>
-                                <ModalBody>
-                                    {
-                                        step === 1 ? <Form1 politicalEntity={politicalEntity} setPoliticalEntity={setPoliticalEntity} /> :
-                                            step === 2 ? <Form2
-                                                politicalEntity={politicalEntity}
-                                                title={title}
-                                                setTitle={setTitle}
-                                                description={description}
-                                                tags={tags}
-                                                setTags={setTags}
-                                                setDescription={setDescription}
-                                                setImageFile={setImageFile}
-                                            /> :
-                                                <Form3 sources={sources} setSources={setSources} />
-                                    }
-                                </ModalBody>
-                                <ModalFooter>
-                                    {
-                                        step > 1 ?
-                                            <Button isDisabled={isSubmitting} colorScheme='gray' mr={3} onClick={previousStep}>
-                                                Previous
-                                            </Button>
-                                            :
-                                            null
-                                    }
-                                    {
-                                        step < 3 ?
-                                            <Button colorScheme='blue' mr={3} onClick={nextStep}>
-                                                Next
-                                            </Button>
-                                            :
-                                            <Button isLoading={isSubmitting} loadingText='Posting' colorScheme='blue' mr={3} onClick={submitPromisePost}>
-                                                Submit
-                                            </Button>
-                                    }
-                                </ModalFooter>
-                            </ModalContent>
-                        </Modal>
-                        <AlertDialog
-                            isOpen={isAlertOpen}
-                            leastDestructiveRef={cancelRef}
-                            onClose={onClose}
-                        >
-                            <AlertDialogOverlay>
-                                <AlertDialogContent className='bg-bunker mx-5'>
-                                    <AlertDialogHeader fontSize='lg' fontWeight='bold'>
-                                        Quit Promise Post
-                                    </AlertDialogHeader>
-
-                                    <AlertDialogBody>
-                                        Are you sure? You cannot undo this action afterwards.
-                                    </AlertDialogBody>
-
-                                    <AlertDialogFooter>
-                                        <Button ref={cancelRef} onClick={() => setIsAlertOpen(false)}>
-                                            Cancel
+                            :
+                            <p className='flex flex-col items-center justify-center w-full h-96 font-bold text-lg'>
+                                No Promises Found
+                            </p>
+                    }
+                    <Modal isOpen={isModalOpen} onClose={() => setIsAlertOpen(true)} closeOnOverlayClick={false} size='5xl'>
+                        <ModalOverlay />
+                        <ModalContent className='bg-bunker py-7 mx-5'>
+                            <ModalCloseButton isDisabled={isSubmitting} />
+                            <ModalHeader>
+                                <Stepper size='sm' index={activeStep} gap='0'>
+                                    {steps.map((step, index) => (
+                                        <Step key={index} gap='0'>
+                                            <StepIndicator>
+                                                <StepStatus complete={<StepIcon />} />
+                                            </StepIndicator>
+                                            <StepSeparator _horizontal={{ ml: '0' }} />
+                                        </Step>
+                                    ))}
+                                </Stepper>
+                                <Text>
+                                    Step {activeStep + 1}: <b>{activeStepText}</b>
+                                </Text>
+                            </ModalHeader>
+                            <ModalBody>
+                                {
+                                    step === 1 ? <Form1 politicalEntity={politicalEntity} setPoliticalEntity={setPoliticalEntity} /> :
+                                        step === 2 ? <Form2
+                                            politicalEntity={politicalEntity}
+                                            title={title}
+                                            setTitle={setTitle}
+                                            description={description}
+                                            tags={tags}
+                                            setTags={setTags}
+                                            setDescription={setDescription}
+                                            setImageFile={setImageFile}
+                                        /> :
+                                            <Form3 sources={sources} setSources={setSources} />
+                                }
+                            </ModalBody>
+                            <ModalFooter>
+                                {
+                                    step > 1 ?
+                                        <Button isDisabled={isSubmitting} colorScheme='gray' mr={3} onClick={previousStep}>
+                                            Previous
                                         </Button>
-                                        <Button
-                                            className='bg-orange-red'
-                                            onClick={closePostFormModal}
-                                            ml={3}
-                                        >
-                                            Quit
+                                        :
+                                        null
+                                }
+                                {
+                                    step < 3 ?
+                                        <Button colorScheme='blue' mr={3} onClick={nextStep}>
+                                            Next
                                         </Button>
-                                    </AlertDialogFooter>
-                                </AlertDialogContent>
-                            </AlertDialogOverlay>
-                        </AlertDialog>
-                    </section>
-                </main>
+                                        :
+                                        <Button isLoading={isSubmitting} loadingText='Posting' colorScheme='blue' mr={3} onClick={submitPromisePost}>
+                                            Submit
+                                        </Button>
+                                }
+                            </ModalFooter>
+                        </ModalContent>
+                    </Modal>
+                    <AlertDialog
+                        isOpen={isAlertOpen}
+                        leastDestructiveRef={cancelRef}
+                        onClose={onClose}
+                    >
+                        <AlertDialogOverlay>
+                            <AlertDialogContent className='bg-bunker mx-5'>
+                                <AlertDialogHeader fontSize='lg' fontWeight='bold'>
+                                    Quit Promise Post
+                                </AlertDialogHeader>
+
+                                <AlertDialogBody>
+                                    Are you sure? You cannot undo this action afterwards.
+                                </AlertDialogBody>
+
+                                <AlertDialogFooter>
+                                    <Button ref={cancelRef} onClick={() => setIsAlertOpen(false)}>
+                                        Cancel
+                                    </Button>
+                                    <Button
+                                        className='bg-orange-red'
+                                        onClick={closePostFormModal}
+                                        ml={3}
+                                    >
+                                        Quit
+                                    </Button>
+                                </AlertDialogFooter>
+                            </AlertDialogContent>
+                        </AlertDialogOverlay>
+                    </AlertDialog>
+                </section>
+            </main>
             <BottomNav />
         </>
     );

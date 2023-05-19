@@ -156,16 +156,16 @@ function Post({ post, user }) {
             </a>
             <div className="flex flex-row items-center gap-12">
               <span className="text-white text-xs md:text-sm">{post.views} Views</span>
-              <span className="text-white text-xs md:text-sm">{post.upvotes.length} Likes</span>
-              <span className="text-white text-xs md:text-sm">{post.comments.length} Comments</span>
+              <span className="text-white text-xs md:text-sm">{post.upvotes ? post.upvotes.length : 0} Likes</span>
+              <span className="text-white text-xs md:text-sm">{post.comments ? post.comments.length: 0} Comments</span>
             </div>
           </div>
         </div>
       </div>
       <div className="flex sm:hidden flex-row items-center pt-3 gap-12">
         <span className="text-white text-xs md:text-sm">{post.views} Views</span>
-        <span className="text-white text-xs md:text-sm">{post.upvotes.length} Likes</span>
-        <span className="text-white text-xs md:text-sm">{post.comments.length} Comment</span>
+        <span className="text-white text-xs md:text-sm">{post.upvotes ? post.upvotes.length : 0} Likes</span>
+        <span className="text-white text-xs md:text-sm">{post.comments ? post.comments.length: 0} Comment</span>
       </div>
     </section>
   );
