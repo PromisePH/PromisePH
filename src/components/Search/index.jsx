@@ -23,7 +23,7 @@ function SearchList(data) {
         fetchData();
     }, [data.val]);
     return postsData ? (data.val && data.visible ?
-        <div className="w-64 bg-black-russian mt-10 p-1 rounded-md fixed border-2 border-solid border-black">
+        <div className="w-64 bg-bunker mt-10 p-1 rounded-md fixed border-2 border-solid border-black">
             <div className="flex flex-col w-full">
                 {function (d) {
                     if (d.length > 0) {
@@ -41,7 +41,7 @@ function SearchList(data) {
         </div>
         :
         !data.val && data.visible ?
-            <div className="w-64 bg-black-russian mt-10 p-1 rounded-md fixed border-2 border-solid border-black">
+            <div className="w-64 bg-bunker mt-10 p-1 rounded-md fixed border-2 border-solid border-black">
                 <div className="flex flex-col w-full">
                     <div className="p-2">
                         {"Search for a Promise"}
@@ -52,7 +52,7 @@ function SearchList(data) {
             <></>)
         :
         data.visible ? <>
-            <div className="w-64 bg-black-russian mt-10 p-1 rounded-md fixed border-2 border-solid border-black">
+            <div className="w-64 bg-bunker mt-10 p-1 rounded-md fixed border-2 border-solid border-black">
                 <div className="flex flex-col w-full">
                     <div className="p-2">
                         <Spinner />

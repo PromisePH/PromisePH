@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react'
 import { useAuthState } from "react-firebase-hooks/auth";
 import { db, auth, storage } from '../../firebase/firebase';
-import { collection, onSnapshot, query, orderBy, setDoc, doc, arrayUnion } from "firebase/firestore";
+import { collection, onSnapshot, query, orderBy, setDoc, doc, arrayUnion, where } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 import CollectionsEnum from '../../constants/collections';
+import EntityCollectionEnum from "../../constants/entity";
+import PostCollectionEnum from '../../constants/posts';
 import Post from '../../components/Post';
 import NavBar from "../../components/NavBar";
 import BottomNav from "../../components/BottomNav";
@@ -57,6 +59,7 @@ function Home() {
     const [sources, setSources] = useState([''])
     const [tags, setTags] = useState([])
     const [imageFile, setImageFile] = useState(null)
+    const [filter, setFilter] = useState(null)
 
     // Post UI state
     const { onClose } = useDisclosure()
@@ -76,7 +79,20 @@ function Home() {
 
     useEffect(() => {
         // Realtime listener for posts
-        const q = query(collection(db, CollectionsEnum.POSTS), orderBy("createdAt", "desc"));
+        let q;
+        if (filter == null) {
+            q = query(collection(db, CollectionsEnum.POSTS), orderBy(PostCollectionEnum.CREATED_AT, "desc"));
+        }
+        else if (filter == EntityCollectionEnum.POPULAR) {
+            q = query(collection(db, CollectionsEnum.POSTS), orderBy(PostCollectionEnum.VIEWS, "desc"));
+        }
+        else if (filter == EntityCollectionEnum.NEW) {
+            q = query(collection(db, CollectionsEnum.POSTS), orderBy(PostCollectionEnum.CREATED_AT, "desc"));
+        }
+        else {
+            q = query(collection(db, CollectionsEnum.POSTS), where(PostCollectionEnum.TAGS, "array-contains", filter));
+        }
+
         onSnapshot(q, doc => {
             setPosts(doc.docs.map(
                 doc => {
@@ -87,7 +103,7 @@ function Home() {
                 }
             ));
         });
-    }, [user]);
+    }, [user, filter]);
 
     const closePostFormModal = () => {
         // Reset the post form onClose
@@ -224,15 +240,14 @@ function Home() {
         }
     }
 
-
     const activeStepText = steps[activeStep].description
+
     return (
         <>
             <NavBar />
             <main className='px-4 py-20 md:pb-0 flex flex-col items-center w-full'>
-                <Filter />
+                <Filter setFilter={(filter) => { setFilter(filter) }} />
                 <section className='max-w-3xl w-full'>
-
                     {
                         user ?
                             <div className='flex w-full gap-2 p-3 mb-2 rounded-lg bg-bunker'>
@@ -244,9 +259,14 @@ function Home() {
                             : null
                     }
                     {
-                        posts.map(post =>
-                            <Post key={post.id} post={post} user={user} />
-                        )
+                        posts.length > 0 ?
+                            posts.map(post =>
+                                <Post key={post.id} post={post} user={user} />
+                            )
+                            :
+                            <p className='flex flex-col items-center justify-center w-full h-96 font-bold text-lg'>
+                                No Promises Found
+                            </p>
                     }
                     <Modal isOpen={isModalOpen} onClose={() => setIsAlertOpen(true)} closeOnOverlayClick={false} size='5xl'>
                         <ModalOverlay />
