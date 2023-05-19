@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { db } from '../../firebase/firebase';
-import { doc, arrayUnion, arrayRemove, updateDoc } from "firebase/firestore";
+import { doc, arrayUnion, arrayRemove, updateDoc} from "firebase/firestore";
 import CollectionsEnum from '../../constants/collections';
 
 import FallbackImage from '../../assets/img/default.jpg'
