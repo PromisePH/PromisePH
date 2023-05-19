@@ -92,7 +92,7 @@ function Comment(com) {
 
                 {/* Comments Column List */}
                 <div className="pt-6">
-                    <div className="bg-midnight p-2 rounded-lg">
+                    <div className="bg-midnight p-3 rounded-lg">
                         {
                             commentData
                                 ? commentData.length > 0

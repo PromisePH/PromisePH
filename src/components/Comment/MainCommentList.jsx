@@ -4,6 +4,9 @@ import { db, auth } from '../../firebase/firebase';
 import { useAuthState } from "react-firebase-hooks/auth";
 import { Spinner } from "@chakra-ui/react";
 import { FiChevronDown, FiChevronUp } from "react-icons/fi";
+import { BiShare } from "react-icons/bi";
+import { SlOptionsVertical } from "react-icons/sl";
+
 import { useNavigate, useParams } from "react-router-dom";
 import { IconContext } from "react-icons";
 
@@ -86,8 +89,8 @@ function MainCommentList(com) {
                 updateRootComment(comRef.id);
                 setActiveReply(false);
             };
-            replyRef();        
-        } 
+            replyRef();
+        }
         // If no User Logged In
         else {
             navigate("/login");
@@ -105,7 +108,7 @@ function MainCommentList(com) {
             const update2 = async () => await updateDoc(comRef, { downvotes: arrayRemove(user.uid) })
             update();
             update2();
-        } 
+        }
         // For vote cancelling
         else if (event == "unvoted") {
             setActiveUpvote(false);
@@ -158,8 +161,8 @@ function MainCommentList(com) {
     return (
         commentData
             ? <>
-                <div className="flex flex-row">
-                    <div className="flex flex-col justify-center relative">
+                <div className="flex flex-row h-auto">
+                    <div className="flex flex-col justify-center relative h-16">
                         {/* Upvote Icon */}
                         <IconContext.Provider value={{ color: activeUpvote ? "#FF4401" : upHover ? "#FF4401" : "FFFFFF" }}>
                             <div className="relative" onMouseDown={() => handleVote("up")} onMouseEnter={() => setUpHover(true)} onMouseLeave={() => setUpHover(false)}>
@@ -180,15 +183,15 @@ function MainCommentList(com) {
                         </IconContext.Provider>
                     </div>
 
-                    <div className="flex flex-col">
+                    <div className="flex flex-col w-11/12">
                         {/* Comment Details Div*/}
-                        <div className="h-2/3 text-justify flex items-end"> {commentData.details} </div>
+                        <div className="text-justify flex items-start pt-3 w-full"> {commentData.details} </div>
                         <div>
                             <div className="flex flex-row">
                                 {/* Commentor Name */}
                                 <div className="text-xs font-bold mr-4"> {commentData.commentorName} </div>
 
-                                {/* Comment Reply Button */} 
+                                {/* Comment Reply Button */}
                                 <div className={`text-xs cursor-pointer mr-4 ${activeReply ? "hidden" : ""}`} onMouseDown={() => setActiveReply(true)}>
                                     Reply
                                 </div>
@@ -203,6 +206,14 @@ function MainCommentList(com) {
                             </div>
                         </div>
                     </div>
+                    {/* Comment's Share and details button */}
+                    <div className="ml-3">
+                        <div className="pt-4 flex flex-row items-start justify-end w-full space-x-2">
+                            <BiShare />
+                            <SlOptionsVertical />
+                        </div>
+                    </div>
+
                 </div>
 
                 {/* Reply Submission Contents Div */}
@@ -218,8 +229,7 @@ function MainCommentList(com) {
                         </div>
 
                         {/* Cancel Reply Button */}
-                        <div className="m-2 px-2 bg-gray-600 rounded-lg cursor-pointer"
-                            onMouseDown={() => setActiveReply(false)}>
+                        <div className="m-2 px-2 bg-gray-600 rounded-lg cursor-pointer" onMouseDown={() => setActiveReply(false)}>
                             Cancel
                         </div>
 
