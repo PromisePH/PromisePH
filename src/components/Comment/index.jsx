@@ -96,10 +96,7 @@ function Comment(com) {
                         {
                             commentData
                                 ? commentData.length > 0
-                                    ? commentData.map((com) => {
-                                        return <MainCommentList key={com.id} id={com.id} />;
-                                    }
-                                    )
+                                    ? commentData.map((com) => { return <MainCommentList key={com.id} id={com.id} />;})
                                     : <div className="w-full flex justify-center my-5">No Comments Found . . .</div>
                                 : <div className="w-full flex justify-center my-5">No Comments Found . . .</div>
                         }
