@@ -26,7 +26,7 @@ import { Link as RouteLink } from 'react-router-dom';
 import { signOut } from 'firebase/auth';
 import { Search2Icon, BellIcon } from '@chakra-ui/icons';
 import { AiFillHome } from 'react-icons/ai';
-// import { FaCalendarAlt } from 'react-icons/fa';
+import { RiTrophyFill } from 'react-icons/ri';
 import { MdOutlinePeopleAlt } from 'react-icons/md';
 import { useNavigate } from 'react-router-dom';
 import IconLink from '../IconLink';
@@ -79,13 +79,13 @@ function NavBar() {
                 <div className='flex flex-row gap-1 md:gap-5'>
                     <div className='flex flex-row items-center gap-5 w-3/4'>
                         <div className='flex-row items-center gap-5 hidden md:flex'>
-                            <IconLink>
+                            <IconLink onClick={() => { navigate('/') }}>
                                 <Icon as={AiFillHome} boxSize={6} />
                             </IconLink>
-                            {/* <IconLink>
-                                <Icon as={FaCalendarAlt} boxSize={6} />
-                            </IconLink> */}
-                            <IconLink>
+                            <IconLink onClick={() => { }}>
+                                <Icon as={RiTrophyFill} boxSize={6} />
+                            </IconLink>
+                            <IconLink onClick={() => { navigate('/politicians') }}>
                                 <Icon as={MdOutlinePeopleAlt} boxSize={6} />
                             </IconLink>
                         </div>
@@ -142,7 +142,7 @@ function NavBar() {
                                             </div>
                                         </MenuButton>
                                         <MenuList>
-                                            <MenuItem onClick={()=>{navigate("/profile")}}>{user.displayName}</MenuItem>
+                                            <MenuItem onClick={() => { navigate("/profile") }}>{user.displayName}</MenuItem>
                                             <MenuDivider />
                                             <MenuItem onClick={handleLogout}>Logout</MenuItem>
                                         </MenuList>

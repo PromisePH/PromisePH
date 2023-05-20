@@ -142,8 +142,8 @@ function Profile() {
                         </div>
                     </div>
                 </section>
-                <Tabs className="w-full max-w-3xl" defaultIndex={0} align="center" variant='unstyled' >
-                    <TabList className="md:gap-24 font-semibold flex-wrap bg-bunker p-1">
+                <Tabs className="w-full max-w-3xl" defaultIndex={0} variant='unstyled' >
+                    <TabList className="md:gap-24 font-semibold flex-wrap bg-bunker p-1 flex justify-center">
                         <Tab className="border-b-4 rounded-sm border-transparent hover:border-orange-500 focus:border-orange-red">Posts</Tab>
                         <Tab className="border-b-4 rounded-sm border-transparent hover:border-orange-500 focus:border-orange-red">Comments</Tab>
                         <Tab className="border-b-4 rounded-sm border-transparent hover:border-orange-500 focus:border-orange-red">Upvotes</Tab>
