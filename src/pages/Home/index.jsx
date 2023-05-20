@@ -41,6 +41,7 @@ import {
     AlertDialogHeader,
     AlertDialogContent,
     AlertDialogOverlay,
+    Spinner
 } from '@chakra-ui/react'
 
 const steps = [
@@ -60,6 +61,7 @@ function Home() {
     const [tags, setTags] = useState([])
     const [imageFile, setImageFile] = useState(null)
     const [filter, setFilter] = useState(null)
+    const [isLoading, setIsLoading] = useState(false)
 
     // Post UI state
     const { onClose } = useDisclosure()
@@ -79,30 +81,39 @@ function Home() {
 
     useEffect(() => {
         // Realtime listener for posts
-        let q;
-        if (filter == null) {
-            q = query(collection(db, CollectionsEnum.POSTS), orderBy(PostCollectionEnum.CREATED_AT, "desc"));
-        }
-        else if (filter == EntityCollectionEnum.POPULAR) {
-            q = query(collection(db, CollectionsEnum.POSTS), orderBy(PostCollectionEnum.VIEWS, "desc"));
-        }
-        else if (filter == EntityCollectionEnum.NEW) {
-            q = query(collection(db, CollectionsEnum.POSTS), orderBy(PostCollectionEnum.CREATED_AT, "desc"));
-        }
-        else {
-            q = query(collection(db, CollectionsEnum.POSTS), where(PostCollectionEnum.TAGS, "array-contains", filter));
-        }
+        try {
+            setIsLoading(true)
+            let q;
+            if (filter == null) {
+                q = query(collection(db, CollectionsEnum.POSTS), orderBy(PostCollectionEnum.CREATED_AT, "desc"));
+            }
+            else if (filter == EntityCollectionEnum.POPULAR) {
+                q = query(collection(db, CollectionsEnum.POSTS), orderBy(PostCollectionEnum.VIEWS, "desc"));
+            }
+            else if (filter == EntityCollectionEnum.NEW) {
+                q = query(collection(db, CollectionsEnum.POSTS), orderBy(PostCollectionEnum.CREATED_AT, "desc"));
+            }
+            else {
+                q = query(collection(db, CollectionsEnum.POSTS), where(PostCollectionEnum.TAGS, "array-contains", filter));
+            }
 
-        onSnapshot(q, doc => {
-            setPosts(doc.docs.map(
-                doc => {
-                    return {
-                        id: doc.id,
-                        ...doc.data()
+            onSnapshot(q, doc => {
+                setPosts(doc.docs.map(
+                    doc => {
+                        return {
+                            id: doc.id,
+                            ...doc.data()
+                        }
                     }
-                }
-            ));
-        });
+                ));
+            });
+        }
+        catch (error) {
+            console.error(error.message)
+        }
+        finally {
+            setIsLoading(false);
+        }
     }, [user, filter]);
 
     const closePostFormModal = () => {
@@ -156,14 +167,22 @@ function Home() {
                 return;
             }
         }
-        if (step == 3 && (sources.length == 0 || tags.length == 0)) {
-            toast({
-                title: "Please add at least one credible source",
-                position: 'bottom-left',
-                status: 'error',
-                isClosable: true
-            })
-            return
+        if (step == 3) {
+            const errors = {
+                [sources.length == 0]: 'Please add at least one credible source.',
+                [tags.length == 0]: 'Please add at least one tag.',
+                [sources.length == 1 && sources[0] == '']: 'Please add at least one credible source.',
+            }
+            const errorMessage = errors[true];
+            if (errorMessage) {
+                toast({
+                    title: "Please add at least one credible source",
+                    position: 'bottom-left',
+                    status: 'error',
+                    isClosable: true
+                })
+                return
+            }
         }
         setStep(step + 1);
         setActiveStep(activeStep + 1);
@@ -259,14 +278,17 @@ function Home() {
                             : null
                     }
                     {
-                        posts.length > 0 ?
-                            posts.map(post =>
-                                <Post key={post.id} post={post} user={user} />
-                            )
+                        isLoading ?
+                            <Spinner />
                             :
-                            <p className='flex flex-col items-center justify-center w-full h-96 font-bold text-lg'>
-                                No Promises Found
-                            </p>
+                            posts.length > 0 ?
+                                posts.map(post =>
+                                    <Post key={post.id} post={post} user={user} />
+                                )
+                                :
+                                <p className='flex flex-col items-center justify-center w-full h-96 font-bold text-lg'>
+                                    No Promises Found
+                                </p>
                     }
                     <Modal isOpen={isModalOpen} onClose={() => setIsAlertOpen(true)} closeOnOverlayClick={false} size='5xl'>
                         <ModalOverlay />

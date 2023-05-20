@@ -11,6 +11,8 @@ import Login from "../pages/Login";
 import Profile from "../pages/Profile";
 import Menu from "../pages/SearchMenu/Menu";
 import Promise from "../pages/Promise";
+import PoliticiansList from "../pages/PoliticiansList";
+import Politician from "../pages/Politician";
 
 const RouterConfig = () => {
 	return (
@@ -21,6 +23,8 @@ const RouterConfig = () => {
 			<Route exact path="/profile" element={<Profile />}></Route>
 			<Route exact path="/search/:pID" element={<Menu/>}/>
 			<Route exact path="/promise/:promiseID" element={<Promise />}/>
+			<Route exact path="/politicians" element={<PoliticiansList />}></Route>
+			<Route exact path="/politicians/:politicianId" element={<Politician />}></Route>
 			<Route path="*" element={<Navigate to="/" />}></Route>
 		</Routes>
 	);
