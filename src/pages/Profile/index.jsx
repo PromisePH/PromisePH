@@ -24,7 +24,8 @@ import {
     Editable,
     EditableInput,
     EditablePreview,
-    useEditableControls
+    useEditableControls,
+    Spinner
 } from "@chakra-ui/react";
 
 function CustomEditableControls() {
@@ -63,33 +64,41 @@ function Profile() {
     const [user] = useAuthState(auth);
     const [posts, setPosts] = useState([])
     const [name, setName] = useState('')
+    const [isLoading, setIsLoading] = useState(false)
     const navigate = useNavigate();
-    useEffect(() => {
+    useEffect(() => {``
         // Realtime listener for posts
         if (!user) {
             navigate('/login')
             return;
         }
 
-        console.log(user)
-
         setName(user.displayName)
 
-        const q = query(collection(db, CollectionsEnum.POSTS), orderBy("createdAt", "desc"));
-        onSnapshot(q, doc => {
-            const posts = doc.docs.map(
-                doc => {
-                    return {
-                        id: doc.id,
-                        ...doc.data()
+        try {
+            setIsLoading(true)
+            const q = query(collection(db, CollectionsEnum.POSTS), orderBy("createdAt", "desc"));
+            onSnapshot(q, doc => {
+                const posts = doc.docs.map(
+                    doc => {
+                        return {
+                            id: doc.id,
+                            ...doc.data()
+                        }
                     }
-                }
-            )
-            const filteredPosts = posts.filter(
-                data => data.poster && data.poster.id === user.uid
-            )
-            setPosts(filteredPosts);
-        });
+                )
+                const filteredPosts = posts.filter(
+                    data => data.poster && data.poster.id === user.uid
+                )
+                setPosts(filteredPosts);
+            });
+        }
+        catch (err) {
+            console.log(err)
+        }
+        finally {
+            setIsLoading(false)
+        }
     }, [user]);
 
     const nameChangeHandler = (e) => {
@@ -151,29 +160,35 @@ function Profile() {
                     <TabPanels>
                         <TabPanel className="px-0">
                             {
-                                user && posts.length > 0 ?
-                                    posts.map(post =>
-                                        <Post key={post.id} post={post} user={user} />
-                                    )
-                                    : null
+                                isLoading ?
+                                    <Spinner/> :
+                                    user && posts.length > 0 ?
+                                        posts.map(post =>
+                                            <Post key={post.id} post={post} user={user} />
+                                        )
+                                        : null
                             }
                         </TabPanel>
                         <TabPanel className="px-0">
                             {
-                                user && posts.length > 0 ?
-                                    posts.map(post =>
-                                        <Post key={post.id} post={post} user={user} />
-                                    )
-                                    : null
+                                isLoading ?
+                                    <Spinner/> :
+                                    user && posts.length > 0 ?
+                                        posts.map(post =>
+                                            <Post key={post.id} post={post} user={user} />
+                                        )
+                                        : null
                             }
                         </TabPanel>
                         <TabPanel className="px-0">
                             {
-                                user && posts.length > 0 ?
-                                    posts.map(post =>
-                                        <Post key={post.id} post={post} user={user} />
-                                    )
-                                    : null
+                                isLoading ?
+                                    <Spinner/> :
+                                    user && posts.length > 0 ?
+                                        posts.map(post =>
+                                            <Post key={post.id} post={post} user={user} />
+                                        )
+                                        : null
                             }
                         </TabPanel>
                     </TabPanels>
