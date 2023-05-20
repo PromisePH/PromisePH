@@ -79,7 +79,7 @@ function Post({ post, user }) {
       </div>
       <div className="flex flex-row gap-3">
         {/* <!-- Image div--> */}
-        <a href={window.location.href} target="_blank" rel="noreferrer" >
+        <a href={post.image} target="_blank" rel="noreferrer" >
           <Image src={post.image} alt={post.title} className='sm:w-36 sm:h-36 w-28 h-28 object-cover rounded-md' fallbackSrc={FallbackImage} />
         </a>
         {/* <!-- Content div--> */}
@@ -87,8 +87,7 @@ function Post({ post, user }) {
           {/* <!-- Header div--> */}
           <div className="flex flex-col gap-1">
             <div className="flex flex-row items-center justify-between">
-              <a target="_blank" rel="noopener" className="text-lg md:text-xl font-bold flex-grow cursor-pointer"
-                onMouseDown={()=>navigate(`promise/${post.id}`)}>
+              <a target="_blank" href={`promise/${post.id}`} rel="noreferrer" className="text-lg md:text-xl font-bold flex-grow cursor-pointer">
                 {post.title}
               </a>
               <div className="text-2xl flex flex-col items-center gap-1">

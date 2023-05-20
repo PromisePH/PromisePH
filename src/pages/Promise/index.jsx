@@ -27,8 +27,8 @@ function Promise() {
     }
 
     useEffect(() => {
-        setIsLoading(true);
         updateView();
+        setIsLoading(true);
         const postRef = doc(db, "posts", params.promiseID);
         const comRef = collection(db, "comment");
         onSnapshot(postRef, (doc) => {
@@ -60,7 +60,12 @@ function Promise() {
         }
         );
     }, [user, params.promiseID]);
-
+    const d1 = data.createdAt ? data.createdAt.toDate() : new Date();
+    const d2 = new Date();
+    const diffDays = Math.round((d2.getTime() - d1.getTime()) / (1000 * 60 * 60 * 24));
+    const yearDiff = d2.getFullYear() - d1.getFullYear();
+    const monthDiff = d2.getMonth() - d1.getMonth();
+    const totalMonthDiff = yearDiff * 12 + monthDiff;
     // Update Reaction
     function updatePostLike(liked) {
         setIsActive(!isActive);
@@ -80,7 +85,7 @@ function Promise() {
         //If a User is Logged In
         if (user) {
             updatePostLike(!isActive);
-        //If no User Logged In
+            //If no User Logged In
         } else {
             navigate("/login");
         }
@@ -129,17 +134,36 @@ function Promise() {
                 </>
                 : <>
                     {/* Main Promise Div */}
-                    <main className="py-16 md:pb-0">
+                    <main className="pt-16 pb-3 pb-0">
                         <div className="max-w-3xl mx-auto bg-bunker shadow-md rounded-lg p-4 mb-4 mt-5">
+
+                            <div className="flex flex-row items-center mb-2">
+                                <a href={window.location.href} target="_blank" rel="noreferrer" className="flex items-center">
+                                {/* Poster Name */}
+                                    <span className="ml-2 text-white text-1xs text-sm font-bold">{data.poster.name}</span>
+                                </a>
+                                <span className="ml-4 text-white text-xs text-sm italic">
+                                {/* Post Date */}
+                                    {diffDays <= 31
+                                        ? diffDays + " Day/s ago"
+                                        : yearDiff > 0 ? yearDiff + " Year/s ago"
+                                            : totalMonthDiff <= 12 && totalMonthDiff != 0
+                                                ? totalMonthDiff + " Month/s ago"
+                                                : diffDays + "Day/s ago"
+                                    }
+                                </span>
+                            </div>
 
                             {/* Promise Contents Div*/}
                             <div className="flex flex-row">
 
                                 {/* Post Image Div */}
                                 <div className="w-28 h-28 box-border">
-                                    <img src={data.image} className="w-28 h-28 object-cover rounded-lg" />
+                                    <a href={`${data.image}`}>
+                                        <img src={data.image} className="w-28 h-28 object-cover rounded-lg" />
+                                    </a>
                                 </div>
-                                
+
                                 {/* Promise Header Div */}
                                 <div className="w-5/6 h-28 box-content box-border">
                                     <div className="flex flex-col p-2 h-max min-w-0 max-w-max">
@@ -147,7 +171,7 @@ function Promise() {
                                         <div className="md:text-2xl font-bold w-full max-w-full h-16 overflow-hidden overflow-ellipsis">
                                             {data.title}
                                         </div>
-                                        
+
                                         {/* Tags Row Div*/}
                                         <div className="flex flex-row h-12 max-h-10 items-center space-x-2">
                                             {/* 'Verified By' Tags Div */}
@@ -179,7 +203,7 @@ function Promise() {
 
                             {/* Promise Description Div */}
                             <div className="mt-5 text-justify">
-                                {data.details}
+                                {data.description}
                             </div>
 
                             {/* (View, Like, Comment) Count - View Sources - React Button Divs*/}

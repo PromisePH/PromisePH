@@ -50,6 +50,7 @@ function Comment(com) {
                         postId: params.promiseID,
                         rootComment: "true",
                         details: comment,
+                        isDeleted: false,
                         replies: [],
                     }
                 );
@@ -77,7 +78,7 @@ function Comment(com) {
                 {/* Post a Comment Area*/}
                 <div className="w-full bg-midnight rounded-lg p-2" onBlur={() => setCommentAlert(false)}>
                     {/* Textarea for comment posting*/}
-                    <textarea className="h-28 p-2 rounded-lg bg-midnight w-full" value={userComment} placeholder="What do you think of this promise..." onChange={(e) => { setUserComment(e.target.value) }} />
+                    <textarea className="h-28 p-2 rounded-lg bg-midnight w-full border-none outline-none" value={userComment} placeholder="What do you think of this promise..." onChange={(e) => { setUserComment(e.target.value) }} />
                     <div className="w-full my-2 flex flex-row-reverse">
                         {/* Comment button for submission */}
                         <div className="bg-gray-600 rounded-full cursor-pointer float-right p-1 w-32 text-center hover:bg-orange-red" onMouseDown={() => { handleRootCommentSubmit(userComment) }}>
@@ -96,7 +97,7 @@ function Comment(com) {
                         {
                             commentData
                                 ? commentData.length > 0
-                                    ? commentData.map((com) => { return <MainCommentList key={com.id} id={com.id} />;})
+                                    ? commentData.map((com) => { return <MainCommentList key={com.id} id={com.id} parentId={null} />;})
                                     : <div className="w-full flex justify-center my-5">No Comments Found . . .</div>
                                 : <div className="w-full flex justify-center my-5">No Comments Found . . .</div>
                         }

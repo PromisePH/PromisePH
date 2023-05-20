@@ -1,14 +1,26 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { doc, addDoc, updateDoc, arrayUnion, collection, arrayRemove, onSnapshot } from 'firebase/firestore';
 import { db, auth } from '../../firebase/firebase';
 import { useAuthState } from "react-firebase-hooks/auth";
-import { Spinner } from "@chakra-ui/react";
+import { Spinner, useDisclosure } from "@chakra-ui/react";
 import { FiChevronDown, FiChevronUp } from "react-icons/fi";
-import { BiShare } from "react-icons/bi";
 import { SlOptionsVertical } from "react-icons/sl";
-
 import { useNavigate, useParams } from "react-router-dom";
 import { IconContext } from "react-icons";
+import {
+    useToast,
+    Button,
+    Menu,
+    MenuButton,
+    MenuList,
+    MenuItem,
+    AlertDialog,
+    AlertDialogBody,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogContent,
+    AlertDialogOverlay,
+} from '@chakra-ui/react'
 
 function MainCommentList(com) {
     const [user] = useAuthState(auth);
@@ -22,7 +34,11 @@ function MainCommentList(com) {
     const [downHover, setDownHover] = useState(false);
     const [activeDownvote, setActiveDownvote] = useState(false);
     const [activeUpvote, setActiveUpvote] = useState(false);
+    const [activeDetail, setActiveDetail] = useState(false);
     const [voteCount, setVoteCount] = useState(0);
+    const { isOpen, onOpen, onClose } = useDisclosure();
+    const toast = useToast();
+    const cancelRef = useRef(null);
     const params = useParams();
     const navigate = useNavigate();
 
@@ -36,17 +52,12 @@ function MainCommentList(com) {
                     ...temp
                 }
             );
-            if (user) {
-                if (temp.upvotes)
-                    if (temp.upvotes.includes(user.uid)) {
-                        setActiveUpvote(true)
-                        setActiveDownvote(false)
-                    }
-                if (temp.downvotes)
-                    if (temp.downvotes.includes(user.uid)) {
-                        setActiveUpvote(false)
-                        setActiveDownvote(true)
-                    }
+            if (user && temp && temp.upvotes.includes(user.uid)) {
+                setActiveUpvote(true)
+                setActiveDownvote(false)
+            } else if (user && temp && temp.downvotes.includes(user.uid)) {
+                setActiveUpvote(false)
+                setActiveDownvote(true)
             } else {
                 setActiveUpvote(false)
                 setActiveDownvote(false)
@@ -65,6 +76,13 @@ function MainCommentList(com) {
     function updateRootComment(replyID) {
         const comRef = doc(db, "comment", com.id);
         const update = async () => await updateDoc(comRef, { replies: arrayUnion(replyID) })
+        update();
+    }
+
+    //Delete Comment
+    function deleteComment() {
+        const comRef = doc(db, "comment", com.id);
+        const update = async () => await updateDoc(comRef, { isDeleted: true })
         update();
     }
 
@@ -149,7 +167,7 @@ function MainCommentList(com) {
             if (vote == "up")
                 activeUpvote ? updateCommentUpvote("unvoted") : updateCommentUpvote("voted");
             //for Downvote    
-            if (vote == "down")
+            else if (vote == "down")
                 activeDownvote ? updateCommentDownvote("unvoted") : updateCommentDownvote("voted");
         }
         //If no User Logged In 
@@ -161,8 +179,8 @@ function MainCommentList(com) {
     return (
         commentData
             ? <>
-                <div className="flex flex-row h-auto">
-                    <div className="flex flex-col justify-center relative h-16">
+                <div className={`flex flex-row h-auto rounded-lg ${activeDetail ? "bg-white bg-opacity-5" : ""}`}>
+                    <div className="flex flex-col justify-center relative h-16 mr-2">
                         {/* Upvote Icon */}
                         <IconContext.Provider value={{ color: activeUpvote ? "#FF4401" : upHover ? "#FF4401" : "FFFFFF" }}>
                             <div className="relative" onMouseDown={() => handleVote("up")} onMouseEnter={() => setUpHover(true)} onMouseLeave={() => setUpHover(false)}>
@@ -185,7 +203,7 @@ function MainCommentList(com) {
 
                     <div className="flex flex-col w-11/12">
                         {/* Comment Details Div*/}
-                        <div className="text-justify flex items-start pt-3 w-full"> {commentData.details} </div>
+                        <div className={`text-justify flex items-start pt-3 w-full ${commentData.isDeleted ? "italic" : ""}`}> {commentData.isDeleted ? "This Comment was removed by the user" : commentData.details} </div>
                         <div>
                             <div className="flex flex-row">
                                 {/* Commentor Name */}
@@ -201,17 +219,45 @@ function MainCommentList(com) {
                                     ? <div className={`${activeReplyContents ? "hidden" : ""} text-xs cursor-pointer  `} onMouseDown={() => setActiveReplyContents(true)}>
                                         Show Replies
                                     </div>
-                                    : <></>
+                                    : null
                                 }
                             </div>
                         </div>
                     </div>
-                    {/* Comment's Share and details button */}
-                    <div className="ml-3">
-                        <div className="pt-4 flex flex-row items-start justify-end w-full space-x-2">
-                            <BiShare />
-                            <SlOptionsVertical />
-                        </div>
+                    {/* Comment details button */}
+                    <div className="ml-1 -mr-1 pt-4 relative">
+                        {
+                            user && commentData && user.uid == commentData.commentorID
+                                ? <>
+                                    <Menu onOpen={() => { setActiveDetail(!activeDetail) }} onClose={() => { setActiveDetail(!activeDetail) }} >
+                                        {/* Menu Button */}
+                                        <MenuButton className={`flex p-1 flex-row items-start justify-end w-full space-x-2 rounded-full cursor-pointer hover:bg-gray-500 ${activeDetail ? "bg-gray-500" : ""}`}>
+                                            <SlOptionsVertical />
+                                        </MenuButton>
+                                        {/* Menu DropDown */}
+                                        <MenuList>
+                                            <MenuItem as={Button}
+                                                onClick={
+                                                    //Checks if the comment is already deleted
+                                                    commentData.isDeleted
+                                                        ? () => toast({
+                                                            title: 'Comment Already Deleted',
+                                                            status: 'error',
+                                                            duration: 3000,
+                                                            isClosable: true,
+
+                                                        })
+                                                        : onOpen
+                                                }
+                                                className="hover:text-red-500 hover:bg-gray-700"
+                                            >
+                                                Delete Comment
+                                            </MenuItem>
+                                        </MenuList>
+                                    </Menu>
+                                </>
+                                : null
+                        }
                     </div>
 
                 </div>
@@ -219,17 +265,17 @@ function MainCommentList(com) {
                 {/* Reply Submission Contents Div */}
                 <div className={`bg-gray-800 p-2 rounded-lg ${activeReply ? "" : "hidden"}`}>
                     {/* Reply Textarea for Reply */}
-                    <textarea className={`w-full h-32 rounded-lg p-2`} placeholder="Post a reply..." value={replyValue} onChange={(e) => setReplyValue(e.target.value)}></textarea>
+                    <textarea className={`w-full h-32 rounded-lg p-2 bg-transparent border-none outline-none`} placeholder="Post a reply..." value={replyValue} onChange={(e) => setReplyValue(e.target.value)}></textarea>
 
                     {/* Reply Submission Buttons & Error Message*/}
                     <div className="flex flex-row-reverse">
                         {/* Reply Button */}
-                        <div className="m-2 px-2 bg-gray-600 rounded-lg cursor-pointer" onMouseDown={() => { replyValue.length > 0 ? handleReplySubmit(replyValue) : setReplyError(true) }}>
+                        <div className={`m-2 px-2 bg-gray-600 rounded-lg cursor-pointer hover:bg-orange-red`} onMouseDown={() => { replyValue.length > 0 ? handleReplySubmit(replyValue) : setReplyError(true) }}>
                             Reply
                         </div>
 
                         {/* Cancel Reply Button */}
-                        <div className="m-2 px-2 bg-gray-600 rounded-lg cursor-pointer" onMouseDown={() => setActiveReply(false)}>
+                        <div className={`m-2 px-2 bg-gray-600 rounded-lg cursor-pointer hover:bg-orange-red`} onMouseDown={() => setActiveReply(false)}>
                             Cancel
                         </div>
 
@@ -255,14 +301,54 @@ function MainCommentList(com) {
                             commentData.replies
                                 ? commentData.replies.map((replyID) => {
                                     return <div className="pl-4" key={replyID}>
-                                        <MainCommentList id={replyID} />
+                                        <MainCommentList id={replyID} parentId={commentData.id} />
                                     </div>
                                 }
                                 )
-                                : <></>
+                                : null
                         }
                     </div>
                 </div>
+
+                {/* Alert for Delete Comment */}
+                <AlertDialog
+                    isOpen={isOpen}
+                    leastDestructiveRef={cancelRef}
+                    onClose={onClose}
+                >
+                    <AlertDialogOverlay>
+                        <AlertDialogContent>
+                            <AlertDialogHeader fontSize='lg' fontWeight='bold'>
+                                Delete Comment
+                            </AlertDialogHeader>
+
+                            <AlertDialogBody>
+                                Are you sure? You cant undo this action afterwards.
+                            </AlertDialogBody>
+
+                            <AlertDialogFooter>
+                                <Button ref={cancelRef} onClick={onClose}>
+                                    Cancel
+                                </Button>
+                                <Button colorScheme='red'
+                                    onClick={onClose}
+                                    onMouseDown={() => {
+                                        deleteComment();
+                                        toast({
+                                            title: 'Comment Deleted.',
+                                            status: 'success',
+                                            duration: 3000,
+                                            isClosable: true,
+                                        })
+                                    }}
+                                    ml={3}
+                                >
+                                    Delete
+                                </Button>
+                            </AlertDialogFooter>
+                        </AlertDialogContent>
+                    </AlertDialogOverlay>
+                </AlertDialog>
             </>
             : <Spinner />
     )

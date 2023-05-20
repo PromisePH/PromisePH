@@ -25,42 +25,41 @@ function SearchList(data) {
         }
         fetchData();
     }, [data.val]);
-    return isLoading && data.visible?
-        <div className="w-64 bg-black-russian mt-10 p-1 rounded-md fixed border-2 border-solid border-black">
+    return isLoading && data.visible
+        ? <div className="w-64 bg-bunker mt-10 p-1 rounded-md fixed border-2 border-solid border-rgb(65 72 78)">
             <div className="flex flex-col w-full">
                 <div className="py-2 pr-1 flex justify-center">
                     <Spinner />
                 </div>
             </div>
         </div>
-        :
-        (data.val && data.visible ?
-        <div className="w-64 bg-black-russian mt-10 p-1 rounded-md fixed border-2 border-solid border-black">
-            <div className="flex flex-col w-full">
-                {function (d) {
-                    if (d.length > 0) {
-                        return d.slice(0, 10).map((t) => {
-                            return <SearchResult info={t} key={t.id} />;
-                        })
-                    } else {
-                        return <div className="p-2">
-                            {"No Promises Found"}
-                        </div>;
-                    }
-                }(postsData)
-                }
-            </div>
-        </div>
-        :
-        !data.val && data.visible ?
-            <div className="w-64 bg-bunker mt-10 p-1 rounded-md fixed border-2 border-solid border-black">
+        : (data.val && data.visible
+            ? <div className="w-64 bg-bunker mt-10 p-1 rounded-md fixed border-2 border-solid border-rgb(65 72 78)">
                 <div className="flex flex-col w-full">
-                    <div className="p-2">
-                        {"Search for a Promise"}
-                    </div>
+                    {function (d) {
+                        if (d.length > 0) {
+                            return d.slice(0, 10).map((t) => {
+                                return <SearchResult info={t} key={t.id} />;
+                            })
+                        } else {
+                            return <div className="p-2">
+                                {"No Promises Found"}
+                            </div>;
+                        }
+                    }(postsData)
+                    }
                 </div>
             </div>
             :
-            <></>)
+            !data.val && data.visible ?
+                <div className="w-64 bg-bunker mt-10 p-1 rounded-md fixed border-2 border-solid border-rgb(65 72 78)">
+                    <div className="flex flex-col w-full">
+                        <div className="p-2">
+                            {"Search for a Promise"}
+                        </div>
+                    </div>
+                </div>
+                :
+                <></>)
 }
 export default SearchList;
