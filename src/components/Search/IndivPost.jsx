@@ -18,7 +18,7 @@ function IndivPost(data) {
   return (
     <section className="max-w-3xl mx-auto bg-bunker shadow-md rounded-lg p-4 mb-4 mt-5">
       <div className="flex md:hidden flex-row items-center">
-        <a href={window.location.href} target="_blank" rel="noopener" className="flex items-center">
+        <a href={window.location.href} target="_blank" rel="noreferrer" className="flex items-center">
           <span className="text-white text-1xs md:text-sm font-bold">{data.info.poster.name}</span>
           <button
             onClick={() => setIsActive(!isActive)}
@@ -37,7 +37,7 @@ function IndivPost(data) {
       <div className="flex flex-row">
         {/* <!-- Image div--> */}
         <div className="flex flex-col justify-between w-1/5">
-          <a href={window.location.href} target="_blank" rel="noopener" className="w-full">
+          <a href={data.info.image} target="_blank" rel="noreferrer" className="w-full">
             <div className="rounded-md">
               <img src={data.info.image} className="w-36 min-w-36 max-w-36 h-36 min-h-36 max-h-36 rounded-xl object-cover" alt="sample" />
             </div>
@@ -63,14 +63,14 @@ function IndivPost(data) {
 
             <div className="flex flex-row mt-1 items-center">
               {data.info.verifiedUpvotes.map((verifiedBy) => {
-                return <div className="bg-caribbean-green border-radius-full rounded-full text-black text-1xs md:text-xs text-center font-bold p-2 mr-1 md:p-3 md:mr-4 transform hover:scale-110">
+                return <div key={verifiedBy} className="bg-caribbean-green border-radius-full rounded-full text-black text-1xs md:text-xs text-center font-bold p-2 mr-1 md:p-3 md:mr-4 transform hover:scale-110">
                   {verifiedBy}
                 </div>
               })}
 
               <ul className="list-unstyled text-sm text-gray-500 flex flex-wrap">
                 {data.info.tags.map((tag) => {
-                  return <li className="bg-midnight border-radius-full rounded-full text-black font-bold text-1xs md:text-xs inline-block text-center px-2 py-1 mb-2 mr-1 md:mr-2 transform hover:scale-110">
+                  return <li key={tag} className="bg-midnight border-radius-full rounded-full text-black font-bold text-1xs md:text-xs inline-block text-center px-2 py-1 mb-2 mr-1 md:mr-2 transform hover:scale-110">
                     <span className="text-white">{tag}</span>
                   </li>
                 })}
@@ -80,7 +80,7 @@ function IndivPost(data) {
 
           {/* <!-- Footer div--> */}
           <div className="hidden md:flex flex-row items-center mt-6">
-            <a href={window.location.href} target="_blank" rel="noopener" className="hidden md:flex flex-row items-center mr-6">
+            <a href={window.location.href} target="_blank" rel="noreferrer" className="hidden md:flex flex-row items-center mr-6">
 
               <img src={SampleAvatar} alt="sample" className="w-8 h-8 rounded-full mr-2" />
 

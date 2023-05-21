@@ -5,6 +5,7 @@ import { useAuthState } from "react-firebase-hooks/auth";
 import { Spinner, useDisclosure } from "@chakra-ui/react";
 import { FiChevronDown, FiChevronUp } from "react-icons/fi";
 import { SlOptionsVertical } from "react-icons/sl";
+import { HiOutlineTrash } from "react-icons/hi";
 import { useNavigate, useParams } from "react-router-dom";
 import { IconContext } from "react-icons";
 import {
@@ -210,7 +211,7 @@ function MainCommentList(com) {
                                 <div className="text-xs font-bold mr-4"> {commentData.commentorName} </div>
 
                                 {/* Comment Reply Button */}
-                                <div className={`text-xs cursor-pointer mr-4 ${activeReply ? "hidden" : ""}`} onMouseDown={() => setActiveReply(true)}>
+                                <div className={`text-xs cursor-pointer mr-4 ${activeReply || commentData.isDeleted ? "hidden" : ""}`} onMouseDown={() => setActiveReply(true)}>
                                     Reply
                                 </div>
 
@@ -229,9 +230,9 @@ function MainCommentList(com) {
                         {
                             user && commentData && user.uid == commentData.commentorID
                                 ? <>
-                                    <Menu onOpen={() => { setActiveDetail(!activeDetail) }} onClose={() => { setActiveDetail(!activeDetail) }} >
+                                    <Menu onOpen={() => { setActiveDetail(true) }} onClose={() => { setActiveDetail(false) }} strategy="fixed" >
                                         {/* Menu Button */}
-                                        <MenuButton className={`flex p-1 flex-row items-start justify-end w-full space-x-2 rounded-full cursor-pointer hover:bg-gray-500 ${activeDetail ? "bg-gray-500" : ""}`}>
+                                        <MenuButton className={`flex p-1 flex-row items-start justify-end w-full space-x-2 rounded-full cursor-pointer md:hover:bg-gray-500 ${activeDetail ? "bg-gray-500" : ""}`}>
                                             <SlOptionsVertical />
                                         </MenuButton>
                                         {/* Menu DropDown */}
@@ -251,7 +252,8 @@ function MainCommentList(com) {
                                                 }
                                                 className="hover:text-red-500 hover:bg-gray-700"
                                             >
-                                                Delete Comment
+                                                <HiOutlineTrash className="mr-2 text-lg"/>
+                                                Delete Comment 
                                             </MenuItem>
                                         </MenuList>
                                     </Menu>

@@ -60,6 +60,6 @@ function SearchList(data) {
                     </div>
                 </div>
                 :
-                <></>)
+                null)
 }
 export default SearchList;

@@ -8,6 +8,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { Skeleton } from '@chakra-ui/react'
 import Comment from "../../components/Comment";
 import NavBar from "../../components/NavBar";
+import BottomNav from "../../components/BottomNav"
 
 function Promise() {
     const [user] = useAuthState(auth);
@@ -158,9 +159,9 @@ function Promise() {
                             <div className="flex flex-row">
 
                                 {/* Post Image Div */}
-                                <div className="w-28 h-28 box-border">
-                                    <a href={`${data.image}`}>
-                                        <img src={data.image} className="w-28 h-28 object-cover rounded-lg" />
+                                <div className="w-28 h-28 rounded-lg object-scale-down">
+                                    <a href={`${data.image}`} className="">
+                                        <img src={data.image} />
                                     </a>
                                 </div>
 
@@ -221,6 +222,7 @@ function Promise() {
                     </main>
                     {/* Comment Section Div */}
                     <Comment id={params.promiseID} />
+                    <BottomNav />
                 </>
         }
     </>

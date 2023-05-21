@@ -59,7 +59,7 @@ function Post({ post, user }) {
     }
   }
   return (
-    <section className="max-w-3xl mx-auto bg-bunker shadow-md rounded-lg p-4 mb-4">
+    <section className="max-w-3xl mx-auto bg-bunker shadow-md rounded-lg p-4 mb-4 cursor-pointer" onMouseDown={()=>navigate(`promise/${post.id}`)}>
       <div className="flex md:hidden flex-row items-center">
         <a href={window.location.href} target="_blank" rel="noreferrer" className="flex items-center">
           <span className="text-white text-1xs md:text-sm font-bold">{post.poster.name}</span>
@@ -79,14 +79,14 @@ function Post({ post, user }) {
       </div>
       <div className="flex flex-row gap-3">
         {/* <!-- Image div--> */}
-        <a href={post.image} target="_blank" rel="noreferrer" >
+        <a href={post.image} onMouseDown={(e)=>e.stopPropagation()} target="_blank" rel="noreferrer" >
           <Image src={post.image} alt={post.title} className='sm:w-36 sm:h-36 w-28 h-28 object-cover rounded-md' fallbackSrc={FallbackImage} />
         </a>
         {/* <!-- Content div--> */}
-        <div className="w-4/5">
+        <div className="w-4/5 cursor-pointer" onMouseDown={()=>navigate(`promise/${post.id}`)}>
           {/* <!-- Header div--> */}
-          <div className="flex flex-col gap-1">
-            <div className="flex flex-row items-center justify-between">
+          <div className="flex flex-col gap-1 cursor-pointer" onMouseDown={()=>navigate(`promise/${post.id}`)}>
+            <div className="flex flex-row items-center justify-between cursor-pointer" onMouseDown={()=>navigate(`promise/${post.id}`)}>
               <a target="_blank" href={`promise/${post.id}`} rel="noreferrer" className="text-lg md:text-xl font-bold flex-grow cursor-pointer">
                 {post.title}
               </a>
@@ -100,6 +100,7 @@ function Post({ post, user }) {
               </button>
               <button
                 onClick={likePost}
+                onMouseDown={(e)=>e.stopPropagation()}
                 className="text-orange-red text-2xl transform hover:scale-110"
               >
                 {isLiked ? <AiFillHeart /> : <AiOutlineHeart />}
@@ -110,7 +111,7 @@ function Post({ post, user }) {
               {
                 post.verifiedUpvotes ?
                   post.verifiedUpvotes.map((upvote) =>
-                    <button key={upvote} className="bg-caribbean-green border-radius-full rounded-full text-black text-1xs md:text-xs text-center font-bold p-2 mr-1 md:p-3 md:mr-4 transform hover:scale-110">
+                    <button key={upvote} className="bg-caribbean-green border-radius-full rounded-full text-black text-1xs md:text-xs text-center font-bold p-2 mr-1 md:p-3 md:mr-4 transform hover:scale-110" onMouseDown={(e)=>e.stopPropagation()}>
                       {upvote}
                     </button>
                   )
@@ -120,7 +121,7 @@ function Post({ post, user }) {
                 {
                   post.tags ?
                     post.tags.map((tag) =>
-                      <button key={tag} className="bg-midnight border-radius-full rounded-full text-black font-bold text-1xs md:text-xs inline-block text-center px-2 py-1 mb-2 mr-1 md:mr-2 transform hover:scale-110">
+                      <button key={tag} className="bg-midnight border-radius-full rounded-full text-black font-bold text-1xs md:text-xs inline-block text-center px-2 py-1 mb-2 mr-1 md:mr-2 transform hover:scale-110" onMouseDown={(e)=>e.stopPropagation()}>
                         <span className="text-white">{tag}</span>
                       </button>
                     )
@@ -132,7 +133,7 @@ function Post({ post, user }) {
           </div>
           {/* <!-- Footer div--> */}
           <div className="hidden sm:flex flex-row items-center mt-6">
-            <a href={window.location.href} target="_blank" rel="noreferrer" className="hidden md:flex flex-row items-center mr-6">
+            <a href="#" target="_blank" rel="noreferrer" className="hidden md:flex flex-row items-center mr-6 cursor-pointer" onMouseDown={(e)=>{e.stopPropagation();}}>
               <div className="min-w-8 h-8 rounded-full mr-2">
                 <Avatar name={post.poster.name}  styles='rounded-lg min-w-fit' alt={post.poster.name} />
               </div>
