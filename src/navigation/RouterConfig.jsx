@@ -21,7 +21,7 @@ const RouterConfig = () => {
 			<Route exact path="/login" element={<Login />}></Route>
 			<Route exact path="/signup" element={<Signup />}></Route>
 			<Route exact path="/profile" element={<Profile />}></Route>
-			<Route exact path="/searchmenu/:pID" element={<Menu/>}/>
+			<Route exact path="/search/:pID" element={<Menu/>}/>
 			<Route exact path="/promise/:promiseID" element={<Promise />}/>
 			<Route exact path="/politicians" element={<PoliticiansList />}></Route>
 			<Route exact path="/politicians/:politicianId" element={<Politician />}></Route>
