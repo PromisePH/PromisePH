@@ -73,7 +73,7 @@ function Comment(com) {
         }
     }
     return (
-        <div className="flex justify-center w-full">
+        <div className="flex justify-center w-full pb-16 px-4">
             <div className="max-w-3xl w-full flex flex-col p-4 bg-bunker rounded-lg">
                 {/* Post a Comment Area*/}
                 <div className="w-full bg-midnight rounded-lg p-2" onBlur={() => setCommentAlert(false)}>

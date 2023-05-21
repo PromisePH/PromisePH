@@ -135,7 +135,7 @@ function Promise() {
                 </>
                 : <>
                     {/* Main Promise Div */}
-                    <main className="pt-16 pb-3 pb-0">
+                    <main className="pt-16 pb-3 px-4">
                         <div className="max-w-3xl mx-auto bg-bunker shadow-md rounded-lg p-4 mb-4 mt-5">
 
                             <div className="flex flex-row items-center mb-2">
@@ -160,7 +160,7 @@ function Promise() {
 
                                 {/* Post Image Div */}
                                 <div className="w-28 h-28 rounded-lg object-scale-down">
-                                    <a href={`${data.image}`} className="">
+                                    <a href={`${data.image}`} target="_blank" rel="noreferrer" className="">
                                         <img src={data.image} />
                                     </a>
                                 </div>

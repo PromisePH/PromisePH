@@ -59,7 +59,7 @@ function Post({ post, user }) {
     }
   }
   return (
-    <section className="max-w-3xl mx-auto bg-bunker shadow-md rounded-lg p-4 mb-4 cursor-pointer" onMouseDown={()=>navigate(`promise/${post.id}`)}>
+    <section className="max-w-3xl mx-auto bg-bunker shadow-md rounded-lg p-4 mb-4 cursor-pointer" onMouseDown={()=>window.open(`/promise/${post.id}`,'_blank')}>
       <div className="flex md:hidden flex-row items-center">
         <a href={window.location.href} target="_blank" rel="noreferrer" className="flex items-center">
           <span className="text-white text-1xs md:text-sm font-bold">{post.poster.name}</span>
@@ -83,10 +83,10 @@ function Post({ post, user }) {
           <Image src={post.image} alt={post.title} className='sm:w-36 sm:h-36 w-28 h-28 object-cover rounded-md' fallbackSrc={FallbackImage} />
         </a>
         {/* <!-- Content div--> */}
-        <div className="w-4/5 cursor-pointer" onMouseDown={()=>navigate(`promise/${post.id}`)}>
+        <div className="w-4/5 cursor-pointer" onMouseDown={()=>window.open(`/promise/${post.id}`,'_blank')}>
           {/* <!-- Header div--> */}
-          <div className="flex flex-col gap-1 cursor-pointer" onMouseDown={()=>navigate(`promise/${post.id}`)}>
-            <div className="flex flex-row items-center justify-between cursor-pointer" onMouseDown={()=>navigate(`promise/${post.id}`)}>
+          <div className="flex flex-col gap-1 cursor-pointer" onMouseDown={()=>window.open(`/promise/${post.id}`,'_blank')}>
+            <div className="flex flex-row items-center justify-between cursor-pointer" onMouseDown={()=>window.open(`/promise/${post.id}`,'_blank')}>
               <a target="_blank" href={`promise/${post.id}`} rel="noreferrer" className="text-lg md:text-xl font-bold flex-grow cursor-pointer">
                 {post.title}
               </a>
@@ -133,7 +133,7 @@ function Post({ post, user }) {
           </div>
           {/* <!-- Footer div--> */}
           <div className="hidden sm:flex flex-row items-center mt-6">
-            <a href="#" target="_blank" rel="noreferrer" className="hidden md:flex flex-row items-center mr-6 cursor-pointer" onMouseDown={(e)=>{e.stopPropagation();}}>
+            <a target="_blank" rel="noreferrer" className="hidden md:flex flex-row items-center mr-6" onMouseDown={(e)=>{e.stopPropagation();}}>
               <div className="min-w-8 h-8 rounded-full mr-2">
                 <Avatar name={post.poster.name}  styles='rounded-lg min-w-fit' alt={post.poster.name} />
               </div>

@@ -236,7 +236,7 @@ function MainCommentList(com) {
                                             <SlOptionsVertical />
                                         </MenuButton>
                                         {/* Menu DropDown */}
-                                        <MenuList>
+                                        <MenuList className="px-2">
                                             <MenuItem as={Button}
                                                 onClick={
                                                     //Checks if the comment is already deleted
@@ -319,7 +319,7 @@ function MainCommentList(com) {
                     onClose={onClose}
                 >
                     <AlertDialogOverlay>
-                        <AlertDialogContent>
+                        <AlertDialogContent className="mx-4 mt-20">
                             <AlertDialogHeader fontSize='lg' fontWeight='bold'>
                                 Delete Comment
                             </AlertDialogHeader>
