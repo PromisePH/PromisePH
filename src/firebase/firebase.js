@@ -1,6 +1,7 @@
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
+import { getStorage } from "firebase/storage";
 import { 
 	getFunctions,
 	// connectFunctionsEmulator
@@ -20,7 +21,7 @@ let app = initializeApp(firebaseConfig);
 
 export const auth = getAuth(app);
 export const db = getFirestore(app);
-
+export const storage = getStorage(app);
 let functions = getFunctions(app);
 // connectFunctionsEmulator(functions, "localhost", 5001);
 
