@@ -159,9 +159,9 @@ function Promise() {
                             <div className="flex flex-row">
 
                                 {/* Post Image Div */}
-                                <div className="w-28 h-28 rounded-lg object-scale-down">
-                                    <a href={`${data.image}`} target="_blank" rel="noreferrer" className="">
-                                        <img src={data.image} />
+                                <div className="w-28 h-28 rounded-lg">
+                                    <a href={`${data.image}`} target="_blank" rel="noreferrer" className="w-28 h-28">
+                                        <img src={data.image} className="object-cover w-full h-full rounded-md"/>
                                     </a>
                                 </div>
 
