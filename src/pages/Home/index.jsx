@@ -169,14 +169,12 @@ function Home() {
         }
         if (step == 3) {
             const errors = {
-                [sources.length == 0]: 'Please add at least one credible source.',
                 [tags.length == 0]: 'Please add at least one tag.',
-                [sources.length == 1 && sources[0] == '']: 'Please add at least one credible source.',
             }
             const errorMessage = errors[true];
             if (errorMessage) {
                 toast({
-                    title: "Please add at least one credible source",
+                    title: errorMessage,
                     position: 'bottom-left',
                     status: 'error',
                     isClosable: true
@@ -190,6 +188,21 @@ function Home() {
 
     const submitPromisePost = async () => {
         try {
+            const errors = {
+                [sources.length == 0]: 'Please add at least one credible source.',
+                [sources.length == 1 && (!sources[0] || sources[0].length == 0)]: 'Please add at least one credible source.',
+            }
+            const errorMessage = errors[true];
+            if (errorMessage) {
+                toast({
+                    title: errorMessage,
+                    position: 'bottom-left',
+                    status: 'error',
+                    isClosable: true
+                })
+                return
+            }
+
             setIsSubmitting(true)
             setStep(step + 1);
 
@@ -236,6 +249,13 @@ function Home() {
                 }
                 await setDoc(tagRef, tagData);
             }
+
+            const userDataRef = doc(db, CollectionsEnum.USER_DATA, user.uid)
+            await setDoc(
+                userDataRef,
+                { userPosts: arrayUnion(postRef.id) },
+                { merge: true }
+            );
 
             // Close modal and show toast
             closePostFormModal()

@@ -23,6 +23,8 @@ import {
     AlertDialogOverlay,
 } from '@chakra-ui/react'
 
+import CollectionsEnum from '../../constants/collections';
+
 function MainCommentList(com) {
     const [user] = useAuthState(auth);
     const [commentData, setCommentData] = useState([]);
@@ -44,7 +46,7 @@ function MainCommentList(com) {
     const navigate = useNavigate();
 
     useEffect(() => {
-        const commentsRef = doc(db, "comment", com.id);
+        const commentsRef = doc(db, CollectionsEnum.COMMENTS, com.id);
         onSnapshot(commentsRef, (doc) => {
             const temp = doc.data();
             setCommentData(
@@ -75,14 +77,14 @@ function MainCommentList(com) {
 
     //Update Root Comment
     function updateRootComment(replyID) {
-        const comRef = doc(db, "comment", com.id);
+        const comRef = doc(db, CollectionsEnum.COMMENTS, com.id);
         const update = async () => await updateDoc(comRef, { replies: arrayUnion(replyID) })
         update();
     }
 
     //Delete Comment
     function deleteComment() {
-        const comRef = doc(db, "comment", com.id);
+        const comRef = doc(db, CollectionsEnum.COMMENTS, com.id);
         const update = async () => await updateDoc(comRef, { isDeleted: true })
         update();
     }
@@ -92,7 +94,7 @@ function MainCommentList(com) {
         // If a User is Logged In
         if (user) {
             const replyRef = async () => {
-                const comRef = await addDoc(collection(db, "comment"),
+                const comRef = await addDoc(collection(db, CollectionsEnum.COMMENTS),
                     {
                         "commentorName": user.displayName,
                         "commentorID": user.uid,
@@ -122,7 +124,7 @@ function MainCommentList(com) {
             setActiveUpvote(true);
             setVoteCount(activeDownvote ? voteCount + 2 : voteCount + 1);
             setActiveDownvote(false);
-            const comRef = doc(db, "comment", com.id);
+            const comRef = doc(db, CollectionsEnum.COMMENTS, com.id);
             const update = async () => await updateDoc(comRef, { upvotes: arrayUnion(user.uid) })
             const update2 = async () => await updateDoc(comRef, { downvotes: arrayRemove(user.uid) })
             update();
@@ -132,7 +134,7 @@ function MainCommentList(com) {
         else if (event == "unvoted") {
             setActiveUpvote(false);
             setVoteCount(voteCount - 1);
-            const comRef = doc(db, "comment", com.id);
+            const comRef = doc(db, CollectionsEnum.COMMENTS, com.id);
             const update = async () => await updateDoc(comRef, { upvotes: arrayRemove(user.uid) })
             update();
         }
@@ -144,7 +146,7 @@ function MainCommentList(com) {
             setActiveDownvote(true);
             setVoteCount(activeUpvote ? voteCount - 2 : voteCount - 1);
             setActiveUpvote(false);
-            const comRef = doc(db, "comment", com.id);
+            const comRef = doc(db, CollectionsEnum.COMMENTS, com.id);
             const update = async () => await updateDoc(comRef, { downvotes: arrayUnion(user.uid) })
             const update2 = async () => await updateDoc(comRef, { upvotes: arrayRemove(user.uid) })
             update();
@@ -154,7 +156,7 @@ function MainCommentList(com) {
         else if (event == "unvoted") {
             setActiveDownvote(false);
             setVoteCount(voteCount + 1);
-            const comRef = doc(db, "comment", com.id);
+            const comRef = doc(db, CollectionsEnum.COMMENTS, com.id);
             const update = async () => await updateDoc(comRef, { downvotes: arrayRemove(user.uid) })
             update();
         }
@@ -252,8 +254,8 @@ function MainCommentList(com) {
                                                 }
                                                 className="hover:text-red-500 hover:bg-gray-700"
                                             >
-                                                <HiOutlineTrash className="mr-2 text-lg"/>
-                                                Delete Comment 
+                                                <HiOutlineTrash className="mr-2 text-lg" />
+                                                Delete Comment
                                             </MenuItem>
                                         </MenuList>
                                     </Menu>
