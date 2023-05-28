@@ -1,14 +1,16 @@
 import React, { useEffect, useState } from "react";
-import { AiOutlineHeart } from "react-icons/ai";
-import { AiFillHeart } from "react-icons/ai";
-import { db, auth } from "../../firebase/firebase";
+import { collection, doc, updateDoc, arrayRemove, arrayUnion, onSnapshot, increment, setDoc } from "firebase/firestore";
+import { AiOutlineHeart, AiFillHeart } from "react-icons/ai";
 import { useAuthState } from "react-firebase-hooks/auth";
-import { collection, doc, updateDoc, arrayRemove, arrayUnion, onSnapshot, increment } from "firebase/firestore";
 import { useNavigate, useParams } from "react-router-dom";
 import { Skeleton } from '@chakra-ui/react'
+
+import { db, auth } from "../../firebase/firebase";
+
 import Comment from "../../components/Comment";
 import NavBar from "../../components/NavBar";
 import BottomNav from "../../components/BottomNav"
+import CollectionsEnum from '../../constants/collections';
 
 function Promise() {
     const [user] = useAuthState(auth);
@@ -37,9 +39,7 @@ function Promise() {
             setPromiseData({ id: doc.id, ...temp });
             setIsActive(
                 user
-                    ? temp.upvotes.includes(user.uid)
-                        ? true
-                        : false
+                    ? !!temp.upvotes.includes(user.uid)
                     : false
             );
             setViewCount(temp.views);
@@ -67,17 +67,28 @@ function Promise() {
     const yearDiff = d2.getFullYear() - d1.getFullYear();
     const monthDiff = d2.getMonth() - d1.getMonth();
     const totalMonthDiff = yearDiff * 12 + monthDiff;
+
     // Update Reaction
-    function updatePostLike(liked) {
+    const updatePostLike = async (liked) => {
         setIsActive(!isActive);
+        const userDataRef = doc(db, CollectionsEnum.USER_DATA, user.uid)
+
         if (liked) {
             const postRef = doc(db, "posts", params.promiseID);
-            const update = async () => await updateDoc(postRef, { upvotes: arrayUnion(user.uid) });
-            update();
+            await updateDoc(postRef, { upvotes: arrayUnion(user.uid) });
+            await setDoc(
+                userDataRef,
+                { upvotedPosts: arrayUnion(params.promiseID) },
+                { merge: true }
+            );
         } else {
             const postRef = doc(db, "posts", params.promiseID);
-            const update = async () => await updateDoc(postRef, { upvotes: arrayRemove(user.uid) });
-            update();
+            await updateDoc(postRef, { upvotes: arrayRemove(user.uid) });
+            await setDoc(
+                userDataRef,
+                { upvotedPosts: arrayRemove(params.promiseID) },
+                { merge: true }
+            );
         }
     }
 
@@ -140,11 +151,11 @@ function Promise() {
 
                             <div className="flex flex-row items-center mb-2">
                                 <a href={window.location.href} target="_blank" rel="noreferrer" className="flex items-center">
-                                {/* Poster Name */}
+                                    {/* Poster Name */}
                                     <span className="ml-2 text-white text-1xs text-sm font-bold">{data.poster.name}</span>
                                 </a>
                                 <span className="ml-4 text-white text-xs text-sm italic">
-                                {/* Post Date */}
+                                    {/* Post Date */}
                                     {diffDays <= 31
                                         ? diffDays + " Day/s ago"
                                         : yearDiff > 0 ? yearDiff + " Year/s ago"
