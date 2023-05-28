@@ -1,7 +1,7 @@
 const CollectionsEnum = {
     POSTS: 'posts',
     USERS: 'users',
-    COMMENTS: 'comments',
+    COMMENTS: 'comment',
     ENTITY: 'entity',
     TAGS: 'tags',
     USER_DATA: 'user_data',

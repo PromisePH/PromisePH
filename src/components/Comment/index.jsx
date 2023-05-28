@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { collection, addDoc, onSnapshot, setDoc, arrayUnion, doc } from "firebase/firestore";
+import { query, where, collection, addDoc, onSnapshot, setDoc, arrayUnion, doc } from "firebase/firestore";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { useParams } from "react-router";
 import { useNavigate } from "react-router-dom";
 
 import { db, auth } from "../../firebase/firebase";
 import CollectionsEnum from '../../constants/collections';
+import CommentsCollectionEnum from "../../constants/comments";
 
 import MainCommentList from "./MainCommentList";
 
@@ -18,7 +19,22 @@ function Comment(com) {
     const navigate = useNavigate();
 
     useEffect(() => {
-        const commentRef = collection(db, "comment");
+        const commentRef = query(
+            collection(
+                db,
+                CollectionsEnum.COMMENTS,
+            ), 
+            where(
+                CommentsCollectionEnum.POST_ID,
+                "==",
+                com.id
+            ),
+            where(
+                CommentsCollectionEnum.ROOT_COMMENT,
+                "==",
+                'true'
+            )
+        );
         onSnapshot(commentRef, (doc) => {
             setCommentData(
                 doc.docs
@@ -27,15 +43,9 @@ function Comment(com) {
                             id: doc.id,
                             ...doc.data(),
                         };
-                    }
-                    )
-                    .filter((comment) => {
-                        return comment.postId.includes(com.id) && comment.rootComment.includes("true");
-                    }
-                    )
+                    })
             );
-        }
-        );
+        });
     }, [user, params.promiseID]);
 
     //Comment Submission
@@ -43,7 +53,7 @@ function Comment(com) {
         //If a User is Logged in
         if (user) {
             const commentRef = async () => {
-                const commentDoc = await addDoc(collection(db, "comment"),
+                const commentDoc = await addDoc(collection(db, CollectionsEnum.COMMENTS),
                     {
                         commentorName: user.displayName,
                         commentorID: user.uid,

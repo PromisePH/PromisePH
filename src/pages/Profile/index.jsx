@@ -8,6 +8,7 @@ import NavBar from "../../components/NavBar";
 import BottomNav from "../../components/BottomNav";
 import Avatar from "../../components/Avatar";
 import Post from '../../components/Post';
+import CommentSummary from "../../components/CommentSummary";
 import CollectionsEnum from '../../constants/collections';
 
 import { MdVerified } from "react-icons/md";
@@ -113,16 +114,13 @@ function Profile() {
                             postId
                         )
                         const postDoc = await getDoc(postRef)
-                        if (!postDoc.exists()) {
-                            console.error("Post not found");
-                            setIsLoading(false)
-                            return;
+                        if (postDoc.exists()) {
+                            const post = {
+                                id: postDoc.id,
+                                ...postDoc.data()
+                            }
+                            postData.push(post)
                         }
-                        const post = {
-                            id: postDoc.id,
-                            ...postDoc.data()
-                        }
-                        postData.push(post)
                     }
                     setPosts(postData)
                 }
@@ -141,16 +139,13 @@ function Profile() {
                             commentId
                         )
                         const commentDoc = await getDoc(commentRef)
-                        if (!commentDoc.exists()) {
-                            console.error("Comment not found");
-                            setIsLoading(false)
-                            return;
+                        if (commentDoc.exists()) {
+                            const comment = {
+                                id: commentDoc.id,
+                                ...commentDoc.data()
+                            }
+                            commentsData.push(comment)
                         }
-                        const comment = {
-                            id: commentDoc.id,
-                            ...commentDoc.data()
-                        }
-                        commentsData.push(comment)
                     }
                     setComments(commentsData)
                 }
@@ -253,7 +248,7 @@ function Profile() {
                                     <div className="h-56 flex justify-center items-center">
                                         <Spinner />
                                     </div> :
-                                    user && posts.length > 0 ?
+                                    posts.length > 0 ?
                                         posts.map(post =>
                                             <Post key={post.id} post={post} user={user} />
                                         ) :
@@ -270,9 +265,9 @@ function Profile() {
                                     <div className="h-56 flex justify-center items-center">
                                         <Spinner />
                                     </div> :
-                                    user && comments.length > 0 ?
-                                        comments.map(post =>
-                                            <Post key={post.id} post={post} user={user} />
+                                    comments.length > 0 ?
+                                        comments.map(comment =>
+                                            <CommentSummary key={comment.id} comment_data={comment} />
                                         ) :
                                         <p className="h-56 flex justify-center items-center">
                                             <span className="text-2xl font-bold">
@@ -287,7 +282,7 @@ function Profile() {
                                     <div className="h-56 flex justify-center items-center">
                                         <Spinner />
                                     </div> :
-                                    user && upvotedPosts.length > 0 ?
+                                    upvotedPosts.length > 0 ?
                                         upvotedPosts.map(post =>
                                             <Post key={post.id} post={post} user={user} />
                                         ) :

@@ -71,7 +71,7 @@ function Post({ post, user }) {
 
   }
   return (
-    <section className="max-w-3xl mx-auto bg-bunker shadow-md rounded-lg p-4 mb-4 cursor-pointer" onMouseDown={() => window.open(`/promise/${post.id}`, '_blank')}>
+    <section className="max-w-3xl mx-auto bg-bunker hover:bg-midnight shadow-md rounded-lg p-4 mb-4 cursor-pointer" onMouseDown={() => window.open(`/promise/${post.id}`, '_blank')}>
       <div className="flex md:hidden flex-row items-center">
         <a href={window.location.href} target="_blank" rel="noreferrer" className="flex items-center">
           <span className="text-white text-1xs md:text-sm font-bold">{post.poster.name}</span>

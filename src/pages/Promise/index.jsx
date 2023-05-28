@@ -33,7 +33,7 @@ function Promise() {
         updateView();
         setIsLoading(true);
         const postRef = doc(db, "posts", params.promiseID);
-        const comRef = collection(db, "comment");
+        const comRef = collection(db, CollectionsEnum.COMMENTS);
         onSnapshot(postRef, (doc) => {
             const temp = doc.data();
             setPromiseData({ id: doc.id, ...temp });
