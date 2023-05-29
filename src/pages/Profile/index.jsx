@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { updateProfile } from 'firebase/auth';
-import { collection, onSnapshot, query, orderBy } from "firebase/firestore";
+import { doc, getDoc } from "firebase/firestore";
 import { db, auth } from '../../firebase/firebase';
 import { useNavigate } from "react-router-dom";
 
@@ -8,6 +8,7 @@ import NavBar from "../../components/NavBar";
 import BottomNav from "../../components/BottomNav";
 import Avatar from "../../components/Avatar";
 import Post from '../../components/Post';
+import CommentSummary from "../../components/CommentSummary";
 import CollectionsEnum from '../../constants/collections';
 
 import { MdVerified } from "react-icons/md";
@@ -63,10 +64,13 @@ function CustomEditableControls() {
 function Profile() {
     const [user] = useAuthState(auth);
     const [posts, setPosts] = useState([])
+    const [comments, setComments] = useState([])
+    const [upvotedPosts, setUpvotedPosts] = useState([])
     const [name, setName] = useState('')
     const [isLoading, setIsLoading] = useState(false)
     const navigate = useNavigate();
-    useEffect(() => {``
+
+    useEffect(() => {
         // Realtime listener for posts
         if (!user) {
             navigate('/login')
@@ -76,27 +80,107 @@ function Profile() {
         setName(user.displayName)
 
         try {
-            setIsLoading(true)
-            const q = query(collection(db, CollectionsEnum.POSTS), orderBy("createdAt", "desc"));
-            onSnapshot(q, doc => {
-                const posts = doc.docs.map(
-                    doc => {
-                        return {
-                            id: doc.id,
-                            ...doc.data()
+            const fetchUserData = async () => {
+                setIsLoading(true)
+                const userDataRef = doc(
+                    db,
+                    CollectionsEnum.USER_DATA,
+                    user.uid
+                )
+                const userDataDoc = await getDoc(userDataRef)
+
+                if (!userDataDoc.exists()) {
+                    console.error("User Data not found");
+                    setIsLoading(false)
+                    return;
+                }
+
+                const userData = userDataDoc.data()
+                if (userData == undefined) {
+                    setIsLoading(false)
+                    return;
+                }
+
+                // Set Posts
+                if (userData.userPosts && userData.userPosts.length > 0) {
+                    setPosts([]);
+
+                    const postIds = userData.userPosts
+                    const postData = []
+                    for (const postId of postIds) {
+                        const postRef = doc(
+                            db,
+                            CollectionsEnum.POSTS,
+                            postId
+                        )
+                        const postDoc = await getDoc(postRef)
+                        if (postDoc.exists()) {
+                            const post = {
+                                id: postDoc.id,
+                                ...postDoc.data()
+                            }
+                            postData.push(post)
                         }
                     }
-                )
-                const filteredPosts = posts.filter(
-                    data => data.poster && data.poster.id === user.uid
-                )
-                setPosts(filteredPosts);
-            });
+                    setPosts(postData)
+                }
+
+
+                // Set Comments
+                if (userData.userComments && userData.userComments.length > 0) {
+                    setComments([]);
+
+                    const commentIds = userData.userComments
+                    const commentsData = []
+                    for (const commentId of commentIds) {
+                        const commentRef = doc(
+                            db,
+                            CollectionsEnum.COMMENTS,
+                            commentId
+                        )
+                        const commentDoc = await getDoc(commentRef)
+                        if (commentDoc.exists()) {
+                            const comment = {
+                                id: commentDoc.id,
+                                ...commentDoc.data()
+                            }
+                            commentsData.push(comment)
+                        }
+                    }
+                    setComments(commentsData)
+                }
+
+                // Set Upvoted Posts
+                if (userData.upvotedPosts && userData.upvotedPosts.length > 0) {
+                    setUpvotedPosts([]);
+
+                    const upvotedPostIds = userData.upvotedPosts
+                    const postData = []
+                    for (const postId of upvotedPostIds) {
+                        const postRef = doc(
+                            db,
+                            CollectionsEnum.POSTS,
+                            postId
+                        )
+                        const postDoc = await getDoc(postRef)
+                        if (postDoc.exists()) {
+                            postData.push({
+                                id: postDoc.id,
+                                ...postDoc.data()
+                            })
+                        }
+                    }
+
+                    setUpvotedPosts(postData)
+                }
+
+                setIsLoading(false)
+            }
+
+            fetchUserData();
         }
         catch (err) {
-            console.log(err)
-        }
-        finally {
+            console.error(err)
             setIsLoading(false)
         }
     }, [user]);
@@ -113,7 +197,7 @@ function Profile() {
         <>
             <NavBar />
             <main className='px-4 py-20 md:pb-0 flex flex-col items-center w-full'>
-                <section className="bg-bunker p-5 rounded-lg w-full max-w-3xl flex flex-col gap-1">
+                <section className="bg-bunker p-5 rounded-t-lg w-full max-w-3xl flex flex-col gap-1">
                     {/* Page Title */}
                     <h1 className='text-2xl font-bold text-center'>Profile</h1>
 
@@ -151,7 +235,7 @@ function Profile() {
                         </div>
                     </div>
                 </section>
-                <Tabs className="w-full max-w-3xl" defaultIndex={0} variant='unstyled' >
+                <Tabs className="w-full max-w-3xl rounded-b-lg" defaultIndex={0} variant='unstyled' >
                     <TabList className="md:gap-24 font-semibold flex-wrap bg-bunker p-1 flex justify-center">
                         <Tab className="border-b-4 rounded-sm border-transparent hover:border-orange-500 focus:border-orange-red">Posts</Tab>
                         <Tab className="border-b-4 rounded-sm border-transparent hover:border-orange-500 focus:border-orange-red">Comments</Tab>
@@ -161,34 +245,52 @@ function Profile() {
                         <TabPanel className="px-0">
                             {
                                 isLoading ?
-                                    <Spinner/> :
-                                    user && posts.length > 0 ?
+                                    <div className="h-56 flex justify-center items-center">
+                                        <Spinner />
+                                    </div> :
+                                    posts.length > 0 ?
                                         posts.map(post =>
                                             <Post key={post.id} post={post} user={user} />
-                                        )
-                                        : null
+                                        ) :
+                                        <p className="h-56 flex justify-center items-center">
+                                            <span className="text-2xl font-bold">
+                                                No Posts Found
+                                            </span>
+                                        </p>
                             }
                         </TabPanel>
                         <TabPanel className="px-0">
                             {
                                 isLoading ?
-                                    <Spinner/> :
-                                    user && posts.length > 0 ?
-                                        posts.map(post =>
-                                            <Post key={post.id} post={post} user={user} />
-                                        )
-                                        : null
+                                    <div className="h-56 flex justify-center items-center">
+                                        <Spinner />
+                                    </div> :
+                                    comments.length > 0 ?
+                                        comments.map(comment =>
+                                            <CommentSummary key={comment.id} comment_data={comment} />
+                                        ) :
+                                        <p className="h-56 flex justify-center items-center">
+                                            <span className="text-2xl font-bold">
+                                                No Comments Found
+                                            </span>
+                                        </p>
                             }
                         </TabPanel>
                         <TabPanel className="px-0">
                             {
                                 isLoading ?
-                                    <Spinner/> :
-                                    user && posts.length > 0 ?
-                                        posts.map(post =>
+                                    <div className="h-56 flex justify-center items-center">
+                                        <Spinner />
+                                    </div> :
+                                    upvotedPosts.length > 0 ?
+                                        upvotedPosts.map(post =>
                                             <Post key={post.id} post={post} user={user} />
-                                        )
-                                        : null
+                                        ) :
+                                        <p className="h-56 flex justify-center items-center">
+                                            <span className="text-2xl font-bold">
+                                                No Upvoted Posts Found
+                                            </span>
+                                        </p>
                             }
                         </TabPanel>
                     </TabPanels>
