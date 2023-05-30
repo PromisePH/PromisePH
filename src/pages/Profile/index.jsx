@@ -10,6 +10,7 @@ import Avatar from "../../components/Avatar";
 import Post from '../../components/Post';
 import CommentSummary from "../../components/CommentSummary";
 import CollectionsEnum from '../../constants/collections';
+import { get_difference_string } from '../../utils/utils';
 
 import { MdVerified } from "react-icons/md";
 import { BsFillCalendarWeekFill } from "react-icons/bs";
@@ -63,6 +64,8 @@ function CustomEditableControls() {
 
 function Profile() {
     const [user] = useAuthState(auth);
+    const [latestPost, setLatestPost] = useState(null)
+    const [totalUpvotes, setTotalUpvotes] = useState(0)
     const [posts, setPosts] = useState([])
     const [comments, setComments] = useState([])
     const [upvotedPosts, setUpvotedPosts] = useState([])
@@ -120,6 +123,14 @@ function Profile() {
                                 ...postDoc.data()
                             }
                             postData.push(post)
+
+                            // append to total upvotes
+                            setTotalUpvotes(totalUpvotes + post.upvotes.length)
+
+                            // compare latest post to date of current post
+                            if (latestPost == null || post.createdAt && post.createdAt > latestPost.createdAt) {
+                                setLatestPost(post)
+                            }
                         }
                     }
                     setPosts(postData)
@@ -220,18 +231,31 @@ function Profile() {
                                 </div>
                                 <CustomEditableControls />
                             </Editable>
-                            <div className='flex flex-row items-center gap-2 md:gap-7'>
-                                {/* Date Joined Div */}
-                                <div className='flex flex-row justify-items-center gap-1'>
-                                    <BsFillCalendarWeekFill className='text-xs' />
-                                    <p className='text-xs opacity-30'>Joined 1 day ago</p>
-                                </div>
-                                {/* Upvote Count Div */}
-                                <div className='flex flex-col items-center ml-2'>
-                                    <p className='font-medium text-xs'>Upvotes</p>
-                                    <p className="flex flex-row items-center font-extralight text-1xs gap-1"><AiFillHeart className="text-orange-red" />7589</p>
-                                </div>
-                            </div>
+                            {
+                                isLoading ?
+                                    <div className="flex justify-center items-center">
+                                        <Spinner />
+                                    </div> :
+                                    <div className='flex flex-row items-center gap-2 md:gap-7'>
+                                        {/* Date Joined Div */}
+                                        <div className='flex flex-row justify-items-center gap-1'>
+                                            <BsFillCalendarWeekFill className='text-xs' />
+                                            {
+                                                latestPost ?
+                                                    <p className='text-xs opacity-30'>Posted {get_difference_string(latestPost.createdAt)}</p>
+                                                    : null
+                                            }
+                                        </div>
+                                        {/* Upvote Count Div */}
+                                        <div className='flex flex-col items-center ml-2'>
+                                            <p className='font-medium text-xs'>Upvotes</p>
+                                            <p className="flex flex-row items-center font-extralight text-1xs gap-1">
+                                                <AiFillHeart className="text-orange-red" />
+                                                {totalUpvotes}
+                                            </p>
+                                        </div>
+                                    </div>
+                            }
                         </div>
                     </div>
                 </section>
