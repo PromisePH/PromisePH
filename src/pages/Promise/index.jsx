@@ -3,7 +3,6 @@ import { collection, doc, updateDoc, arrayRemove, arrayUnion, onSnapshot, increm
 import { AiOutlineHeart, AiFillHeart } from "react-icons/ai";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { useNavigate, useParams } from "react-router-dom";
-import { Skeleton } from '@chakra-ui/react'
 
 import { db, auth } from "../../firebase/firebase";
 
@@ -11,6 +10,29 @@ import Comment from "../../components/Comment";
 import NavBar from "../../components/NavBar";
 import BottomNav from "../../components/BottomNav"
 import CollectionsEnum from '../../constants/collections';
+
+import {
+    Modal,
+    ModalOverlay,
+    ModalContent,
+    ModalHeader,
+    ModalBody,
+    ModalCloseButton,
+    useDisclosure,
+    Link,
+    ListItem,
+    UnorderedList,
+    Skeleton
+} from '@chakra-ui/react'
+import { ExternalLinkIcon } from '@chakra-ui/icons'
+
+function FallBackLinkPreview({ source }) {
+    return (
+        <Link href={source} isExternal className="break-all">
+            {source} <ExternalLinkIcon mx='2px' />
+        </Link>
+    )
+}
 
 function Promise() {
     const [user] = useAuthState(auth);
@@ -20,6 +42,7 @@ function Promise() {
     const [likeCount, setLikeCount] = useState(0);
     const [viewCount, setViewCount] = useState(0);
     const [commentCount, setCommentCount] = useState(0);
+    const { isOpen, onOpen, onClose } = useDisclosure()
     const navigate = useNavigate();
     const params = useParams();
 
@@ -223,7 +246,7 @@ function Promise() {
                                 <span className="text-white text-xs md:text-sm">{viewCount} Views</span>
                                 <span className="text-white text-xs md:text-sm">{likeCount} Likes</span>
                                 <span className="text-white text-xs md:text-sm">{commentCount} Comments</span>
-                                <span className="text-white text-xs md:text-sm underline cursor-pointer">View Sources</span>
+                                <button className="text-white text-xs md:text-sm underline cursor-pointer" onClick={onOpen}>View Sources</button>
                                 <button className="text-orange-red text-2xl transform hover:scale-110" onClick={() => handleLike()}>
                                     {isActive ? <AiFillHeart /> : <AiOutlineHeart />}
                                 </button>
@@ -236,6 +259,28 @@ function Promise() {
                     <BottomNav />
                 </>
         }
+
+        <Modal isOpen={isOpen} onClose={onClose} closeOnOverlayClick={false} isCentered>
+            <ModalOverlay />
+            <ModalContent className='bg-bunker py-7 mx-5'>
+                <ModalHeader className="font-bold text-center text-3xl">Sources</ModalHeader>
+                <ModalCloseButton />
+                <ModalBody>
+                    <UnorderedList>
+                        {
+                            data && data.sources && data.sources.length > 0 ?
+                                data.sources.map((source, key) => {
+                                    return <ListItem key={key}>
+                                        <FallBackLinkPreview source={source} />
+                                    </ListItem>
+                                })
+                                : <ListItem className="text-2xl font-bold">No Sources</ListItem>
+                        }
+
+                    </UnorderedList>
+                </ModalBody>
+            </ModalContent>
+        </Modal>
     </>
 }
 export default Promise;
