@@ -11,7 +11,7 @@ import Top4 from "../../assets/img/Top4.png";
 import Top5 from "../../assets/img/Top5.png";
 import Top6 from "../../assets/img/Top6.png";
 
-function Profile() {
+function Leaderboard() {
     let navigate = useNavigate(); 
     const routeChange = () =>{ 
       let path = `politician/3J4PFiHd7nkhdkG7Nyzz`; 
@@ -22,10 +22,10 @@ function Profile() {
         <>
             <NavBar />
             <main className='md:px-4 py-20 md:pb-0 flex flex-col items-center'>
-                <section className="pt-1 md:pt-16">
+                <section className="pt-1 md:pt-12">
                     {/* Top 3 Div */}
                     <div className="flex flex-col items-center bg-bunker rounded-45px md:px-20 py-3 mb-4">
-                        <h className="text-3xl md:text-5xl font-bold">Leaderboard</h>
+                        <h1 className="text-3xl md:text-5xl font-bold">Leaderboard</h1>
                         <div className="flex flex-row h-60">
                             {/* Top 2 Div */}
                             <div onClick={routeChange} className="flex flex-col h-full pt-4">
@@ -92,4 +92,4 @@ function Profile() {
         </>
     );
 }
-export default Profile;
+export default Leaderboard;
