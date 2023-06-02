@@ -3,13 +3,11 @@ import { useNavigate } from "react-router-dom";
 
 import NavBar from "../../components/NavBar";
 import BottomNav from "../../components/BottomNav";
+import LeaderboardItem from "../../components/LeaderboardItem";
 
 import Top1 from "../../assets/img/Top1.png";
 import Top2 from "../../assets/img/Top2.png";
 import Top3 from "../../assets/img/Top3.png";
-import Top4 from "../../assets/img/Top4.png";
-import Top5 from "../../assets/img/Top5.png";
-import Top6 from "../../assets/img/Top6.png";
 
 function Leaderboard() {
     let navigate = useNavigate();
@@ -57,33 +55,9 @@ function Leaderboard() {
                     </div>
                     {/* Top 4++ Div */}
                     <div className="flex flex-col items-center bg-bunker md:px-4 rounded-tl-45px rounded-tr-45px">
-                        {/* Top 4 Div */}
-                        <div onClick={routeChange} className="min-w-full flex flex-row border-b-2 md:pt-3 py-2 md:pb-3 md:mb-3 px-2 md:px-6 items-center hover:cursor-pointer">
-                            <img className="pr-7" src={Top4} />
-                            <div className="flex flex-col flex-grow">
-                                <p className="text-xs md:text-xl font-bold">Leni Robredo</p>
-                                <p className="text-1xs md:text-lg font-extralight">@letletilet</p>
-                            </div>
-                            <p className="text-2xl text-bruschetta-tomato font-extrabold md:pl-32">6296</p>
-                        </div>
-                        {/* Top 5 Div */}
-                        <div onClick={routeChange} className="min-w-full flex flex-row border-b-2 md:pt-3 py-2 md:pb-3 md:mb-3 px-2 md:px-6 items-center hover:cursor-pointer">
-                            <img className="pr-7" src={Top5} />
-                            <div className="flex flex-col flex-grow">
-                                <p className="text-xs md:text-xl font-bold">Mar Roxas</p>
-                                <p className="text-1xs md:text-lg font-extralight">@maroxas</p>
-                            </div>
-                            <p className="text-2xl text-bruschetta-tomato font-extrabold  md:pl-32">5877</p>
-                        </div>
-                        {/* Top 6 Div */}
-                        <div onClick={routeChange} className="min-w-full flex flex-row border-b-2 md:pt-3 py-2 md:pb-3 md:mb-3 px-2 md:px-6 items-center hover:cursor-pointer">
-                            <img className="pr-7" src={Top6} />
-                            <div className="flex flex-col flex-grow">
-                                <p className="text-xs md:text-xl font-bol">Isko Moreno</p>
-                                <p className="text-1xs md:text-lg font-extralight">@iskomnl</p>
-                            </div>
-                            <p className="text-2xl text-bruschetta-tomato font-extrabold md:pl-32">4542</p>
-                        </div>
+                        <LeaderboardItem />
+                        <LeaderboardItem />
+                        <LeaderboardItem />
                     </div>
                 </section>
             </main>
