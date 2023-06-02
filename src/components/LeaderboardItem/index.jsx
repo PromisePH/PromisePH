@@ -9,7 +9,7 @@ function LeaderboardItem() {
         navigate('/politicians/WBXl4RkjhTg3fckg6TGk');
     }
     return (
-        <div onClick={routeChange} className="min-w-full flex flex-row border-b-2 md:pt-3 py-2 md:pb-3 md:mb-3 px-2 md:px-6 items-center hover:cursor-pointer">
+        <div onClick={routeChange} className="min-w-full flex flex-row border-b-2 p-2 md:px-6 items-center hover:cursor-pointer hover:bg-midnight">
             <img className="pr-7" src={Top6} />
             <div className="flex flex-col flex-grow">
                 <p className="text-xs md:text-xl font-bol">Isko Moreno</p>
