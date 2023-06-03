@@ -11,10 +11,12 @@ import CommentsCollectionEnum from "../../constants/comments";
 import MainCommentList from "./MainCommentList";
 
 function Comment(com) {
+
     const [user] = useAuthState(auth);
     const [userComment, setUserComment] = useState([]);
     const [commentAlert, setCommentAlert] = useState(false);
     const [commentData, setCommentData] = useState([]);
+    const [postDeleteStatus, setPostDeleteStatus] = useState(true);
     const params = useParams();
     const navigate = useNavigate();
 
@@ -35,6 +37,7 @@ function Comment(com) {
                 'true'
             )
         );
+        setPostDeleteStatus(com.postIsDeleted);
         onSnapshot(commentRef, (doc) => {
             setCommentData(
                 doc.docs
@@ -46,7 +49,7 @@ function Comment(com) {
                     })
             );
         });
-    }, [user, params.promiseID]);
+    }, [user, params.promiseID, com]);
 
     //Comment Submission
     const handleRootCommentSubmit = (comment) => {
@@ -98,7 +101,7 @@ function Comment(com) {
         <div className="flex justify-center w-full pb-16 px-4">
             <div className="max-w-3xl w-full flex flex-col p-4 bg-bunker rounded-lg">
                 {/* Post a Comment Area*/}
-                <div className="w-full bg-midnight rounded-lg p-2" onBlur={() => setCommentAlert(false)}>
+                <div className={`w-full bg-midnight rounded-lg p-2 mb-6 ${postDeleteStatus ? "hidden" : ""}`} onBlur={() => setCommentAlert(false)}>
                     {/* Textarea for comment posting*/}
                     <textarea className="h-28 p-2 rounded-lg bg-midnight w-full border-none outline-none" value={userComment} placeholder="What do you think of this promise..." onChange={(e) => { setUserComment(e.target.value) }} />
                     <div className="w-full my-2 flex flex-row-reverse">
@@ -114,17 +117,15 @@ function Comment(com) {
                 </div>
 
                 {/* Comments Column List */}
-                <div className="pt-6">
                     <div className="bg-midnight p-3 rounded-lg">
                         {
                             commentData
                                 ? commentData.length > 0
-                                    ? commentData.map((com) => { return <MainCommentList key={com.id} id={com.id} parentId={null} />; })
+                                    ? commentData.map((com) => { return <MainCommentList key={com.id} id={com.id} parentId={null} postIsDeleted={postDeleteStatus}/>; })
                                     : <div className="w-full flex justify-center my-5">No Comments Found . . .</div>
                                 : <div className="w-full flex justify-center my-5">No Comments Found . . .</div>
                         }
                     </div>
-                </div>
             </div>
         </div>
     );

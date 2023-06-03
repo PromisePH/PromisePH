@@ -39,6 +39,7 @@ function MainCommentList(com) {
     const [activeUpvote, setActiveUpvote] = useState(false);
     const [activeDetail, setActiveDetail] = useState(false);
     const [voteCount, setVoteCount] = useState(0);
+    const [postDeleteStatus, setPostDeleteStatus] = useState(com.postIsDeleted);
     const { isOpen, onOpen, onClose } = useDisclosure();
     const toast = useToast();
     const cancelRef = useRef(null);
@@ -46,6 +47,7 @@ function MainCommentList(com) {
     const navigate = useNavigate();
 
     useEffect(() => {
+        setPostDeleteStatus(com.postIsDeleted)
         const commentsRef = doc(db, CollectionsEnum.COMMENTS, com.id);
         onSnapshot(commentsRef, (doc) => {
             const temp = doc.data();
@@ -73,7 +75,7 @@ function MainCommentList(com) {
                     : 0
             })
         })
-    }, [user, params.promiseID]);
+    }, [user, params.promiseID,com]);
 
     //Update Root Comment
     function updateRootComment(replyID) {
@@ -213,7 +215,7 @@ function MainCommentList(com) {
                                 <div className="text-xs font-bold mr-4"> {commentData.commentorName} </div>
 
                                 {/* Comment Reply Button */}
-                                <div className={`text-xs cursor-pointer mr-4 ${activeReply || commentData.isDeleted ? "hidden" : ""}`} onMouseDown={() => setActiveReply(true)}>
+                                <div className={`text-xs cursor-pointer mr-4 ${activeReply || commentData.isDeleted || postDeleteStatus ? "hidden" : ""}`} onMouseDown={() => setActiveReply(true)}>
                                     Reply
                                 </div>
 
@@ -305,7 +307,7 @@ function MainCommentList(com) {
                             commentData.replies
                                 ? commentData.replies.map((replyID) => {
                                     return <div className="pl-4" key={replyID}>
-                                        <MainCommentList id={replyID} parentId={commentData.id} />
+                                        <MainCommentList id={replyID} parentId={commentData.id} postIsDeleted={postDeleteStatus}/>
                                     </div>
                                 }
                                 )

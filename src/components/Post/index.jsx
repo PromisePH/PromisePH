@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { db } from '../../firebase/firebase';
@@ -6,15 +6,32 @@ import { doc, arrayUnion, arrayRemove, updateDoc, setDoc } from "firebase/firest
 import CollectionsEnum from '../../constants/collections';
 
 import FallbackImage from '../../assets/img/default.jpg'
-import { Image } from '@chakra-ui/react'
+import { Image, useDisclosure } from '@chakra-ui/react'
 import Avatar from '../../components/Avatar';
 import { AiOutlineHeart } from "react-icons/ai";
 import { AiFillHeart } from "react-icons/ai";
 import { RxDot } from "react-icons/rx";
 import { RxDotFilled } from "react-icons/rx";
 import { GoKebabHorizontal } from "react-icons/go";
-
+import { HiOutlineTrash } from "react-icons/hi";
+import {
+  useToast,
+  Button,
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuItem,
+  AlertDialog,
+  AlertDialogBody,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogContent,
+  AlertDialogOverlay,
+} from '@chakra-ui/react'
 function Post({ post, user }) {
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const cancelRef = useRef(null);
+  const toast = useToast();
   const [isLiked, setIsLiked] = useState(false);
   const [isPoster, setIsPoster] = useState(false);
   const [isActive, setIsActive] = useState(false);
@@ -39,6 +56,15 @@ function Post({ post, user }) {
       setIsLiked(true)
     }
   }, [post]);
+
+  //Update Root Comment
+  function deletePost() {
+    console.log(post.id);
+    const postRef = doc(db, "posts", post.id);
+    const update = async () => await setDoc(postRef, { isDeleted: true }, {merge : true})
+    update();
+  }
+
 
   const likePost = async () => {
     if (user == null) {
@@ -102,14 +128,41 @@ function Post({ post, user }) {
               <a target="_blank" href={`promise/${post.id}`} rel="noreferrer" className="text-lg md:text-xl font-bold flex-grow cursor-pointer">
                 {post.title}
               </a>
-              <div className="text-2xl flex flex-col items-center gap-1">
-                <button className="hover:bg-gray-700 p-1 rounded-full">
+              <div className=" flex flex-col items-center">
+                <div className="h-max hover:bg-gray-700 p-1 flex items-center rounded-full">
                   {
+                    //Post Dropdown Menu
+                    //Visible Only if Post Creator == Logged In User
                     isPoster ?
-                      <GoKebabHorizontal />
+                      <Menu onMouseDown={(e)=>e.stopPropagation()}>
+                        <MenuButton onMouseDown={(e)=>e.stopPropagation()}>
+                          <GoKebabHorizontal onMouseDown={(e)=>e.stopPropagation()} className="hover:bg-white text-xl"/>
+                        </MenuButton> 
+                        <MenuList onMouseDown={(e)=>e.stopPropagation()} className="px-2">
+                          <MenuItem as={Button} 
+                          className="hover:text-red-600"
+                          onMouseDown={(e)=>e.stopPropagation()}
+                          onClick={
+                            //Checks if the post is already deleted
+                            post.isDeleted
+                              ? () => toast({
+                                title: 'Post Already Deleted',
+                                status: 'error',
+                                duration: 3000,
+                                isClosable: true,
+
+                              })
+                            //Else Open ALert Dialog for Delete
+                              : onOpen
+                          }>
+                            <HiOutlineTrash className="mr-2 text-lg" onMouseDown={(e)=>e.stopPropagation()}/>
+                            Delete Post
+                          </MenuItem>
+                        </MenuList>
+                      </Menu>
                       : null
                   }
-                </button>
+                  </div>
                 <button
                   onClick={likePost}
                   onMouseDown={(e) => e.stopPropagation()}
@@ -130,6 +183,14 @@ function Post({ post, user }) {
                   : null
               }
               <div className="list-unstyled text-sm text-gray-500 flex flex-wrap">
+                {
+                  //DELETE Flair to indicate that the post is Deleted
+                  post.isDeleted
+                    ? <div className="bg-red-600 border-radius-full rounded-full text-black text-1xs md:text-xs text-center font-bold p-2 mr-1 md:p-3 md:mr-4 transform hover:scale-110 text-white" onMouseDown={(e) => e.stopPropagation()}>
+                      DELETED
+                    </div>
+                    : null
+                }
                 {
                   post.tags ?
                     post.tags.map((tag) =>
@@ -180,6 +241,47 @@ function Post({ post, user }) {
         <span className="text-white text-xs md:text-sm">{post.upvotes ? post.upvotes.length : 0} Likes</span>
         <span className="text-white text-xs md:text-sm">{post.comments ? post.comments.length : 0} Comment</span>
       </div>
+      {/* Alert Dialog for Post Deletion */}
+      <AlertDialog
+        isOpen={isOpen}
+        leastDestructiveRef={cancelRef}
+        onClose={onClose}
+        onMouseDown={(e)=>e.stopPropagation()}
+      >
+        <AlertDialogOverlay onMouseDown={(e)=>e.stopPropagation()}>
+          <AlertDialogContent className="mx-4 mt-20" onMouseDown={(e)=>e.stopPropagation()}>
+            <AlertDialogHeader fontSize='lg' fontWeight='bold' onMouseDown={(e)=>e.stopPropagation()}>
+              Delete Post
+            </AlertDialogHeader>
+
+            <AlertDialogBody onMouseDown={(e)=>e.stopPropagation()}>
+              Are you sure? You cant undo this action afterwards.
+            </AlertDialogBody>
+
+            <AlertDialogFooter onMouseDown={(e)=>e.stopPropagation()}>
+              <Button ref={cancelRef} onClick={onClose} onMouseDown={(e)=>e.stopPropagation()}>
+                Cancel
+              </Button>
+              <Button colorScheme='red'
+                onClick={onClose}
+                onMouseDown={(e) => {
+                  e.stopPropagation();
+                  deletePost();
+                  toast({
+                    title: 'Post Deleted.',
+                    status: 'success',
+                    duration: 3000,
+                    isClosable: true,
+                  })
+                }}
+                ml={3}
+              >
+                Delete
+              </Button>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialogOverlay>
+      </AlertDialog>
     </section>
   );
 }

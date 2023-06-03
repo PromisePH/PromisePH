@@ -2,7 +2,7 @@ import React from "react";
 import { useParams, useLocation } from "react-router-dom";
 import { db, auth } from "../../firebase/firebase";
 import { useAuthState } from "react-firebase-hooks/auth";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, getDocs, query, where } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { Spinner } from '@chakra-ui/react'
 import Post from "../../components/Post";
@@ -16,9 +16,9 @@ function Menu() {
     let location = useLocation();
     useEffect(() => {
         async function fetchData() {
-            setIsLoading(true)
-            const postsRef = collection(db, "posts");
-            const postsSnapshot = await getDocs(postsRef);
+            setIsLoading(true);
+            const q = query(collection(db, "posts"), where("isDeleted", "==", false));
+            const postsSnapshot = await getDocs(q);
             const newData = postsSnapshot.docs.map(doc => ({
                 id: doc.id,
                 ...doc.data()

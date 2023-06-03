@@ -85,16 +85,16 @@ function Home() {
             setIsLoading(true)
             let q;
             if (filter == null) {
-                q = query(collection(db, CollectionsEnum.POSTS), orderBy(PostCollectionEnum.CREATED_AT, "desc"));
+                q = query(collection(db, CollectionsEnum.POSTS), where("isDeleted", "==", false),orderBy(PostCollectionEnum.CREATED_AT, "desc"));
             }
             else if (filter == EntityCollectionEnum.POPULAR) {
-                q = query(collection(db, CollectionsEnum.POSTS), orderBy(PostCollectionEnum.VIEWS, "desc"));
+                q = query(collection(db, CollectionsEnum.POSTS), where("isDeleted", "==", false), orderBy(PostCollectionEnum.VIEWS, "desc"));
             }
             else if (filter == EntityCollectionEnum.NEW) {
-                q = query(collection(db, CollectionsEnum.POSTS), orderBy(PostCollectionEnum.CREATED_AT, "desc"));
+                q = query(collection(db, CollectionsEnum.POSTS), where("isDeleted", "==", false), orderBy(PostCollectionEnum.CREATED_AT, "desc"));
             }
             else {
-                q = query(collection(db, CollectionsEnum.POSTS), where(PostCollectionEnum.TAGS, "array-contains", filter));
+                q = query(collection(db, CollectionsEnum.POSTS), where("isDeleted", "==", false), where(PostCollectionEnum.TAGS, "array-contains", filter));
             }
 
             onSnapshot(q, doc => {
@@ -237,6 +237,7 @@ function Home() {
                 tags: tags,
                 isMallicious: false,
                 isFake: false,
+                isDeleted: false,
             }
             await setDoc(postRef, postData);
 
