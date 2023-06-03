@@ -174,7 +174,7 @@ function Promise() {
         }
     }
 
-    const handleJudgePromise = ({ isFilfilled }) => {
+    const handleJudgePromise = (isFilfilled) => {
         if (!user) {
             navigate('/login');
             return;
@@ -197,14 +197,38 @@ function Promise() {
         e.preventDefault();
         try {
             setIsPostingJudgement(true);
+            if (judgeComment.length == 0 || rating == 0) {
+                toast({
+                    title: "Please fill all fields",
+                    status: "error",
+                    position: 'bottom-left',
+                    isClosable: true,
+                })
+                return;
+            }
+
+            const postRef = doc(db, CollectionsEnum.POSTS, params.promiseID);
+            await setDoc(
+                postRef,
+                {
+                    promisePoints: increment(isFullfilled ? 1 : -1),
+                },
+                { merge: true }
+            )
 
             // edit tiwala points for political entity
+            const postDocData = await getDoc(postRef);
+            const entityDocUpdate = {
+                tiwalaPoints: increment(isFullfilled ? rating : -rating),
+            }
+            if (postDocData.exists() && postDocData.data().promisePoints > 0) {
+                entityDocUpdate.fulfilledPromises = arrayUnion(params.promiseID);
+            }
+
             const politicalEntityRef = doc(db, CollectionsEnum.ENTITY, data.entityId);
             await setDoc(
                 politicalEntityRef,
-                {
-                    tiwalaPoints: increment(isFullfilled ? rating : -rating),
-                },
+                entityDocUpdate,
                 { merge: true }
             )
 
