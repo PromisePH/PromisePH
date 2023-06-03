@@ -4,6 +4,7 @@ import { doc, getDoc } from "firebase/firestore";
 import { db } from "../../firebase/firebase";
 
 import CollectionsEnum from "../../constants/collections";
+import { get_difference_string } from "../../utils/utils";
 
 function CommentSummary({ comment_data }) {
     const [post, setPost] = useState("");
@@ -16,12 +17,6 @@ function CommentSummary({ comment_data }) {
         }
         fetchPosts()
     }, [])
-    const d1 = comment_data.createdAt.toDate();
-    const d2 = new Date();
-    const diffDays = Math.round((d2.getTime() - d1.getTime()) / (1000 * 60 * 60 * 24));
-    const yearDiff = d2.getFullYear() - d1.getFullYear();
-    const monthDiff = d2.getMonth() - d1.getMonth();
-    const totalMonthDiff = yearDiff * 12 + monthDiff;
 
     const navigateToPost = () => {
         navigate(`/promise/${comment_data.postId}`);
@@ -34,10 +29,8 @@ function CommentSummary({ comment_data }) {
             </p>
             <div className="flex flex-row gap-10">
                 <p>
-                    {diffDays <= 31 ? diffDays + " dy. ago"
-                        : yearDiff > 0 ? yearDiff + " yr. ago"
-                            : totalMonthDiff <= 12 && totalMonthDiff != 0 ? totalMonthDiff + " mo. ago"
-                                : diffDays + "dy. ago"
+                    {
+                        get_difference_string(comment_data.createdAt)
                     }
                 </p>
                 <p>

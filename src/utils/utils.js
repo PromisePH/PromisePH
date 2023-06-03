@@ -11,12 +11,16 @@ export const get_difference_string = (date) => {
 
     if (diffDays <= 31) {
         return diffDays + " dy. ago"
-    } 
+    }
     if (yearDiff > 0) {
         return yearDiff + " yr. ago"
-    } 
+    }
     if (totalMonthDiff <= 12 && totalMonthDiff != 0) {
         return totalMonthDiff + " mo. ago"
     }
     return diffDays + "dy. ago"
+}
+
+export const time_stamp_to_string = (date) => {
+    return new Date(date.seconds * 1000).toLocaleDateString("en-US");
 }

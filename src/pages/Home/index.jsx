@@ -237,6 +237,7 @@ function Home() {
                 tags: tags,
                 isMallicious: false,
                 isFake: false,
+                promisePoints: 0
             }
             await setDoc(postRef, postData);
 
