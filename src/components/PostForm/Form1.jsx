@@ -90,6 +90,7 @@ function Form1({ politicalEntity, setPoliticalEntity }) {
         createdAt: new Date(),
         updatedAt: new Date(),
         dateAppointed: new Date(),
+        tiwalaPoints: 0,
     });
 
     const {
@@ -147,7 +148,6 @@ function Form1({ politicalEntity, setPoliticalEntity }) {
                 ...formData,
                 imageURL: imageURL
             }
-
             await setDoc(entityRef, entityData);
 
             // Set the selected entity
