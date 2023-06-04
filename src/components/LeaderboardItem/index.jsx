@@ -1,8 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 
-import Top6 from "../../assets/img/Top6.png";
-
 function LeaderboardItem() {
     let navigate = useNavigate();
     const routeChange = () => {
@@ -10,7 +8,7 @@ function LeaderboardItem() {
     }
     return (
         <div onClick={routeChange} className="min-w-full flex flex-row border-b-2 p-2 md:px-6 items-center hover:cursor-pointer hover:bg-midnight">
-            <img className="pr-7" src={Top6} />
+           <img src={"https://avatars.githubusercontent.com/u/82669071?s=80&v=4"} className="mr-7 w-20 h-20 md:w-24 md:h-24 rounded-full" />
             <div className="flex flex-col flex-grow">
                 <p className="text-xs md:text-xl font-bol">Isko Moreno</p>
                 <p className="text-1xs md:text-lg font-extralight">@iskomnl</p>

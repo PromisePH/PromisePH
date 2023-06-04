@@ -25,6 +25,8 @@ export default {
         'caribbean-green': '#00CC8D',
         'aluminium': '#818384',
         'bruschetta-tomato': '#FF6347',
+        'HULK': '#008000',
+        
       },
       fontSize: {
         '1xs': ['0.625em', '0.75rem'], /* 10px */
@@ -33,6 +35,9 @@ export default {
       maxWidth: {
         '1xs': '13rem', /* 208px */
         '2xs': '10rem', /* 160px */
+      },
+      borderColor: {
+        'HULK': '#008000',
       },
       borderRadius: {
         '45px': '2.813rem', /* 45px */
