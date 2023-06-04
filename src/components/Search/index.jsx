@@ -1,6 +1,6 @@
 import React from "react";
 import { db } from "../../firebase/firebase";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, getDocs, query, where } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import SearchResult from "./SearchResult";
 import { Spinner } from '@chakra-ui/react'
@@ -11,8 +11,8 @@ function SearchList(data) {
     useEffect(() => {
         async function fetchData() {
             setIsLoading(true);
-            const postsRef = collection(db, "posts");
-            const postsSnapshot = await getDocs(postsRef);
+            const q = query(collection(db, "posts"), where("isDeleted", "==", false));
+            const postsSnapshot = await getDocs(q);
             const newData = postsSnapshot.docs.map(doc => ({
                 id: doc.id,
                 ...doc.data()
@@ -43,7 +43,7 @@ function SearchList(data) {
                             })
                         } else {
                             return <div className="p-2">
-                                {"No Promises Found"}
+                                No Promise Found
                             </div>;
                         }
                     }(postsData)
@@ -55,7 +55,7 @@ function SearchList(data) {
                 <div className="w-64 bg-bunker mt-10 p-1 rounded-md fixed border-2 border-solid border-rgb(65 72 78)">
                     <div className="flex flex-col w-full">
                         <div className="p-2">
-                            {"Search for a Promise"}
+                            Search for a Promise
                         </div>
                     </div>
                 </div>

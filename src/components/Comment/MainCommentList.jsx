@@ -23,6 +23,8 @@ import {
     AlertDialogOverlay,
 } from '@chakra-ui/react'
 
+import CollectionsEnum from '../../constants/collections';
+
 function MainCommentList(com) {
     const [user] = useAuthState(auth);
     const [commentData, setCommentData] = useState([]);
@@ -37,6 +39,7 @@ function MainCommentList(com) {
     const [activeUpvote, setActiveUpvote] = useState(false);
     const [activeDetail, setActiveDetail] = useState(false);
     const [voteCount, setVoteCount] = useState(0);
+    const [postDeleteStatus, setPostDeleteStatus] = useState(com.postIsDeleted);
     const { isOpen, onOpen, onClose } = useDisclosure();
     const toast = useToast();
     const cancelRef = useRef(null);
@@ -44,7 +47,8 @@ function MainCommentList(com) {
     const navigate = useNavigate();
 
     useEffect(() => {
-        const commentsRef = doc(db, "comment", com.id);
+        setPostDeleteStatus(com.postIsDeleted)
+        const commentsRef = doc(db, CollectionsEnum.COMMENTS, com.id);
         onSnapshot(commentsRef, (doc) => {
             const temp = doc.data();
             setCommentData(
@@ -71,18 +75,18 @@ function MainCommentList(com) {
                     : 0
             })
         })
-    }, [user, params.promiseID]);
+    }, [user, params.promiseID,com]);
 
     //Update Root Comment
     function updateRootComment(replyID) {
-        const comRef = doc(db, "comment", com.id);
+        const comRef = doc(db, CollectionsEnum.COMMENTS, com.id);
         const update = async () => await updateDoc(comRef, { replies: arrayUnion(replyID) })
         update();
     }
 
     //Delete Comment
     function deleteComment() {
-        const comRef = doc(db, "comment", com.id);
+        const comRef = doc(db, CollectionsEnum.COMMENTS, com.id);
         const update = async () => await updateDoc(comRef, { isDeleted: true })
         update();
     }
@@ -92,7 +96,7 @@ function MainCommentList(com) {
         // If a User is Logged In
         if (user) {
             const replyRef = async () => {
-                const comRef = await addDoc(collection(db, "comment"),
+                const comRef = await addDoc(collection(db, CollectionsEnum.COMMENTS),
                     {
                         "commentorName": user.displayName,
                         "commentorID": user.uid,
@@ -122,7 +126,7 @@ function MainCommentList(com) {
             setActiveUpvote(true);
             setVoteCount(activeDownvote ? voteCount + 2 : voteCount + 1);
             setActiveDownvote(false);
-            const comRef = doc(db, "comment", com.id);
+            const comRef = doc(db, CollectionsEnum.COMMENTS, com.id);
             const update = async () => await updateDoc(comRef, { upvotes: arrayUnion(user.uid) })
             const update2 = async () => await updateDoc(comRef, { downvotes: arrayRemove(user.uid) })
             update();
@@ -132,7 +136,7 @@ function MainCommentList(com) {
         else if (event == "unvoted") {
             setActiveUpvote(false);
             setVoteCount(voteCount - 1);
-            const comRef = doc(db, "comment", com.id);
+            const comRef = doc(db, CollectionsEnum.COMMENTS, com.id);
             const update = async () => await updateDoc(comRef, { upvotes: arrayRemove(user.uid) })
             update();
         }
@@ -144,7 +148,7 @@ function MainCommentList(com) {
             setActiveDownvote(true);
             setVoteCount(activeUpvote ? voteCount - 2 : voteCount - 1);
             setActiveUpvote(false);
-            const comRef = doc(db, "comment", com.id);
+            const comRef = doc(db, CollectionsEnum.COMMENTS, com.id);
             const update = async () => await updateDoc(comRef, { downvotes: arrayUnion(user.uid) })
             const update2 = async () => await updateDoc(comRef, { upvotes: arrayRemove(user.uid) })
             update();
@@ -154,7 +158,7 @@ function MainCommentList(com) {
         else if (event == "unvoted") {
             setActiveDownvote(false);
             setVoteCount(voteCount + 1);
-            const comRef = doc(db, "comment", com.id);
+            const comRef = doc(db, CollectionsEnum.COMMENTS, com.id);
             const update = async () => await updateDoc(comRef, { downvotes: arrayRemove(user.uid) })
             update();
         }
@@ -211,7 +215,7 @@ function MainCommentList(com) {
                                 <div className="text-xs font-bold mr-4"> {commentData.commentorName} </div>
 
                                 {/* Comment Reply Button */}
-                                <div className={`text-xs cursor-pointer mr-4 ${activeReply || commentData.isDeleted ? "hidden" : ""}`} onMouseDown={() => setActiveReply(true)}>
+                                <div className={`text-xs cursor-pointer mr-4 ${activeReply || commentData.isDeleted || postDeleteStatus ? "hidden" : ""}`} onMouseDown={() => setActiveReply(true)}>
                                     Reply
                                 </div>
 
@@ -252,8 +256,8 @@ function MainCommentList(com) {
                                                 }
                                                 className="hover:text-red-500 hover:bg-gray-700"
                                             >
-                                                <HiOutlineTrash className="mr-2 text-lg"/>
-                                                Delete Comment 
+                                                <HiOutlineTrash className="mr-2 text-lg" />
+                                                Delete Comment
                                             </MenuItem>
                                         </MenuList>
                                     </Menu>
@@ -303,7 +307,7 @@ function MainCommentList(com) {
                             commentData.replies
                                 ? commentData.replies.map((replyID) => {
                                     return <div className="pl-4" key={replyID}>
-                                        <MainCommentList id={replyID} parentId={commentData.id} />
+                                        <MainCommentList id={replyID} parentId={commentData.id} postIsDeleted={postDeleteStatus}/>
                                     </div>
                                 }
                                 )

@@ -24,7 +24,7 @@ import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from '../../firebase/firebase';
 import { Link as RouteLink } from 'react-router-dom';
 import { signOut } from 'firebase/auth';
-import { Search2Icon, BellIcon } from '@chakra-ui/icons';
+import { Search2Icon } from '@chakra-ui/icons';
 import { AiFillHome } from 'react-icons/ai';
 import { RiTrophyFill } from 'react-icons/ri';
 import { MdOutlinePeopleAlt } from 'react-icons/md';
@@ -77,12 +77,12 @@ function NavBar() {
                     </div>
                 </Link>
                 <div className='flex flex-row gap-1 md:gap-5'>
-                    <div className='flex flex-row items-center gap-5 w-3/4'>
+                    <div className='flex flex-row items-center gap-5 w-full mx-1'>
                         <div className='flex-row items-center gap-5 hidden md:flex'>
                             <IconLink onClick={() => { navigate('/') }}>
                                 <Icon as={AiFillHome} boxSize={6} />
                             </IconLink>
-                            <IconLink onClick={() => { }}>
+                            <IconLink onClick={() => {navigate('/leaderboard') }}>
                                 <Icon as={RiTrophyFill} boxSize={6} />
                             </IconLink>
                             <IconLink onClick={() => { navigate('/politicians') }}>
@@ -120,9 +120,6 @@ function NavBar() {
                     {
                         user ?
                             <HStack spacing={4}>
-                                <IconLink >
-                                    <BellIcon boxSize={6} />
-                                </IconLink>
                                 <Flex alignItems={'center'}>
                                     <Menu>
                                         <MenuButton

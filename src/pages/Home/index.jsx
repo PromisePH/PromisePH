@@ -85,16 +85,16 @@ function Home() {
             setIsLoading(true)
             let q;
             if (filter == null) {
-                q = query(collection(db, CollectionsEnum.POSTS), orderBy(PostCollectionEnum.CREATED_AT, "desc"));
+                q = query(collection(db, CollectionsEnum.POSTS), where("isDeleted", "==", false),orderBy(PostCollectionEnum.CREATED_AT, "desc"));
             }
             else if (filter == EntityCollectionEnum.POPULAR) {
-                q = query(collection(db, CollectionsEnum.POSTS), orderBy(PostCollectionEnum.VIEWS, "desc"));
+                q = query(collection(db, CollectionsEnum.POSTS), where("isDeleted", "==", false), orderBy(PostCollectionEnum.VIEWS, "desc"));
             }
             else if (filter == EntityCollectionEnum.NEW) {
-                q = query(collection(db, CollectionsEnum.POSTS), orderBy(PostCollectionEnum.CREATED_AT, "desc"));
+                q = query(collection(db, CollectionsEnum.POSTS), where("isDeleted", "==", false), orderBy(PostCollectionEnum.CREATED_AT, "desc"));
             }
             else {
-                q = query(collection(db, CollectionsEnum.POSTS), where(PostCollectionEnum.TAGS, "array-contains", filter));
+                q = query(collection(db, CollectionsEnum.POSTS), where("isDeleted", "==", false), where(PostCollectionEnum.TAGS, "array-contains", filter));
             }
 
             onSnapshot(q, doc => {
@@ -169,14 +169,12 @@ function Home() {
         }
         if (step == 3) {
             const errors = {
-                [sources.length == 0]: 'Please add at least one credible source.',
                 [tags.length == 0]: 'Please add at least one tag.',
-                [sources.length == 1 && sources[0] == '']: 'Please add at least one credible source.',
             }
             const errorMessage = errors[true];
             if (errorMessage) {
                 toast({
-                    title: "Please add at least one credible source",
+                    title: errorMessage,
                     position: 'bottom-left',
                     status: 'error',
                     isClosable: true
@@ -190,6 +188,21 @@ function Home() {
 
     const submitPromisePost = async () => {
         try {
+            const errors = {
+                [sources.length == 0]: 'Please add at least one credible source.',
+                [sources.length == 1 && (!sources[0] || sources[0].length == 0)]: 'Please add at least one credible source.',
+            }
+            const errorMessage = errors[true];
+            if (errorMessage) {
+                toast({
+                    title: errorMessage,
+                    position: 'bottom-left',
+                    status: 'error',
+                    isClosable: true
+                })
+                return
+            }
+
             setIsSubmitting(true)
             setStep(step + 1);
 
@@ -224,6 +237,8 @@ function Home() {
                 tags: tags,
                 isMallicious: false,
                 isFake: false,
+                isDeleted: false,
+                promisePoints: 0
             }
             await setDoc(postRef, postData);
 
@@ -236,6 +251,13 @@ function Home() {
                 }
                 await setDoc(tagRef, tagData);
             }
+
+            const userDataRef = doc(db, CollectionsEnum.USER_DATA, user.uid)
+            await setDoc(
+                userDataRef,
+                { userPosts: arrayUnion(postRef.id) },
+                { merge: true }
+            );
 
             // Close modal and show toast
             closePostFormModal()
