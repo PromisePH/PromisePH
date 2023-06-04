@@ -238,6 +238,7 @@ function Home() {
                 isMallicious: false,
                 isFake: false,
                 isDeleted: false,
+                promisePoints: 0
             }
             await setDoc(postRef, postData);
 
