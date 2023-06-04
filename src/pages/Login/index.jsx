@@ -70,8 +70,8 @@ function Login() {
 
     return (
         <main className='min-h-screen bg-black-pearl flex'>
-            <section className='flex justify-center items-center gap-5 md:px-12 px-5 md:w-3/5 w-full z-10'>
-                <div className='rounded-lg bg-black-pearl flex flex-col justify-center items-center gap-5 p-5 w-full'>
+            <section className='flex justify-center items-center gap-5 md:px-12 px-5 md:w-1/2 w-full z-10'>
+                <div className='rounded-lg bg-black-pearl flex flex-col justify-center items-center gap-5 p-5 w-full shadow-2xl drop-shadow-2xl'>
                     <div className='no-underline flex flex-row items-center'>
                         <img src={Logo} alt="PromisePH Logo" className="h-12 w-12" />
                         <span className='text-center ml-2 text-orange-red font-extrabold text-4xl'>
