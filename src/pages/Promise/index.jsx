@@ -70,12 +70,12 @@ function Promise() {
     const [viewCount, setViewCount] = useState(0);
     const [isPoster, setIsPoster] = useState(false);
     const [commentCount, setCommentCount] = useState(0);
-    const { isOpen, onOpen, onClose } = useDisclosure();
+    const [politicalEntity, setPoliticalEntity] = useState(null);
+
+    // delete promise state
     const [postDeleteStatus, setPostDeleteStatus] = useState(true);
     const [isPostDelete, setIsPostDelete] = useState(false);
-    const toast = useToast();
-    const cancelRef = useRef(null);
-    const [politicalEntity, setPoliticalEntity] = useState(null);
+
     // judge promise state
     const [alreadyJudged, setAlreadyJudged] = useState(false);
     const [isFullfilled, setIsFullfilled] = useState(false);
@@ -84,9 +84,10 @@ function Promise() {
     const [isJudgeModalOpen, setIsJudgeModalOpen] = useState(false);
     const [isPostingJudgement, setIsPostingJudgement] = useState(false);
 
-
-
     const navigate = useNavigate();
+    const { isOpen, onOpen, onClose } = useDisclosure();
+    const toast = useToast();
+    const cancelRef = useRef(null);
     const params = useParams();
     const ratingNumbers = [1, 2, 3, 4, 5];
 
@@ -111,17 +112,14 @@ function Promise() {
 
         const postRef = doc(db, 'posts', params.promiseID);
         const comRef = collection(db, CollectionsEnum.COMMENTS);
-        onSnapshot(postRef, (doc) => {
-            const temp = doc.data();
-            setPromiseData({ id: doc.id, ...temp });
-            setIsPoster(
-                user && user.uid
-                    ? user.uid == temp.poster.id
-                        ? true
-                        : false
-                    : false
-            )
+
+        onSnapshot(postRef, (doc_data) => {
+            const temp = doc_data.data();
+            setPromiseData({ id: doc_data.id, ...temp });
+
+            setIsPoster(user && user.uid && user.uid == temp.poster.id)
             setPostDeleteStatus(temp.isDeleted);
+
             setIsActive(
                 user
                     ? !!temp.upvotes.includes(user.uid)
@@ -299,6 +297,8 @@ function Promise() {
                 status: 'success',
                 isClosable: true
             })
+
+            setAlreadyJudged(true);
         }
         catch (error) {
             const errorMessage = error.message;
@@ -323,15 +323,16 @@ function Promise() {
         // If post is Deleted but the post creator is logged in
         if (data.isDeleted && user && user.uid === data.poster.id) {
             return false;
-            //If the post is Deleted and the logged in user is not the post owner
-        } else if (data.isDeleted && user && user.uid !== data.poster.id) {
-            return true;
-            //If the post is delted but no user logged in
-        } else if (!data.isDeleted) {
-            return false;
-        } else {
+        }
+        //If the post is Deleted and the logged in user is not the post owner
+        if (data.isDeleted && user && user.uid !== data.poster.id) {
             return true;
         }
+        //If the post is delted but no user logged in
+        if (!data.isDeleted) {
+            return false;
+        }
+        return true;
     }
 
     return <>
@@ -433,7 +434,7 @@ function Promise() {
                                                                             isClosable: true,
 
                                                                         })
-                                                                        : ()=>setIsPostDelete(true)
+                                                                        : () => setIsPostDelete(true)
                                                                 }
                                                                 className="hover:text-red-600 hover:bg-gray-700"
                                                             >
@@ -505,46 +506,46 @@ function Promise() {
                                     </div>
                                 </div>
 
-                            {/* Promise Description Div */}
-                            <div className='mt-5 text-justify'>
-                                {data.description}
-                            </div>
+                                {/* Promise Description Div */}
+                                <div className='mt-5 text-justify'>
+                                    {data.description}
+                                </div>
 
-                            {/* (View, Like, Comment) Count - View Sources - React Button Divs*/}
-                            <div className='flex flex-wrap flex-row justify-evenly items-center pt-3 gap-12'>
-                                <span className='text-white text-xs md:text-sm'>{viewCount} Views</span>
-                                <span className='text-white text-xs md:text-sm'>{likeCount} Likes</span>
-                                <span className='text-white text-xs md:text-sm'>{commentCount} Comments</span>
-                                <button className='text-white text-xs md:text-sm underline cursor-pointer' onClick={onOpen}>View Sources</button>
-                                <Popover>
-                                    <PopoverTrigger>
-                                        <button className='bg-orange-red text-white font-bold p-2 rounded-full hover:scale-110'>
-                                            Judge
-                                        </button>
-                                    </PopoverTrigger>
-                                    <PopoverContent className='bg-bunker'>
-                                        <PopoverArrow />
-                                        <PopoverCloseButton />
-                                        <PopoverHeader className='text-center font-bold'>
-                                            Is this Promise...
-                                        </PopoverHeader>
-                                        <PopoverBody className='flex justify-around px-5'>
-                                            <button onClick={() => handleJudgePromise(true)} className='bg-caribbean-green text-white font-bold p-3 rounded-full hover:scale-110'>
-                                                Fulfilled
+                                {/* (View, Like, Comment) Count - View Sources - React Button Divs*/}
+                                <div className='flex flex-wrap flex-row justify-evenly items-center pt-3 gap-12'>
+                                    <span className='text-white text-xs md:text-sm'>{viewCount} Views</span>
+                                    <span className='text-white text-xs md:text-sm'>{likeCount} Likes</span>
+                                    <span className='text-white text-xs md:text-sm'>{commentCount} Comments</span>
+                                    <button className='text-white text-xs md:text-sm underline cursor-pointer' onClick={onOpen}>View Sources</button>
+                                    <Popover>
+                                        <PopoverTrigger>
+                                            <button className='bg-orange-red text-white font-bold p-2 rounded-full hover:scale-110'>
+                                                Judge
                                             </button>
-                                            <div className='text-center flex items-center justify-center font-bold'>
-                                                or
-                                            </div>
-                                            <button onClick={() => handleJudgePromise(false)} className='bg-burning-orange text-white font-bold p-3 rounded-full hover:scale-110'>
-                                                Unfulfilled
-                                            </button>
-                                        </PopoverBody>
-                                    </PopoverContent>
-                                </Popover>
-                                <button className='text-orange-red text-2xl transform hover:scale-110' onClick={() => handleLike()}>
-                                    {isActive ? <AiFillHeart /> : <AiOutlineHeart />}
-                                </button>
-                            </div>
+                                        </PopoverTrigger>
+                                        <PopoverContent className='bg-bunker'>
+                                            <PopoverArrow />
+                                            <PopoverCloseButton />
+                                            <PopoverHeader className='text-center font-bold'>
+                                                Is this Promise...
+                                            </PopoverHeader>
+                                            <PopoverBody className='flex justify-around px-5'>
+                                                <button onClick={() => handleJudgePromise(true)} className='bg-caribbean-green text-white font-bold p-3 rounded-full hover:scale-110'>
+                                                    Fulfilled
+                                                </button>
+                                                <div className='text-center flex items-center justify-center font-bold'>
+                                                    or
+                                                </div>
+                                                <button onClick={() => handleJudgePromise(false)} className='bg-burning-orange text-white font-bold p-3 rounded-full hover:scale-110'>
+                                                    Unfulfilled
+                                                </button>
+                                            </PopoverBody>
+                                        </PopoverContent>
+                                    </Popover>
+                                    <button className='text-orange-red text-2xl transform hover:scale-110' onClick={() => handleLike()}>
+                                        {isActive ? <AiFillHeart /> : <AiOutlineHeart />}
+                                    </button>
+                                </div>
 
                             </div>
                         </main>
@@ -557,7 +558,7 @@ function Promise() {
         <AlertDialog
             isOpen={isPostDelete}
             leastDestructiveRef={cancelRef}
-            onClose={()=>setIsPostDelete(false)}
+            onClose={() => setIsPostDelete(false)}
             onMouseDown={(e) => e.stopPropagation()}
         >
             <AlertDialogOverlay onMouseDown={(e) => e.stopPropagation()}>
