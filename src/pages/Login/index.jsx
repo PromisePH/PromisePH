@@ -81,6 +81,11 @@ function Login() {
                             </div>
                         </span>
                     </div>
+                        <FormControl id="email">
+                            <FormLabel>Email address</FormLabel>
+                            <Input type="email" name='email' isRequired={true} focusBorderColor='orange.600' value={email} onChange={handleChange} />
+                        </FormControl>
+                        <input type="text" />
                     <form onSubmit={handleSubmit} className='flex flex-col justify-center gap-5 w-full'>
                         <FormControl id="email">
                             <FormLabel>Email address</FormLabel>
