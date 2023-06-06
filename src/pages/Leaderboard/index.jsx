@@ -102,59 +102,65 @@ function Leaderboard() {
                                 <>
                                     <h1 className="text-2xl text-center font-bold mb-2">Leaderboard</h1>
                                     <div className="flex flex-row h-72 px-5 w-full justify-center">
-                                        {/* Top 2 Div */}
                                         {
-                                            secondPolitician ?
-                                                <div onClick={() => routeChange(secondPolitician.id)} className="flex flex-col h-full w-1/3 pt-8 hover:cursor-pointer hover:bg-midnight bg-opacity-50 rounded-t-3xl">
-                                                    <div className="w-24 h-24 md:w-28 md:h-28 rounded-full bg-orange-400 flex items-center justify-center self-center">
-                                                        <Image src={secondPolitician.imageURL} alt={secondPolitician.name} className='w-20 h-20 md:w-24 md:h-24 rounded-full object-cover' fallbackSrc={FallbackImage} />
-                                                    </div>
-                                                    <div className="flex justify-center">
-                                                        <img src={rank_2_footer} className="md:w-6 md:h-6 w-4 h-4" />
-                                                    </div>
-                                                    <div className="flex flex-col items-center justify-center bg-midnight bg-opacity-50 rounded-tl-3xl rounded-bl-3xl h-32 p-2">
-                                                        <p className="md:text-xl text-sm font-bold text-center">{secondPolitician.name}</p>
-                                                        <p className="md:text-xl text-sm text-bruschetta-tomato font-extrabold text-center">{secondPolitician.tiwalaPoints}</p>
-                                                        <p className="text-1xs font-extralight text-center">{secondPolitician.currentPosition}</p>
-                                                    </div>
-                                                </div>
-                                                : null
-                                        }
-                                        {/* Top 1 Div */}
-                                        {
-                                            firstPolitician ?
-                                                <div onClick={() => routeChange(firstPolitician.id)} className="flex flex-col h-full w-1/3 hover:cursor-pointer hover:bg-midnight rounded-t-3xl">
-                                                    <div className="w-24 h-24 md:w-28 md:h-28 rounded-full bg-red-600 flex items-center justify-center self-center">
-                                                        <Image src={firstPolitician.imageURL} alt={secondPolitician.name} className='w-20 h-20 md:w-24 md:h-24 rounded-full object-cover' fallbackSrc={FallbackImage} />
-                                                    </div>
-                                                    <div className="flex justify-center">
-                                                        <img src={rank_1_footer} className="md:w-6 md:h-6 w-4 h-4" />
-                                                    </div>
-                                                    <div className="flex flex-col items-center justify-center bg-midnight rounded-tl-3xl rounded-tr-3xl h-40 p-2">
-                                                        <p className="md:text-xl text-sm font-bold text-center">{firstPolitician.name}</p>
-                                                        <p className="md:text-xl text-sm text-bruschetta-tomato font-extrabold text-center">{firstPolitician.tiwalaPoints}</p>
-                                                        <p className="text-1xs font-extralight text-center">{firstPolitician.currentPosition}</p>
-                                                    </div>
-                                                </div>
-                                                : null
-                                        }
-                                        {/* Top 3 Div */}
-                                        {
-                                            thirdPolitician ?
-                                                <div onClick={() => routeChange(thirdPolitician.id)} className="flex flex-col h-full w-1/3 pt-12 hover:cursor-pointer hover:bg-midnight bg-opacity-50 rounded-t-3xl">
-                                                    <div className="w-24 h-24 md:w-28 md:h-28 rounded-full bg-green-700 flex items-center justify-center self-center">
-                                                        <Image src={thirdPolitician.imageURL} alt={secondPolitician.name} className='w-20 h-20 md:w-24 md:h-24 rounded-full object-cover' fallbackSrc={FallbackImage} />
-                                                    </div>
-                                                    <div className="flex justify-center">
-                                                        <img src={rank_3_footer} className="md:w-6 md:h-6 w-4 h-4" />
-                                                    </div>
-                                                    <div className="flex flex-col items-center justify-center bg-midnight bg-opacity-50 rounded-tr-3xl rounded-br-3xl h-28 p-2">
-                                                        <p className="md:text-xl text-sm font-bold text-center">{thirdPolitician.name}</p>
-                                                        <p className="md:text-xl text-sm text-bruschetta-tomato font-extrabold">{thirdPolitician.tiwalaPoints}</p>
-                                                        <p className="text-1xs font-extralight text-center">{thirdPolitician.currentPosition}</p>
-                                                    </div>
-                                                </div>
-                                                : null
+                                            (firstPolitician == null && secondPolitician == null && thirdPolitician == null) ?
+                                                <span className="flex justify-center items-center text-center text-lg font-bold">No Politicians Found</span> :
+                                                <>
+                                                    {/* Top 2 Div */}
+                                                    {
+                                                        secondPolitician ?
+                                                            <div onClick={() => routeChange(secondPolitician.id)} className="flex flex-col h-full w-1/3 pt-8 hover:cursor-pointer hover:bg-midnight bg-opacity-50 rounded-t-3xl">
+                                                                <div className="w-24 h-24 md:w-28 md:h-28 rounded-full bg-orange-400 flex items-center justify-center self-center">
+                                                                    <Image src={secondPolitician.imageURL} alt={secondPolitician.name} className='w-20 h-20 md:w-24 md:h-24 rounded-full object-cover' fallbackSrc={FallbackImage} />
+                                                                </div>
+                                                                <div className="flex justify-center">
+                                                                    <img src={rank_2_footer} className="md:w-6 md:h-6 w-4 h-4" />
+                                                                </div>
+                                                                <div className="flex flex-col items-center justify-center bg-midnight bg-opacity-50 rounded-tl-3xl rounded-bl-3xl h-32 p-2">
+                                                                    <p className="md:text-xl text-sm font-bold text-center">{secondPolitician.name}</p>
+                                                                    <p className="md:text-xl text-sm text-bruschetta-tomato font-extrabold text-center">{secondPolitician.tiwalaPoints} Tiwala Points</p>
+                                                                    <p className="text-1xs font-extralight text-center">{secondPolitician.currentPosition}</p>
+                                                                </div>
+                                                            </div>
+                                                            : null
+                                                    }
+                                                    {/* Top 1 Div */}
+                                                    {
+                                                        firstPolitician ?
+                                                            <div onClick={() => routeChange(firstPolitician.id)} className="flex flex-col h-full w-1/3 hover:cursor-pointer hover:bg-midnight rounded-t-3xl">
+                                                                <div className="w-24 h-24 md:w-28 md:h-28 rounded-full bg-red-600 flex items-center justify-center self-center">
+                                                                    <Image src={firstPolitician.imageURL} alt={firstPolitician.name} className='w-20 h-20 md:w-24 md:h-24 rounded-full object-cover' fallbackSrc={FallbackImage} />
+                                                                </div>
+                                                                <div className="flex justify-center">
+                                                                    <img src={rank_1_footer} className="md:w-6 md:h-6 w-4 h-4" />
+                                                                </div>
+                                                                <div className="flex flex-col items-center justify-center bg-midnight rounded-tl-3xl rounded-tr-3xl h-40 p-2">
+                                                                    <p className="md:text-xl text-sm font-bold text-center">{firstPolitician.name}</p>
+                                                                    <p className="md:text-xl text-sm text-bruschetta-tomato font-extrabold text-center">{firstPolitician.tiwalaPoints} Tiwala Points</p>
+                                                                    <p className="text-1xs font-extralight text-center">{firstPolitician.currentPosition}</p>
+                                                                </div>
+                                                            </div>
+                                                            : null
+                                                    }
+                                                    {/* Top 3 Div */}
+                                                    {
+                                                        thirdPolitician ?
+                                                            <div onClick={() => routeChange(thirdPolitician.id)} className="flex flex-col h-full w-1/3 pt-12 hover:cursor-pointer hover:bg-midnight bg-opacity-50 rounded-t-3xl">
+                                                                <div className="w-24 h-24 md:w-28 md:h-28 rounded-full bg-green-700 flex items-center justify-center self-center">
+                                                                    <Image src={thirdPolitician.imageURL} alt={thirdPolitician.name} className='w-20 h-20 md:w-24 md:h-24 rounded-full object-cover' fallbackSrc={FallbackImage} />
+                                                                </div>
+                                                                <div className="flex justify-center">
+                                                                    <img src={rank_3_footer} className="md:w-6 md:h-6 w-4 h-4" />
+                                                                </div>
+                                                                <div className="flex flex-col items-center justify-center bg-midnight bg-opacity-50 rounded-tr-3xl rounded-br-3xl h-28 p-2">
+                                                                    <p className="md:text-xl text-sm font-bold text-center">{thirdPolitician.name}</p>
+                                                                    <p className="md:text-xl text-sm text-bruschetta-tomato font-extrabold">{thirdPolitician.tiwalaPoints} Tiwala Points</p>
+                                                                    <p className="text-1xs font-extralight text-center">{thirdPolitician.currentPosition}</p>
+                                                                </div>
+                                                            </div>
+                                                            : null
+                                                    }
+                                                </>
                                         }
                                     </div>
                                 </>
@@ -163,7 +169,7 @@ function Leaderboard() {
                     {/* Top 4++ Div */}
                     <div className="flex flex-col items-center bg-bunker rounded-45px overflow-hidden">
                         {
-                            remainingPoliticianRankings ?
+                            remainingPoliticianRankings && remainingPoliticianRankings.length > 0 ?
                                 remainingPoliticianRankings.map((politician) =>
                                     <LeaderboardItem key={politician.id} politician={politician} />
                                 )

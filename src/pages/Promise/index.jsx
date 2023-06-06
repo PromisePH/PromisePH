@@ -91,19 +91,26 @@ function Promise() {
     const params = useParams();
     const ratingNumbers = [1, 2, 3, 4, 5];
 
-    const updateView = async () => {
-        const postRef = doc(db, 'posts', params.promiseID);
-        await updateDoc(postRef, { views: increment(1) });
-
-        const userDataRef = doc(db, CollectionsEnum.USER_DATA, user.uid);
-        const userData = await getDoc(userDataRef)
-        if (userData.exists() && userData.data().judgedPromises) {
-            setAlreadyJudged(userData.data().judgedPromises.includes(params.promiseID));
+    useEffect(() => {
+        const updateView = async () => {
+            const postRef = doc(db, 'posts', params.promiseID);
+            await updateDoc(postRef, { views: increment(1) });
         }
-    }
+        updateView();
+    }, []);
 
     useEffect(() => {
         setIsLoading(true);
+        const updateView = async () => {
+            if (!user){
+                return
+            }
+            const userDataRef = doc(db, CollectionsEnum.USER_DATA, user.uid);
+            const userData = await getDoc(userDataRef)
+            if (userData.exists() && userData.data().judgedPromises) {
+                setAlreadyJudged(userData.data().judgedPromises.includes(params.promiseID));
+            }
+        }
         updateView();
 
         const postRef = doc(db, 'posts', params.promiseID);
@@ -450,7 +457,7 @@ function Promise() {
                                     </div>
 
                                     {/* Promise Header Div */}
-                                    <div className="w-5/6 h-28 box-content box-border">
+                                    <div className="w-5/6 h-28 box-border">
                                         <div className="flex flex-col p-2 h-max min-w-0 max-w-max">
                                             {/* Post Title Div */}
                                             <div className="md:text-2xl font-bold w-full max-w-full h-16 overflow-hidden overflow-ellipsis">
@@ -474,7 +481,7 @@ function Promise() {
                                                 <div>
                                                     {
                                                         data.isDeleted
-                                                            ? <div className="bg-red-600 border-radius-full rounded-full text-black text-1xs md:text-xs text-center font-bold p-2 mr-1 md:p-3 md:mr-4 transform hover:scale-110 text-white" onMouseDown={(e) => e.stopPropagation()}>
+                                                            ? <div className="bg-red-600 border-radius-full rounded-full text-1xs md:text-xs text-center font-bold p-2 mr-1 md:p-3 md:mr-4 transform hover:scale-110 text-white" onMouseDown={(e) => e.stopPropagation()}>
                                                                 DELETED
                                                             </div>
                                                             : null
