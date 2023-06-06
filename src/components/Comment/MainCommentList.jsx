@@ -167,13 +167,15 @@ function MainCommentList(com) {
     // Up/Down Vote Clicking
     function handleVote(vote) {
         //If a User is Logged In
-        if (user) {
+        if (user && !commentData.isDeleted) {
             //for Upvote
             if (vote == "up")
                 activeUpvote ? updateCommentUpvote("unvoted") : updateCommentUpvote("voted");
             //for Downvote    
             else if (vote == "down")
                 activeDownvote ? updateCommentDownvote("unvoted") : updateCommentDownvote("voted");
+        }else if(commentData.isDeleted){
+            return
         }
         //If no User Logged In 
         else {
@@ -187,10 +189,10 @@ function MainCommentList(com) {
                 <div className={`flex flex-row h-auto rounded-lg ${activeDetail ? "bg-white bg-opacity-5" : ""}`}>
                     <div className="flex flex-col justify-center relative h-16 mr-2">
                         {/* Upvote Icon */}
-                        <IconContext.Provider value={{ color: activeUpvote ? "#FF4401" : upHover ? "#FF4401" : "FFFFFF" }}>
-                            <div className="relative" onMouseDown={() => handleVote("up")} onMouseEnter={() => setUpHover(true)} onMouseLeave={() => setUpHover(false)}>
-                                <div className={`absolute ${activeUpvote ? "bg-white bg-opacity-10" : upHover ? "bg-white bg-opacity-10" : ""} w-full h-1/2 max-h-3.5 mt-2 rounded-md cursor-pointer`}></div>
-                                <FiChevronUp className="text-3xl cursor-pointer" />
+                        <IconContext.Provider value={{ color: activeUpvote && !commentData.isDeleted ? "#FF4401" : upHover && !commentData.isDeleted ? "#FF4401" : commentData.isDeleted ? "#818384" : "FFFFFF" }}>
+                            <div className="relative" onMouseDown={() => handleVote("up")} onMouseEnter={() => commentData.isDeleted ? null : setUpHover(true)} onMouseLeave={() => setUpHover(false)}>
+                                <div className={`absolute ${activeUpvote ? "bg-white bg-opacity-10" : upHover ? "bg-white bg-opacity-10" : ""} w-full h-1/2 max-h-3.5 mt-2 rounded-md ${commentData.isDeleted ? "": "cursor-pointer"}`}></div>
+                                <FiChevronUp className="text-3xl" />
                             </div>
                         </IconContext.Provider>
 
@@ -198,9 +200,9 @@ function MainCommentList(com) {
                         <div className="w-full flex justify-center absolute">{voteCount}</div>
 
                         {/* Downvote Icon */}
-                        <IconContext.Provider value={{ color: activeDownvote ? "#7193ff" : downHover ? "#7193ff" : "FFFFFF" }}>
-                            <div className="relative" onMouseDown={() => handleVote("down")} onMouseEnter={() => setDownHover(true)} onMouseLeave={() => setDownHover(false)}>
-                                <div className={`absolute ${activeDownvote ? "bg-white bg-opacity-10" : downHover ? "bg-white bg-opacity-10" : ""} w-full h-1/2 max-h-3.5 mt-2 rounded-md cursor-pointer`}></div>
+                        <IconContext.Provider value={{ color: activeDownvote && !commentData.isDeleted ? "#7193ff" : downHover && !commentData.isDeleted ? "#7193ff" : commentData.isDeleted ? "#818384" : "FFFFFF" }}>
+                            <div className="relative" onMouseDown={() => handleVote("down")} onMouseEnter={() => commentData.isDeleted ? null : setDownHover(true)} onMouseLeave={() => setDownHover(false)}>
+                                <div className={`absolute ${activeDownvote ? "bg-white bg-opacity-10" : downHover ? "bg-white bg-opacity-10" : ""} w-full h-1/2 max-h-3.5 mt-2 rounded-md ${commentData.isDeleted ? "": "cursor-pointer"}`}></div>
                                 <FiChevronDown className="text-3xl p-0" />
                             </div>
                         </IconContext.Provider>
