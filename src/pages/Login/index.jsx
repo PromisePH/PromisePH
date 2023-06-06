@@ -37,7 +37,7 @@ function Login() {
     const { email, password } = formData;
 
     const handleChange = (e) => {
-        const { name, value } = e.target;
+        const { name, value } = e.target || e.nativeEvent.target;
         setFormData((prevState) => ({
             ...prevState,
             [name]: value

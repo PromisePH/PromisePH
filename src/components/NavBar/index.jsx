@@ -72,7 +72,7 @@ function NavBar() {
             <div className='h-full w-full flex items-center justify-between md:justify-center md:gap-x-20 gap-2 px-2'>
                 <Link as={RouteLink} to='/' style={{ textDecoration: 'none' }} className='min-w-fit'>
                     <div className='no-underline flex flex-row items-center min-w-fit'>
-                        <img src={Logo} alt="PromisePH Logo" className="h-10 min-w-fit" />
+                        <img src={Logo} alt="PromisePH Logo" className="h-10 w-10" />
                         <span className='text-center ml-2 text-orange-red font-extrabold text-2xl hidden md:block'>PromisePH</span>
                     </div>
                 </Link>
@@ -82,7 +82,7 @@ function NavBar() {
                             <IconLink onClick={() => { navigate('/') }}>
                                 <Icon as={AiFillHome} boxSize={6} />
                             </IconLink>
-                            <IconLink onClick={() => {navigate('/leaderboard') }}>
+                            <IconLink onClick={() => { navigate('/leaderboard') }}>
                                 <Icon as={RiTrophyFill} boxSize={6} />
                             </IconLink>
                             <IconLink onClick={() => { navigate('/politicians') }}>

@@ -28,6 +28,7 @@ import {
   AlertDialogContent,
   AlertDialogOverlay,
 } from '@chakra-ui/react';
+
 function Post({ post, user }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const cancelRef = useRef(null);

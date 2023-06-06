@@ -93,23 +93,26 @@ function Promise() {
     const params = useParams();
     const ratingNumbers = [1, 2, 3, 4, 5];
 
-    const updateView = async () => {
-        const postRef = doc(db, 'posts', params.promiseID);
-        await updateDoc(postRef, { views: increment(1) });
-
-        const userDataRef = doc(db, CollectionsEnum.USER_DATA, user.uid);
-        const userData = await getDoc(userDataRef)
-        if (userData.exists() && userData.data().judgedPromises) {
-            setAlreadyJudged(userData.data().judgedPromises.includes(params.promiseID));
+    useEffect(() => {
+        const updateView = async () => {
+            const postRef = doc(db, 'posts', params.promiseID);
+            await updateDoc(postRef, { views: increment(1) });
         }
-    }
+        updateView();
+    }, []);
 
     useEffect(() => {
-        if (!user) {
-            return;
-        }
-
         setIsLoading(true);
+        const updateView = async () => {
+            if (!user){
+                return
+            }
+            const userDataRef = doc(db, CollectionsEnum.USER_DATA, user.uid);
+            const userData = await getDoc(userDataRef)
+            if (userData.exists() && userData.data().judgedPromises) {
+                setAlreadyJudged(userData.data().judgedPromises.includes(params.promiseID));
+            }
+        }
         updateView();
 
         const postRef = doc(db, 'posts', params.promiseID);
@@ -368,8 +371,8 @@ function Promise() {
             isLoading
                 ? <>
                     {/* Skeleton */}
-                    <div className='flex pt-20 justify-center md:w-full'>
-                        <div className='p-4 flex flex-col bg-bunker items-center w-full md:w-4/12'>
+                    <main className="w-full pt-16 pb-3 px-4 flex justify-center items-center flex-col">
+                        <div className='w-full max-w-3xl mx-auto bg-bunker shadow-md rounded-lg p-4 mb-4 mt-5'>
                             <div className='flex flex-row w-full mb-10'>
                                 <Skeleton height='130px' width='160px' className='rounded-md' />
                                 <div className='flex flex-col w-full px-4'>
@@ -392,16 +395,14 @@ function Promise() {
                                 <Skeleton height='17px' width='10%' className='rounded-md' />
                             </div>
                         </div>
-                    </div>
-                    <div className='flex justify-center w-full mt-10'>
-                        <div className='p-4 flex flex-col bg-bunker items-center w-full md:w-4/12'>
+                        <div className='w-full max-w-3xl flex justify-center p-4 bg-bunker rounded-lg'>
                             <div className='w-full flex flex-col items-center my-5'>
                                 <Skeleton height='20px' width='95%' className='rounded-md' />
                                 <Skeleton height='20px' width='95%' className='rounded-md my-10' />
                                 <Skeleton height='20px' width='95%' className='rounded-md' />
                             </div>
                         </div>
-                    </div>
+                    </main>
                 </>
                 //Checks the post's delete status
                 : deleteStatus()
@@ -479,7 +480,6 @@ function Promise() {
 
                                 {/* Promise Contents Div*/}
                                 <div className="flex flex-row">
-
                                     {/* Post Image Div */}
                                     <div className="rounded-lg object-scale-down">
                                         <a href={`${data.image}`} target="_blank" rel="noreferrer" className="">
@@ -488,7 +488,7 @@ function Promise() {
                                     </div>
 
                                     {/* Promise Header Div */}
-                                    <div className="w-5/6 h-28 box-content box-border">
+                                    <div className="w-5/6 h-28 box-border">
                                         <div className="flex flex-col p-2 h-max min-w-0 max-w-max">
                                             {/* Post Title Div */}
                                             <div className="md:text-2xl font-bold w-full max-w-full h-16 overflow-hidden overflow-ellipsis">
@@ -512,7 +512,7 @@ function Promise() {
                                                 <div>
                                                     {
                                                         data.isDeleted
-                                                            ? <div className="bg-red-600 border-radius-full rounded-full text-black text-1xs md:text-xs text-center font-bold p-2 mr-1 md:p-3 md:mr-4 transform hover:scale-110 text-white" onMouseDown={(e) => e.stopPropagation()}>
+                                                            ? <div className="bg-red-600 border-radius-full rounded-full text-1xs md:text-xs text-center font-bold p-2 mr-1 md:p-3 md:mr-4 transform hover:scale-110 text-white" onMouseDown={(e) => e.stopPropagation()}>
                                                                 DELETED
                                                             </div>
                                                             : null
