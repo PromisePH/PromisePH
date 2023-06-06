@@ -5,7 +5,6 @@ import { useAuthState } from "react-firebase-hooks/auth";
 import {
     FormControl,
     FormLabel,
-    Input,
     Button,
     Divider,
     Link,
@@ -84,11 +83,11 @@ function Login() {
                     <form onSubmit={handleSubmit} className='flex flex-col justify-center gap-5 w-full'>
                         <FormControl id="email">
                             <FormLabel>Email address</FormLabel>
-                            <Input type="email" name='email' isRequired={true} focusBorderColor='orange.600' value={email} onChange={handleChange} />
+                            <input type="email" name='email'  value={email} onChange={handleChange} />
                         </FormControl>
                         <FormControl id="password">
                             <FormLabel>Password</FormLabel>
-                            <Input type="password" name='password' isRequired={true} focusBorderColor='orange.600' value={password} onChange={handleChange} />
+                            <input type="password" name='password'  value={password} onChange={handleChange} />
                         </FormControl>
                         <Button
                             colorScheme="gray"
