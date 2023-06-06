@@ -28,6 +28,7 @@ import {
   AlertDialogContent,
   AlertDialogOverlay,
 } from '@chakra-ui/react'
+
 function Post({ post, user }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const cancelRef = useRef(null);
@@ -61,7 +62,7 @@ function Post({ post, user }) {
   function deletePost() {
     console.log(post.id);
     const postRef = doc(db, "posts", post.id);
-    const update = async () => await setDoc(postRef, { isDeleted: true }, {merge : true})
+    const update = async () => await setDoc(postRef, { isDeleted: true }, { merge: true })
     update();
   }
 
@@ -134,35 +135,35 @@ function Post({ post, user }) {
                     //Post Dropdown Menu
                     //Visible Only if Post Creator == Logged In User
                     isPoster ?
-                      <Menu onMouseDown={(e)=>e.stopPropagation()}>
-                        <MenuButton onMouseDown={(e)=>e.stopPropagation()}>
-                          <GoKebabHorizontal onMouseDown={(e)=>e.stopPropagation()} className="hover:bg-white text-xl"/>
-                        </MenuButton> 
-                        <MenuList onMouseDown={(e)=>e.stopPropagation()} className="px-2">
-                          <MenuItem as={Button} 
-                          className="hover:text-red-600"
-                          onMouseDown={(e)=>e.stopPropagation()}
-                          onClick={
-                            //Checks if the post is already deleted
-                            post.isDeleted
-                              ? () => toast({
-                                title: 'Post Already Deleted',
-                                status: 'error',
-                                duration: 3000,
-                                isClosable: true,
+                      <Menu onMouseDown={(e) => e.stopPropagation()}>
+                        <MenuButton onMouseDown={(e) => e.stopPropagation()}>
+                          <GoKebabHorizontal onMouseDown={(e) => e.stopPropagation()} className="hover:bg-white text-xl" />
+                        </MenuButton>
+                        <MenuList onMouseDown={(e) => e.stopPropagation()} className="px-2">
+                          <MenuItem as={Button}
+                            className="hover:text-red-600"
+                            onMouseDown={(e) => e.stopPropagation()}
+                            onClick={
+                              //Checks if the post is already deleted
+                              post.isDeleted
+                                ? () => toast({
+                                  title: 'Post Already Deleted',
+                                  status: 'error',
+                                  duration: 3000,
+                                  isClosable: true,
 
-                              })
-                            //Else Open ALert Dialog for Delete
-                              : onOpen
-                          }>
-                            <HiOutlineTrash className="mr-2 text-lg" onMouseDown={(e)=>e.stopPropagation()}/>
+                                })
+                                //Else Open ALert Dialog for Delete
+                                : onOpen
+                            }>
+                            <HiOutlineTrash className="mr-2 text-lg" onMouseDown={(e) => e.stopPropagation()} />
                             Delete Post
                           </MenuItem>
                         </MenuList>
                       </Menu>
                       : null
                   }
-                  </div>
+                </div>
                 <button
                   onClick={likePost}
                   onMouseDown={(e) => e.stopPropagation()}
@@ -246,20 +247,20 @@ function Post({ post, user }) {
         isOpen={isOpen}
         leastDestructiveRef={cancelRef}
         onClose={onClose}
-        onMouseDown={(e)=>e.stopPropagation()}
+        onMouseDown={(e) => e.stopPropagation()}
       >
-        <AlertDialogOverlay onMouseDown={(e)=>e.stopPropagation()}>
-          <AlertDialogContent className="mx-4 mt-20" onMouseDown={(e)=>e.stopPropagation()}>
-            <AlertDialogHeader fontSize='lg' fontWeight='bold' onMouseDown={(e)=>e.stopPropagation()}>
+        <AlertDialogOverlay onMouseDown={(e) => e.stopPropagation()}>
+          <AlertDialogContent className="mx-4 mt-20" onMouseDown={(e) => e.stopPropagation()}>
+            <AlertDialogHeader fontSize='lg' fontWeight='bold' onMouseDown={(e) => e.stopPropagation()}>
               Delete Post
             </AlertDialogHeader>
 
-            <AlertDialogBody onMouseDown={(e)=>e.stopPropagation()}>
+            <AlertDialogBody onMouseDown={(e) => e.stopPropagation()}>
               Are you sure? You cant undo this action afterwards.
             </AlertDialogBody>
 
-            <AlertDialogFooter onMouseDown={(e)=>e.stopPropagation()}>
-              <Button ref={cancelRef} onClick={onClose} onMouseDown={(e)=>e.stopPropagation()}>
+            <AlertDialogFooter onMouseDown={(e) => e.stopPropagation()}>
+              <Button ref={cancelRef} onClick={onClose} onMouseDown={(e) => e.stopPropagation()}>
                 Cancel
               </Button>
               <Button colorScheme='red'

@@ -103,10 +103,6 @@ function Promise() {
     }
 
     useEffect(() => {
-        if (!user) {
-            return;
-        }
-
         setIsLoading(true);
         updateView();
 
@@ -120,11 +116,7 @@ function Promise() {
             setIsPoster(user && user.uid && user.uid == temp.poster.id)
             setPostDeleteStatus(temp.isDeleted);
 
-            setIsActive(
-                user
-                    ? !!temp.upvotes.includes(user.uid)
-                    : false
-            );
+            setIsActive(user && temp.upvotes.includes(user.uid));
             setViewCount(temp.views);
             setLikeCount(
                 temp.upvotes
@@ -341,8 +333,8 @@ function Promise() {
             isLoading
                 ? <>
                     {/* Skeleton */}
-                    <div className='flex pt-20 justify-center md:w-full'>
-                        <div className='p-4 flex flex-col bg-bunker items-center w-full md:w-4/12'>
+                    <main className="w-full pt-16 pb-3 px-4 flex justify-center items-center flex-col">
+                        <div className='w-full max-w-3xl mx-auto bg-bunker shadow-md rounded-lg p-4 mb-4 mt-5'>
                             <div className='flex flex-row w-full mb-10'>
                                 <Skeleton height='130px' width='160px' className='rounded-md' />
                                 <div className='flex flex-col w-full px-4'>
@@ -365,16 +357,14 @@ function Promise() {
                                 <Skeleton height='17px' width='10%' className='rounded-md' />
                             </div>
                         </div>
-                    </div>
-                    <div className='flex justify-center w-full mt-10'>
-                        <div className='p-4 flex flex-col bg-bunker items-center w-full md:w-4/12'>
+                        <div className='w-full max-w-3xl flex justify-center p-4 bg-bunker rounded-lg'>
                             <div className='w-full flex flex-col items-center my-5'>
                                 <Skeleton height='20px' width='95%' className='rounded-md' />
                                 <Skeleton height='20px' width='95%' className='rounded-md my-10' />
                                 <Skeleton height='20px' width='95%' className='rounded-md' />
                             </div>
                         </div>
-                    </div>
+                    </main>
                 </>
                 //Checks the post's delete status
                 : deleteStatus()
@@ -452,7 +442,6 @@ function Promise() {
 
                                 {/* Promise Contents Div*/}
                                 <div className="flex flex-row">
-
                                     {/* Post Image Div */}
                                     <div className="rounded-lg object-scale-down">
                                         <a href={`${data.image}`} target="_blank" rel="noreferrer" className="">
