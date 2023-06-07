@@ -59,10 +59,12 @@ function Post({ post, user }) {
 
     if (post.upvotes && post.upvotes.includes(user.uid)) {
       setIsPinkied(true)
+      setIsHammered(false)
     }
 
     if (post.downvotes && post.downvotes.includes(user.uid)) {
       setIsHammered(true)
+      setIsPinkied(false)
     }
 
   }, [post]);

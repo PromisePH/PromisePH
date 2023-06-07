@@ -104,7 +104,7 @@ function Promise() {
     useEffect(() => {
         setIsLoading(true);
         const updateView = async () => {
-            if (!user){
+            if (!user) {
                 return
             }
             const userDataRef = doc(db, CollectionsEnum.USER_DATA, user.uid);
@@ -124,7 +124,16 @@ function Promise() {
 
             setIsPoster(user && user.uid && user.uid == temp.poster.id)
             setPostDeleteStatus(temp.isDeleted);
-
+            setIsHammered(
+                user && temp.downvotes.includes(user.uid)
+                    ? true 
+                    : false
+            );
+            setIsPinkied(
+                user && temp.upvotes.includes(user.uid)
+                    ? true 
+                    : false
+            );
             setViewCount(temp.views);
             setLikeCount(
                 temp.upvotes
