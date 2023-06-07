@@ -1,14 +1,13 @@
 import React, { useEffect, useRef, useState } from "react";
-import { AiOutlineHeart, AiFillHeart } from "react-icons/ai";
 import { BsTrash } from "react-icons/bs";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { useNavigate, useParams } from "react-router-dom";
 import { collection, doc, updateDoc, arrayRemove, arrayUnion, onSnapshot, increment, setDoc, addDoc, getDoc } from 'firebase/firestore';
 
 import { db, auth } from '../../firebase/firebase';
-
+import { TbHandLittleFinger, TbHammer, TbHandGrab } from "react-icons/tb";
 import { GoKebabHorizontal } from "react-icons/go";
-
+import { IconContext } from "react-icons";
 import Comment from "../../components/Comment";
 import NavBar from "../../components/NavBar";
 import BottomNav from "../../components/BottomNav"
@@ -64,13 +63,16 @@ function Promise() {
 
     // promise details state
     const [data, setPromiseData] = useState([]);
-    const [isActive, setIsActive] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [likeCount, setLikeCount] = useState(0);
     const [viewCount, setViewCount] = useState(0);
     const [isPoster, setIsPoster] = useState(false);
     const [commentCount, setCommentCount] = useState(0);
     const [politicalEntity, setPoliticalEntity] = useState(null);
+    const [pinkyHovered, setPinkyHovered] = useState(false);
+    const [hammerHovered, setHammerHovered] = useState(false);
+    const [isPinkied, setIsPinkied] = useState(false);
+    const [isHammered, setIsHammered] = useState(false);
 
     // delete promise state
     const [postDeleteStatus, setPostDeleteStatus] = useState(true);
@@ -102,7 +104,7 @@ function Promise() {
     useEffect(() => {
         setIsLoading(true);
         const updateView = async () => {
-            if (!user){
+            if (!user) {
                 return
             }
             const userDataRef = doc(db, CollectionsEnum.USER_DATA, user.uid);
@@ -122,8 +124,16 @@ function Promise() {
 
             setIsPoster(user && user.uid && user.uid == temp.poster.id)
             setPostDeleteStatus(temp.isDeleted);
-
-            setIsActive(user && temp.upvotes.includes(user.uid));
+            setIsHammered(
+                user && temp.downvotes.includes(user.uid)
+                    ? true 
+                    : false
+            );
+            setIsPinkied(
+                user && temp.upvotes.includes(user.uid)
+                    ? true 
+                    : false
+            );
             setViewCount(temp.views);
             setLikeCount(
                 temp.upvotes
@@ -160,28 +170,69 @@ function Promise() {
     const monthDiff = d2.getMonth() - d1.getMonth();
     const totalMonthDiff = yearDiff * 12 + monthDiff;
 
-    // Update Reaction
-    const updatePostLike = async (liked) => {
-        setIsActive(!isActive);
+    const Hammered = async () => {
+        if (user == null) {
+            navigate('/login');
+            return
+        }
+        setIsPinkied(false);
+        const postRef = doc(db, CollectionsEnum.POSTS, params.promiseID)
         const userDataRef = doc(db, CollectionsEnum.USER_DATA, user.uid)
-
-        if (liked) {
-            const postRef = doc(db, 'posts', params.promiseID);
-            await updateDoc(postRef, { upvotes: arrayUnion(user.uid) });
+        if (isHammered) {
+            setIsHammered(false);
+            await updateDoc(postRef, {
+                downvotes: arrayRemove(user.uid)
+            });
             await setDoc(
                 userDataRef,
-                { upvotedPosts: arrayUnion(params.promiseID) },
+                { downvotedPosts: arrayRemove(params.promiseID) },
                 { merge: true }
             );
         } else {
-            const postRef = doc(db, 'posts', params.promiseID);
-            await updateDoc(postRef, { upvotes: arrayRemove(user.uid) });
+            setIsHammered(true);
+            await updateDoc(postRef, {
+                downvotes: arrayUnion(user.uid),
+                upvotes: arrayRemove(user.uid)
+            });
+            await updateDoc(userDataRef, {
+                downvotedPosts: arrayUnion(params.promiseID),
+                upvotedPosts: arrayRemove(params.promiseID)
+            }
+            );
+        }
+
+    }
+    const Pinkied = async () => {
+        if (user == null) {
+            navigate('/login');
+            return
+        }
+        setIsHammered(false);
+        const postRef = doc(db, CollectionsEnum.POSTS, params.promiseID)
+        const userDataRef = doc(db, CollectionsEnum.USER_DATA, user.uid)
+        if (isPinkied) {
+            setIsPinkied(false);
+            await updateDoc(postRef, {
+                upvotes: arrayRemove(user.uid)
+            });
             await setDoc(
                 userDataRef,
                 { upvotedPosts: arrayRemove(params.promiseID) },
                 { merge: true }
             );
+        } else {
+            setIsPinkied(true);
+            await updateDoc(postRef, {
+                upvotes: arrayUnion(user.uid),
+                downvotes: arrayRemove(user.uid)
+            });
+            await updateDoc(userDataRef, {
+                upvotedPosts: arrayUnion(params.promiseID),
+                downvotedPosts: arrayRemove(params.promiseID)
+            }
+            );
         }
+
     }
 
     //Delete Post Function
@@ -192,17 +243,6 @@ function Promise() {
         update();
         setPostDeleteStatus(true);
         setIsPostDelete(false);
-    }
-
-    // Heart Reaction Clicked
-    const handleLike = () => {
-        //If a User is Logged In
-        if (user) {
-            updatePostLike(!isActive);
-            //If no User Logged In
-        } else {
-            navigate('/login');
-        }
     }
 
     const handleJudgePromise = (isFilfilled) => {
@@ -508,39 +548,65 @@ function Promise() {
                                 </div>
 
                                 {/* (View, Like, Comment) Count - View Sources - React Button Divs*/}
-                                <div className='flex flex-wrap flex-row justify-evenly items-center pt-3 gap-12'>
-                                    <span className='text-white text-xs md:text-sm'>{viewCount} Views</span>
-                                    <span className='text-white text-xs md:text-sm'>{likeCount} Likes</span>
-                                    <span className='text-white text-xs md:text-sm'>{commentCount} Comments</span>
-                                    <button className='text-white text-xs md:text-sm underline cursor-pointer' onClick={onOpen}>View Sources</button>
-                                    <Popover>
-                                        <PopoverTrigger>
-                                            <button className='bg-orange-red text-white font-bold p-2 rounded-full hover:scale-110'>
-                                                Judge
-                                            </button>
-                                        </PopoverTrigger>
-                                        <PopoverContent className='bg-bunker'>
-                                            <PopoverArrow />
-                                            <PopoverCloseButton />
-                                            <PopoverHeader className='text-center font-bold'>
-                                                Is this Promise...
-                                            </PopoverHeader>
-                                            <PopoverBody className='flex justify-around px-5'>
-                                                <button onClick={() => handleJudgePromise(true)} className='bg-caribbean-green text-white font-bold p-3 rounded-full hover:scale-110'>
-                                                    Fulfilled
-                                                </button>
-                                                <div className='text-center flex items-center justify-center font-bold'>
-                                                    or
-                                                </div>
-                                                <button onClick={() => handleJudgePromise(false)} className='bg-burning-orange text-white font-bold p-3 rounded-full hover:scale-110'>
-                                                    Unfulfilled
-                                                </button>
-                                            </PopoverBody>
-                                        </PopoverContent>
-                                    </Popover>
-                                    <button className='text-orange-red text-2xl transform hover:scale-110' onClick={() => handleLike()}>
-                                        {isActive ? <AiFillHeart /> : <AiOutlineHeart />}
-                                    </button>
+                                <div className='grid grid-cols-12 items-end pt-3 max-w-full'>
+                                    <div className="col-span-11 grid grid-rows-12 md:grid-cols-12 max-w-full gap-4">
+                                        <div className="md:col-span-6 col- flex flex-row flex-wrap justify-around items-center">
+                                            <span className='text-white text-xs md:text-sm'>{viewCount} Views</span>
+                                            <span className='text-white text-xs md:text-sm'>{likeCount} Likes</span>
+                                            <span className='text-white text-xs md:text-sm'>{commentCount} Comments</span>
+                                        </div>
+                                        <div className="md:col-span-6 flex flex-row flex-wrap justify-around items-center">
+                                            <button className='text-white text-xs md:text-sm underline cursor-pointer' onClick={onOpen}>View Sources</button>
+                                            <Popover>
+                                                <PopoverTrigger>
+                                                    <button className='bg-orange-red text-white font-bold p-2 rounded-full hover:scale-110'>
+                                                        Judge
+                                                    </button>
+                                                </PopoverTrigger>
+                                                <PopoverContent className='bg-bunker'>
+                                                    <PopoverArrow />
+                                                    <PopoverCloseButton />
+                                                    <PopoverHeader className='text-center font-bold'>
+                                                        Is this Promise...
+                                                    </PopoverHeader>
+                                                    <PopoverBody className='flex justify-around px-5'>
+                                                        <button onClick={() => handleJudgePromise(true)} className='bg-caribbean-green text-white font-bold p-3 rounded-full hover:scale-110'>
+                                                            Fulfilled
+                                                        </button>
+                                                        <div className='text-center flex items-center justify-center font-bold'>
+                                                            or
+                                                        </div>
+                                                        <button onClick={() => handleJudgePromise(false)} className='bg-burning-orange text-white font-bold p-3 rounded-full hover:scale-110'>
+                                                            Unfulfilled
+                                                        </button>
+                                                    </PopoverBody>
+                                                </PopoverContent>
+                                            </Popover>
+                                        </div>
+                                    </div>
+                                    <div className="col-span-1 flex flex-col justify-center items-center">
+                                        <button
+                                            onClick={Pinkied}
+                                            onMouseDown={(e) => { e.stopPropagation() }}
+                                            onMouseEnter={() => setPinkyHovered(true)}
+                                            onMouseLeave={() => setPinkyHovered(false)}
+                                            className={`text-white text-2xl transform rounded-full max-w-fit p-1 ${!isPinkied ? "hover:scale-110 hover:bg-gray-700" : "bg-gray-700 scale-110"}`}
+                                        >
+                                            {isPinkied || pinkyHovered
+                                                ? <IconContext.Provider value={{ color: "#FF4401" }}><TbHandLittleFinger className="text-4xl" /></IconContext.Provider>
+                                                : <TbHandGrab className="text-4xl" />
+                                            }
+                                        </button>
+                                        <button
+                                            onClick={Hammered}
+                                            onMouseDown={(e) => { e.stopPropagation() }}
+                                            onMouseEnter={() => setHammerHovered(true)}
+                                            onMouseLeave={() => setHammerHovered(false)}
+                                            className={`text-white text-2xl transform rounded-full max-w-fit p-1 ${!isHammered ? "hover:duration-75 hover:scale-110 hover:bg-gray-700 hover:rotate-45" : "rotate-45 bg-gray-700 scale-110"}`}
+                                        >
+                                            {isHammered || hammerHovered ? <IconContext.Provider value={{ color: "#7193ff" }}> <TbHammer className="text-4xl" /> </IconContext.Provider> : <TbHammer className="text-4xl" />}
+                                        </button>
+                                    </div>
                                 </div>
 
                             </div>

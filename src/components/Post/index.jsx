@@ -8,12 +8,12 @@ import CollectionsEnum from '../../constants/collections';
 import FallbackImage from '../../assets/img/default.jpg'
 import { Image, useDisclosure } from '@chakra-ui/react'
 import Avatar from '../../components/Avatar';
-import { AiOutlineHeart } from "react-icons/ai";
-import { AiFillHeart } from "react-icons/ai";
+import { IconContext } from "react-icons";
 import { RxDot } from "react-icons/rx";
 import { RxDotFilled } from "react-icons/rx";
 import { GoKebabHorizontal } from "react-icons/go";
 import { HiOutlineTrash } from "react-icons/hi";
+import { TbHandLittleFinger, TbHammer, TbHandGrab } from "react-icons/tb";
 import {
   useToast,
   Button,
@@ -27,15 +27,18 @@ import {
   AlertDialogHeader,
   AlertDialogContent,
   AlertDialogOverlay,
-} from '@chakra-ui/react'
+} from '@chakra-ui/react';
 
 function Post({ post, user }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const cancelRef = useRef(null);
   const toast = useToast();
-  const [isLiked, setIsLiked] = useState(false);
   const [isPoster, setIsPoster] = useState(false);
   const [isActive, setIsActive] = useState(false);
+  const [pinkyHovered, setPinkyHovered] = useState(false);
+  const [hammerHovered, setHammerHovered] = useState(false);  
+  const [isPinkied, setIsPinkied] = useState(false);
+  const [isHammered, setIsHammered] = useState(false);
   const navigate = useNavigate();
   const d1 = post.createdAt.toDate();
   const d2 = new Date();
@@ -45,7 +48,8 @@ function Post({ post, user }) {
   const totalMonthDiff = yearDiff * 12 + monthDiff;
   useEffect(() => {
     if (user == null || post == null) {
-      setIsLiked(false)
+      setIsPinkied(false)
+      setIsHammered(false)
       return
     }
 
@@ -54,8 +58,15 @@ function Post({ post, user }) {
     }
 
     if (post.upvotes && post.upvotes.includes(user.uid)) {
-      setIsLiked(true)
+      setIsPinkied(true)
+      setIsHammered(false)
     }
+
+    if (post.downvotes && post.downvotes.includes(user.uid)) {
+      setIsHammered(true)
+      setIsPinkied(false)
+    }
+
   }, [post]);
 
   //Update Root Comment
@@ -67,15 +78,48 @@ function Post({ post, user }) {
   }
 
 
-  const likePost = async () => {
+  const Hammered = async () => {
     if (user == null) {
       navigate('/login');
       return
     }
+    setIsPinkied(false);
     const postRef = doc(db, CollectionsEnum.POSTS, post.id)
     const userDataRef = doc(db, CollectionsEnum.USER_DATA, user.uid)
-    if (isLiked) {
-      setIsLiked(false);
+    if (isHammered) {
+      setIsHammered(false);
+      await updateDoc(postRef, {
+        downvotes: arrayRemove(user.uid)
+      });
+      await setDoc(
+        userDataRef,
+        { downvotedPosts: arrayRemove(post.id) },
+        { merge: true }
+      );
+    } else {
+      setIsHammered(true);
+      await updateDoc(postRef, {
+        downvotes: arrayUnion(user.uid),
+        upvotes: arrayRemove(user.uid)
+      });
+      await updateDoc(userDataRef, {
+        downvotedPosts: arrayUnion(post.id),
+        upvotedPosts: arrayRemove(post.id)
+      }
+      );
+    }
+
+  }
+  const Pinkied = async () => {
+    if (user == null) {
+      navigate('/login');
+      return
+    }
+    setIsHammered(false);
+    const postRef = doc(db, CollectionsEnum.POSTS, post.id)
+    const userDataRef = doc(db, CollectionsEnum.USER_DATA, user.uid)
+    if (isPinkied) {
+      setIsPinkied(false);
       await updateDoc(postRef, {
         upvotes: arrayRemove(user.uid)
       });
@@ -85,18 +129,20 @@ function Post({ post, user }) {
         { merge: true }
       );
     } else {
-      setIsLiked(true);
+      setIsPinkied(true);
       await updateDoc(postRef, {
-        upvotes: arrayUnion(user.uid)
+        upvotes: arrayUnion(user.uid),
+        downvotes: arrayRemove(user.uid)
       });
-      await setDoc(
-        userDataRef,
-        { upvotedPosts: arrayUnion(post.id) },
-        { merge: true }
+      await updateDoc(userDataRef, {
+        upvotedPosts: arrayUnion(post.id),
+        downvotedPosts: arrayRemove(post.id)
+      }
       );
     }
 
   }
+
   return (
     <section className="max-w-3xl mx-auto bg-bunker hover:bg-midnight shadow-md rounded-lg p-4 mb-4 cursor-pointer" onMouseDown={() => window.open(`/promise/${post.id}`, '_blank')}>
       <div className="flex md:hidden flex-row items-center">
@@ -125,53 +171,10 @@ function Post({ post, user }) {
         <div className="w-4/5 cursor-pointer" onMouseDown={() => window.open(`/promise/${post.id}`, '_blank')}>
           {/* <!-- Header div--> */}
           <div className="flex flex-col gap-1 cursor-pointer" onMouseDown={() => window.open(`/promise/${post.id}`, '_blank')}>
-            <div className="flex flex-row items-center justify-between cursor-pointer" onMouseDown={() => window.open(`/promise/${post.id}`, '_blank')}>
-              <a target="_blank" href={`promise/${post.id}`} rel="noreferrer" className="text-lg md:text-xl font-bold flex-grow cursor-pointer">
+            <div className="flex flex-row flex-wrap items-center justify-between cursor-pointer" onMouseDown={() => window.open(`/promise/${post.id}`, '_blank')}>
+              <a target="_blank" href={`promise/${post.id}`} rel="noreferrer" className="text-lg md:text-xl font-bold flex flex-wrap cursor-pointer">
                 {post.title}
               </a>
-              <div className=" flex flex-col items-center">
-                <div className="h-max hover:bg-gray-700 p-1 flex items-center rounded-full">
-                  {
-                    //Post Dropdown Menu
-                    //Visible Only if Post Creator == Logged In User
-                    isPoster ?
-                      <Menu onMouseDown={(e) => e.stopPropagation()}>
-                        <MenuButton onMouseDown={(e) => e.stopPropagation()}>
-                          <GoKebabHorizontal onMouseDown={(e) => e.stopPropagation()} className="hover:bg-white text-xl" />
-                        </MenuButton>
-                        <MenuList onMouseDown={(e) => e.stopPropagation()} className="px-2">
-                          <MenuItem as={Button}
-                            className="hover:text-red-600"
-                            onMouseDown={(e) => e.stopPropagation()}
-                            onClick={
-                              //Checks if the post is already deleted
-                              post.isDeleted
-                                ? () => toast({
-                                  title: 'Post Already Deleted',
-                                  status: 'error',
-                                  duration: 3000,
-                                  isClosable: true,
-
-                                })
-                                //Else Open ALert Dialog for Delete
-                                : onOpen
-                            }>
-                            <HiOutlineTrash className="mr-2 text-lg" onMouseDown={(e) => e.stopPropagation()} />
-                            Delete Post
-                          </MenuItem>
-                        </MenuList>
-                      </Menu>
-                      : null
-                  }
-                </div>
-                <button
-                  onClick={likePost}
-                  onMouseDown={(e) => e.stopPropagation()}
-                  className="text-orange-red text-2xl transform hover:scale-110"
-                >
-                  {isLiked ? <AiFillHeart /> : <AiOutlineHeart />}
-                </button>
-              </div>
             </div>
             <div className="flex flex-row items-center">
               {
@@ -235,6 +238,63 @@ function Post({ post, user }) {
               <span className="text-white text-xs md:text-sm">{post.comments ? post.comments.length : 0} Comments</span>
             </div>
           </div>
+        </div>
+        <div className=" flex flex-col items-center">
+          <div className="h-max hover:bg-gray-700 p-1 flex items-center rounded-full">
+            {
+              //Post Dropdown Menu
+              //Visible Only if Post Creator == Logged In User
+              isPoster ?
+                <Menu onMouseDown={(e) => e.stopPropagation()}>
+                  <MenuButton onMouseDown={(e) => e.stopPropagation()}>
+                    <GoKebabHorizontal onMouseDown={(e) => e.stopPropagation()} className="hover:bg-white text-xl" />
+                  </MenuButton>
+                  <MenuList onMouseDown={(e) => e.stopPropagation()} className="px-2">
+                    <MenuItem as={Button}
+                      className="hover:text-red-600"
+                      onMouseDown={(e) => e.stopPropagation()}
+                      onClick={
+                        //Checks if the post is already deleted
+                        post.isDeleted
+                          ? () => toast({
+                            title: 'Post Already Deleted',
+                            status: 'error',
+                            duration: 3000,
+                            isClosable: true,
+
+                          })
+                          //Else Open ALert Dialog for Delete
+                          : onOpen
+                      }>
+                      <HiOutlineTrash className="mr-2 text-lg" onMouseDown={(e) => e.stopPropagation()} />
+                      Delete Post
+                    </MenuItem>
+                  </MenuList>
+                </Menu>
+                : null
+            }
+          </div>
+          <button
+            onClick={Pinkied}
+            onMouseDown={(e) => {e.stopPropagation()}}
+            onMouseEnter={() => setPinkyHovered(true)}
+            onMouseLeave={() => setPinkyHovered(false)}
+            className={`text-white text-2xl transform rounded-full ${!isPinkied ? "hover:scale-110 hover:bg-gray-700" : "bg-gray-700 scale-110"}`}
+          >
+            {isPinkied || pinkyHovered  
+              ? <IconContext.Provider value={{ color: "#FF4401" }}><TbHandLittleFinger className="text-3xl" /></IconContext.Provider> 
+              :<TbHandGrab className="text-3xl" />
+              }
+          </button>
+          <button
+            onClick={Hammered}
+            onMouseDown={(e) => {e.stopPropagation()}}
+            onMouseEnter={() => setHammerHovered(true)}
+            onMouseLeave={() => setHammerHovered(false)}
+            className={`text-white text-2xl transform rounded-full ${!isHammered ? "hover:duration-75 hover:scale-110 hover:bg-gray-700 hover:rotate-45" : "rotate-45 bg-gray-700 scale-110"}`}
+          >
+            {isHammered || hammerHovered ? <IconContext.Provider value={{ color: "#7193ff" }}> <TbHammer className="text-3xl" /> </IconContext.Provider> : <TbHammer className="text-3xl" />}
+          </button>
         </div>
       </div>
       <div className="flex sm:hidden flex-row items-center pt-3 gap-12">
