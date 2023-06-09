@@ -23,10 +23,10 @@ function Login() {
 
     const navigate = useNavigate();
     useEffect(() => {
-        if (user) {
+        if (user && !isLoading) {
             navigate('/');
         }
-    }, [user]);
+    }, [user, isLoading]);
 
     const toast = useToast()
     const [formData, setFormData] = useState({
