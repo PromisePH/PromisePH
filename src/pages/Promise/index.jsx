@@ -52,7 +52,7 @@ import { ExternalLinkIcon } from '@chakra-ui/icons'
 
 function FallBackLinkPreview({ source }) {
     return (
-        <Link href={source} isExternal className='break-all'>
+        <Link href={`https://${source}`} isExternal className='break-all'>
             {source} <ExternalLinkIcon mx='2px' />
         </Link>
     )
