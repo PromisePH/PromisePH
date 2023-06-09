@@ -240,11 +240,14 @@ function Profile() {
                                         {/* Date Joined Div */}
                                         <div className='flex flex-row justify-items-center gap-1'>
                                             <BsFillCalendarWeekFill className='text-xs' />
-                                            {
-                                                latestPost ?
-                                                    <p className='text-xs opacity-30'>Posted {get_difference_string(latestPost.createdAt)}</p>
-                                                    : null
-                                            }
+                                            <p className='text-xs opacity-30'>
+                                                {
+                                                    latestPost ?
+                                                        `Posted ${get_difference_string(latestPost.createdAt)}`
+                                                        :
+                                                        'No posts yet'
+                                                }
+                                            </p>
                                         </div>
                                         {/* Upvote Count Div */}
                                         <div className='flex flex-col items-center ml-2'>
