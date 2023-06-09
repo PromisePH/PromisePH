@@ -232,12 +232,10 @@ function Promise() {
             }
             );
         }
-
     }
 
     //Delete Post Function
     function deletePost() {
-        console.log(data.id);
         const postRef = doc(db, "posts", data.id);
         const update = async () => await setDoc(postRef, { isDeleted: true }, { merge: true })
         update();

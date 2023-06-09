@@ -50,7 +50,6 @@ function Leaderboard() {
             setThirdPolitician(rankings_data[2]);
             setRemainingPoliticianRankings(remaining_rankings_data);
 
-            console.log(rankings_data)
             setIsLoading(false)
         }
 

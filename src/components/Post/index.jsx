@@ -71,7 +71,6 @@ function Post({ post, user }) {
 
   //Update Root Comment
   function deletePost() {
-    console.log(post.id);
     const postRef = doc(db, "posts", post.id);
     const update = async () => await setDoc(postRef, { isDeleted: true }, { merge: true })
     update();
