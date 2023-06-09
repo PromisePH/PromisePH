@@ -148,6 +148,9 @@ function Form1({ politicalEntity, setPoliticalEntity }) {
                 ...formData,
                 imageURL: imageURL
             }
+            if (entityData.dateAppointed) {
+                entityData.dateAppointed = new Date(entityData.dateAppointed)
+            }
             await setDoc(entityRef, entityData);
 
             // Set the selected entity

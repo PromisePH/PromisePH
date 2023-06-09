@@ -10,12 +10,15 @@ function SearchItem({ result, setSelectedEntity }) {
     const [unfulfilledPromisesCount, setUnfulfilledPromisesCount] = useState(0)
 
     useEffect(() => {
-        if (result.posts && result.fulfilledPromises) {
-            setPromiseCount(result.posts.length)
+        if (result.promises) {
+            setPromiseCount(result.promises.length)
+        }
+        if (result.fulfilledPromises) {
             setFulfilledPromisesCount(result.fulfilledPromises.length)
         }
-
-        setUnfulfilledPromisesCount(promisesCount - fulfilledPromisesCount)
+        if (promisesCount >= fulfilledPromisesCount) {
+            setUnfulfilledPromisesCount(promisesCount - fulfilledPromisesCount)
+        }
     }, [result])
 
     return (
