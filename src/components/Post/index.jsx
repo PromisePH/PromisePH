@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { db } from '../../firebase/firebase';
-import { doc, arrayUnion, arrayRemove, updateDoc, setDoc } from "firebase/firestore";
+import { doc, arrayUnion, arrayRemove, updateDoc, setDoc, getDoc } from "firebase/firestore";
 import CollectionsEnum from '../../constants/collections';
 
 import FallbackImage from '../../assets/img/default.jpg'
@@ -36,10 +36,12 @@ function Post({ post, user }) {
   const [isPoster, setIsPoster] = useState(false);
   const [isActive, setIsActive] = useState(false);
   const [pinkyHovered, setPinkyHovered] = useState(false);
-  const [hammerHovered, setHammerHovered] = useState(false);  
+  const [hammerHovered, setHammerHovered] = useState(false);
   const [isPinkied, setIsPinkied] = useState(false);
   const [isHammered, setIsHammered] = useState(false);
+  const [politicalEntity, setPoliticalEntity] = useState(null);
   const navigate = useNavigate();
+
   const d1 = post.createdAt.toDate();
   const d2 = new Date();
   const diffDays = Math.round((d2.getTime() - d1.getTime()) / (1000 * 60 * 60 * 24));
@@ -67,6 +69,15 @@ function Post({ post, user }) {
       setIsPinkied(false)
     }
 
+    const politicalEntityRef = doc(db, CollectionsEnum.ENTITY, post.entityId);
+    getDoc(politicalEntityRef).then((doc) => {
+      if (doc.exists()) {
+        setPoliticalEntity({
+          id: doc.id,
+          ...doc.data()
+        });
+      }
+    });
   }, [post]);
 
   //Update Root Comment
@@ -170,7 +181,16 @@ function Post({ post, user }) {
         <div className="w-4/5 cursor-pointer" onMouseDown={() => window.open(`/promise/${post.id}`, '_blank')}>
           {/* <!-- Header div--> */}
           <div className="flex flex-col gap-1 cursor-pointer" onMouseDown={() => window.open(`/promise/${post.id}`, '_blank')}>
-            <div className="flex flex-row flex-wrap items-center justify-between cursor-pointer" onMouseDown={() => window.open(`/promise/${post.id}`, '_blank')}>
+            <div className="cursor-pointer" onMouseDown={() => window.open(`/promise/${post.id}`, '_blank')}>
+              {
+                politicalEntity ?
+                  <div className="opacity-80 text-xs">
+                    <span className="font-bold">
+                      {politicalEntity.name}
+                    </span> promises...
+                  </div>
+                  : null
+              }
               <a target="_blank" href={`promise/${post.id}`} rel="noreferrer" className="text-lg md:text-xl font-bold flex flex-wrap cursor-pointer">
                 {post.title}
               </a>
@@ -189,7 +209,7 @@ function Post({ post, user }) {
                 {
                   //DELETE Flair to indicate that the post is Deleted
                   post.isDeleted
-                    ? <div className="bg-red-600 border-radius-full rounded-full text-black text-1xs md:text-xs text-center font-bold p-2 mr-1 md:p-3 md:mr-4 transform hover:scale-110 text-white" onMouseDown={(e) => e.stopPropagation()}>
+                    ? <div className="bg-red-600 border-radius-full rounded-full text-1xs md:text-xs text-center font-bold p-2 mr-1 md:p-3 md:mr-4 transform hover:scale-110 text-white" onMouseDown={(e) => e.stopPropagation()}>
                       DELETED
                     </div>
                     : null
@@ -275,22 +295,22 @@ function Post({ post, user }) {
           </div>
           <button
             onClick={Pinkied}
-            onMouseDown={(e) => {e.stopPropagation()}}
+            onMouseDown={(e) => { e.stopPropagation() }}
             onMouseEnter={() => setPinkyHovered(true)}
             onMouseLeave={() => setPinkyHovered(false)}
-            className={`text-white text-2xl transform rounded-full ${!isPinkied ? "hover:scale-110 hover:bg-gray-700" : "bg-gray-700 scale-110"}`}
+            className={`text-white text-2xl my-1 p-1 transform rounded-full ${isPinkied ? "bg-gray-700 scale-110" : "hover:scale-110 hover:bg-gray-700"}`}
           >
-            {isPinkied || pinkyHovered  
-              ? <IconContext.Provider value={{ color: "#FF4401" }}><TbHandLittleFinger className="text-3xl" /></IconContext.Provider> 
-              :<TbHandGrab className="text-3xl" />
-              }
+            {isPinkied || pinkyHovered
+              ? <IconContext.Provider value={{ color: "#FF4401" }}><TbHandLittleFinger className="text-3xl" /></IconContext.Provider>
+              : <TbHandGrab className="text-3xl" />
+            }
           </button>
           <button
             onClick={Hammered}
-            onMouseDown={(e) => {e.stopPropagation()}}
+            onMouseDown={(e) => { e.stopPropagation() }}
             onMouseEnter={() => setHammerHovered(true)}
             onMouseLeave={() => setHammerHovered(false)}
-            className={`text-white text-2xl transform rounded-full ${!isHammered ? "hover:duration-75 hover:scale-110 hover:bg-gray-700 hover:rotate-45" : "rotate-45 bg-gray-700 scale-110"}`}
+            className={`text-white text-2xl my-1 p-1 transform rounded-full ${isHammered ? "rotate-45 bg-gray-700 scale-110" : "hover:duration-75 hover:scale-110 hover:bg-gray-700 hover:rotate-45"}`}
           >
             {isHammered || hammerHovered ? <IconContext.Provider value={{ color: "#7193ff" }}> <TbHammer className="text-3xl" /> </IconContext.Provider> : <TbHammer className="text-3xl" />}
           </button>

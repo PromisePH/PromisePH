@@ -125,14 +125,10 @@ function Promise() {
             setIsPoster(user && user.uid && user.uid == temp.poster.id)
             setPostDeleteStatus(temp.isDeleted);
             setIsHammered(
-                user && temp.downvotes.includes(user.uid)
-                    ? true 
-                    : false
+                !!(user && temp.downvotes.includes(user.uid))
             );
             setIsPinkied(
-                user && temp.upvotes.includes(user.uid)
-                    ? true 
-                    : false
+                !!(user && temp.upvotes.includes(user.uid))
             );
             setViewCount(temp.views);
             setLikeCount(
@@ -433,9 +429,9 @@ function Promise() {
                                     <div className="flex flex-row items-center mb-2 mx-0 w-3/6">
                                         <a href={window.location.href} target="_blank" rel="noreferrer" className="flex items-center">
                                             {/* Poster Name */}
-                                            <span className="ml-2 text-white text-1xs text-sm font-bold">{data.poster.name}</span>
+                                            <span className="ml-2 text-white text-sm font-bold">{data.poster.name}</span>
                                         </a>
-                                        <span className="ml-4 text-white text-xs text-sm italic">
+                                        <span className="ml-4 text-white text-sm italic">
                                             {/* Post Date */}
                                             {diffDays <= 31
                                                 ? diffDays + " Day/s ago"
@@ -497,6 +493,18 @@ function Promise() {
                                     {/* Promise Header Div */}
                                     <div className="w-5/6 h-28 box-border">
                                         <div className="flex flex-col p-2 h-max min-w-0 max-w-max">
+                                            {
+                                                politicalEntity ?
+                                                    <div className="opacity-80 text-xs">
+                                                        <span
+                                                            onClick={() => navigate(`/politicians/${politicalEntity.id}`)}
+                                                            className="font-bold hover:underline cursor-pointer"
+                                                        >
+                                                            {politicalEntity.name}
+                                                        </span> promises...
+                                                    </div>
+                                                    : null
+                                            }
                                             {/* Post Title Div */}
                                             <div className="md:text-2xl font-bold w-full max-w-full h-16 overflow-hidden overflow-ellipsis">
                                                 {data.title}
@@ -588,7 +596,7 @@ function Promise() {
                                             onMouseDown={(e) => { e.stopPropagation() }}
                                             onMouseEnter={() => setPinkyHovered(true)}
                                             onMouseLeave={() => setPinkyHovered(false)}
-                                            className={`text-white text-2xl transform rounded-full max-w-fit p-1 ${!isPinkied ? "hover:scale-110 hover:bg-gray-700" : "bg-gray-700 scale-110"}`}
+                                            className={`text-white text-2xl my-1 transform rounded-full max-w-fit p-1 ${isPinkied ? "bg-gray-700 scale-110" : "hover:scale-110 hover:bg-gray-700"}`}
                                         >
                                             {isPinkied || pinkyHovered
                                                 ? <IconContext.Provider value={{ color: "#FF4401" }}><TbHandLittleFinger className="text-4xl" /></IconContext.Provider>
@@ -600,7 +608,7 @@ function Promise() {
                                             onMouseDown={(e) => { e.stopPropagation() }}
                                             onMouseEnter={() => setHammerHovered(true)}
                                             onMouseLeave={() => setHammerHovered(false)}
-                                            className={`text-white text-2xl transform rounded-full max-w-fit p-1 ${!isHammered ? "hover:duration-75 hover:scale-110 hover:bg-gray-700 hover:rotate-45" : "rotate-45 bg-gray-700 scale-110"}`}
+                                            className={`text-white text-2xl my-1 transform rounded-full max-w-fit p-1 ${isHammered ? "rotate-45 bg-gray-700 scale-110" : "hover:duration-75 hover:scale-110 hover:bg-gray-700 hover:rotate-45"}`}
                                         >
                                             {isHammered || hammerHovered ? <IconContext.Provider value={{ color: "#7193ff" }}> <TbHammer className="text-4xl" /> </IconContext.Provider> : <TbHammer className="text-4xl" />}
                                         </button>
