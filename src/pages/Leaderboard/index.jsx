@@ -117,7 +117,7 @@ function Leaderboard() {
                                                                 </div>
                                                                 <div className="flex flex-col items-center justify-center bg-midnight bg-opacity-50 rounded-tl-3xl rounded-bl-3xl h-32 p-2">
                                                                     <p className="md:text-xl text-sm font-bold text-center">{secondPolitician.name}</p>
-                                                                    <p className="md:text-xl text-sm text-bruschetta-tomato font-extrabold text-center">{secondPolitician.tiwalaPoints} Tiwala Points</p>
+                                                                    <p className="md:text-xl text-1xs text-bruschetta-tomato font-extrabold text-center">{secondPolitician.tiwalaPoints} Tiwala Points</p>
                                                                     <p className="text-1xs font-extralight text-center">{secondPolitician.currentPosition}</p>
                                                                 </div>
                                                             </div>
@@ -135,7 +135,7 @@ function Leaderboard() {
                                                                 </div>
                                                                 <div className="flex flex-col items-center justify-center bg-midnight rounded-tl-3xl rounded-tr-3xl h-40 p-2">
                                                                     <p className="md:text-xl text-sm font-bold text-center">{firstPolitician.name}</p>
-                                                                    <p className="md:text-xl text-sm text-bruschetta-tomato font-extrabold text-center">{firstPolitician.tiwalaPoints} Tiwala Points</p>
+                                                                    <p className="md:text-xl text-1xs text-bruschetta-tomato font-extrabold text-center">{firstPolitician.tiwalaPoints} Tiwala Points</p>
                                                                     <p className="text-1xs font-extralight text-center">{firstPolitician.currentPosition}</p>
                                                                 </div>
                                                             </div>
@@ -153,7 +153,7 @@ function Leaderboard() {
                                                                 </div>
                                                                 <div className="flex flex-col items-center justify-center bg-midnight bg-opacity-50 rounded-tr-3xl rounded-br-3xl h-28 p-2">
                                                                     <p className="md:text-xl text-sm font-bold text-center">{thirdPolitician.name}</p>
-                                                                    <p className="md:text-xl text-sm text-bruschetta-tomato font-extrabold">{thirdPolitician.tiwalaPoints} Tiwala Points</p>
+                                                                    <p className="md:text-xl text-1xs text-bruschetta-tomato font-extrabold text-center">{thirdPolitician.tiwalaPoints} Tiwala Points</p>
                                                                     <p className="text-1xs font-extralight text-center">{thirdPolitician.currentPosition}</p>
                                                                 </div>
                                                             </div>
