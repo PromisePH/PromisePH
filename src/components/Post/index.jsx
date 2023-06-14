@@ -74,7 +74,6 @@ function Post({ post, user }) {
     const snapshot = async () => {
       const lengthData = await getCountFromServer(q);
       setCommentLength(lengthData.data().count);
-      console.log(commentLength);
     }
     snapshot();
     getDoc(politicalEntityRef).then((doc) => {
