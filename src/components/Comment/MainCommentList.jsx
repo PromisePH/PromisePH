@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { doc, addDoc, updateDoc, arrayUnion, collection, arrayRemove, onSnapshot } from 'firebase/firestore';
+import { doc, addDoc, updateDoc, arrayUnion, collection, arrayRemove, onSnapshot, setDoc } from 'firebase/firestore';
 import { db, auth } from '../../firebase/firebase';
 import { useAuthState } from "react-firebase-hooks/auth";
 import { Spinner, useDisclosure } from "@chakra-ui/react";
@@ -109,6 +109,12 @@ function MainCommentList(com) {
                         "replies": []
                     }
                 );
+                const userDataRef = doc(db, CollectionsEnum.USER_DATA, user.uid)
+                await setDoc(
+                    userDataRef,
+                    { userComments: arrayUnion(comRef.id) },
+                    { merge: true }
+                );
                 updateRootComment(comRef.id);
                 setActiveReply(false);
             };
@@ -182,7 +188,6 @@ function MainCommentList(com) {
             navigate("/login");
         }
     }
-
     return (
         commentData
             ? <>
@@ -217,7 +222,7 @@ function MainCommentList(com) {
                                 <div className="text-xs font-bold mr-4"> {commentData.commentorName} </div>
 
                                 {/* Comment Reply Button */}
-                                <div className={`text-xs cursor-pointer mr-4 ${activeReply || commentData.isDeleted || postDeleteStatus ? "hidden" : ""}`} onMouseDown={() => setActiveReply(true)}>
+                                <div className={`text-xs cursor-pointer mr-4 ${activeReply || commentData.isDeleted || postDeleteStatus || com.nestNum > 0 ? "hidden" : ""}`} onMouseDown={() => setActiveReply(true)}>
                                     Reply
                                 </div>
 
@@ -306,10 +311,10 @@ function MainCommentList(com) {
                     {/* Recursion Replies */}
                     <div className={`${activeReplyContents ? "" : "hidden"} w-full`}>
                         {
-                            commentData.replies
+                            commentData.replies && com.nestNum < 1
                                 ? commentData.replies.map((replyID) => {
                                     return <div className="pl-4" key={replyID}>
-                                        <MainCommentList id={replyID} parentId={commentData.id} postIsDeleted={postDeleteStatus}/>
+                                        <MainCommentList id={replyID} parentId={commentData.id} postIsDeleted={postDeleteStatus} nestNum={com.nestNum + 1}/>
                                     </div>
                                 }
                                 )

@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 
-import { db } from '../../firebase/firebase';
+import { db,auth } from '../../firebase/firebase';
 import { collection, onSnapshot, query, orderBy, where, getDoc, doc } from "firebase/firestore";
 import { useParams, useLocation } from "react-router-dom";
+import { useAuthState } from 'react-firebase-hooks/auth';
 
 import CollectionsEnum from "../../constants/collections";
 import NavBar from "../../components/NavBar";
@@ -11,6 +12,7 @@ import Post from "../../components/Post";
 import SearchItem from "../../components/PostForm/SearchItem";
 
 function Politician() {
+    const [user] = useAuthState(auth);
     const [posts, setPosts] = useState([]);
     const [entity, setEntity] = useState({});
     let location = useLocation();
@@ -59,7 +61,7 @@ function Politician() {
                     {
                         posts && posts.length > 0 ?
                             posts.map(post => (
-                                <Post key={post.id} post={post} />
+                                <Post key={post.id} post={post} user={user}/>
                             ))
                             :
                             <p className='flex flex-col items-center justify-center w-full h-96 font-bold text-lg'>
