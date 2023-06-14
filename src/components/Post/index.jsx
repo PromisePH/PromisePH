@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { db } from '../../firebase/firebase';
-import { doc, arrayUnion, arrayRemove, updateDoc, setDoc, getDoc } from "firebase/firestore";
+import { doc, arrayUnion, arrayRemove, updateDoc, setDoc, getDoc, query, collection, where, getCountFromServer } from "firebase/firestore";
 import CollectionsEnum from '../../constants/collections';
 
 import FallbackImage from '../../assets/img/default.jpg'
@@ -33,6 +33,7 @@ function Post({ post, user }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const cancelRef = useRef(null);
   const toast = useToast();
+  const [commentLength, setCommentLength] = useState(0);
   const [isPoster, setIsPoster] = useState(false);
   const [isActive, setIsActive] = useState(false);
   const [pinkyHovered, setPinkyHovered] = useState(false);
@@ -68,8 +69,14 @@ function Post({ post, user }) {
       setIsHammered(true)
       setIsPinkied(false)
     }
-
     const politicalEntityRef = doc(db, CollectionsEnum.ENTITY, post.entityId);
+    const q = query(collection(db, CollectionsEnum.COMMENTS), where("postId", "==", post.id));
+    const snapshot = async () => {
+      const lengthData = await getCountFromServer(q);
+      setCommentLength(lengthData.data().count);
+      console.log(commentLength);
+    }
+    snapshot();
     getDoc(politicalEntityRef).then((doc) => {
       if (doc.exists()) {
         setPoliticalEntity({
@@ -254,7 +261,7 @@ function Post({ post, user }) {
             <div className="flex flex-row items-center gap-12">
               <span className="text-white text-xs md:text-sm">{post.views} Views</span>
               <span className="text-white text-xs md:text-sm">{post.upvotes ? post.upvotes.length : 0} Likes</span>
-              <span className="text-white text-xs md:text-sm">{post.comments ? post.comments.length : 0} Comments</span>
+              <span className="text-white text-xs md:text-sm">{commentLength} Comments</span>
             </div>
           </div>
         </div>
@@ -319,7 +326,7 @@ function Post({ post, user }) {
       <div className="flex sm:hidden flex-row items-center pt-3 gap-12">
         <span className="text-white text-xs md:text-sm">{post.views} Views</span>
         <span className="text-white text-xs md:text-sm">{post.upvotes ? post.upvotes.length : 0} Likes</span>
-        <span className="text-white text-xs md:text-sm">{post.comments ? post.comments.length : 0} Comment</span>
+        <span className="text-white text-xs md:text-sm">{commentLength} Comment</span>
       </div>
       {/* Alert Dialog for Post Deletion */}
       <AlertDialog

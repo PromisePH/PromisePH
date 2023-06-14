@@ -121,7 +121,7 @@ function Comment(com) {
                         {
                             commentData
                                 ? commentData.length > 0
-                                    ? commentData.map((com) => { return <MainCommentList key={com.id} id={com.id} parentId={null} postIsDeleted={postDeleteStatus}/>; })
+                                    ? commentData.map((com) => { return <MainCommentList key={com.id} id={com.id} parentId={null} postIsDeleted={postDeleteStatus} nestNum={0}/>  })
                                     : <div className="w-full flex justify-center my-5">No Comments Found . . .</div>
                                 : <div className="w-full flex justify-center my-5">No Comments Found . . .</div>
                         }

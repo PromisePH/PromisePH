@@ -133,7 +133,7 @@ function Profile() {
                             }
                         }
                     }
-                    setPosts(postData)
+                    setPosts(postData.reverse())
                 }
 
 
@@ -158,7 +158,7 @@ function Profile() {
                             commentsData.push(comment)
                         }
                     }
-                    setComments(commentsData)
+                    setComments(commentsData.reverse())
                 }
 
                 // Set Upvoted Posts
@@ -182,7 +182,7 @@ function Profile() {
                         }
                     }
 
-                    setUpvotedPosts(postData)
+                    setUpvotedPosts(postData.reverse())
                 }
 
                 setIsLoading(false)
