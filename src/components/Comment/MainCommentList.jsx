@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { doc, addDoc, updateDoc, arrayUnion, collection, arrayRemove, onSnapshot } from 'firebase/firestore';
+import { doc, addDoc, updateDoc, arrayUnion, collection, arrayRemove, onSnapshot, setDoc } from 'firebase/firestore';
 import { db, auth } from '../../firebase/firebase';
 import { useAuthState } from "react-firebase-hooks/auth";
 import { Spinner, useDisclosure } from "@chakra-ui/react";
@@ -23,6 +23,8 @@ import {
     AlertDialogOverlay,
 } from '@chakra-ui/react'
 
+import CollectionsEnum from '../../constants/collections';
+
 function MainCommentList(com) {
     const [user] = useAuthState(auth);
     const [commentData, setCommentData] = useState([]);
@@ -37,6 +39,7 @@ function MainCommentList(com) {
     const [activeUpvote, setActiveUpvote] = useState(false);
     const [activeDetail, setActiveDetail] = useState(false);
     const [voteCount, setVoteCount] = useState(0);
+    const [postDeleteStatus, setPostDeleteStatus] = useState(com.postIsDeleted);
     const { isOpen, onOpen, onClose } = useDisclosure();
     const toast = useToast();
     const cancelRef = useRef(null);
@@ -44,7 +47,8 @@ function MainCommentList(com) {
     const navigate = useNavigate();
 
     useEffect(() => {
-        const commentsRef = doc(db, "comment", com.id);
+        setPostDeleteStatus(com.postIsDeleted)
+        const commentsRef = doc(db, CollectionsEnum.COMMENTS, com.id);
         onSnapshot(commentsRef, (doc) => {
             const temp = doc.data();
             setCommentData(
@@ -71,18 +75,18 @@ function MainCommentList(com) {
                     : 0
             })
         })
-    }, [user, params.promiseID]);
+    }, [user, params.promiseID,com]);
 
     //Update Root Comment
     function updateRootComment(replyID) {
-        const comRef = doc(db, "comment", com.id);
+        const comRef = doc(db, CollectionsEnum.COMMENTS, com.id);
         const update = async () => await updateDoc(comRef, { replies: arrayUnion(replyID) })
         update();
     }
 
     //Delete Comment
     function deleteComment() {
-        const comRef = doc(db, "comment", com.id);
+        const comRef = doc(db, CollectionsEnum.COMMENTS, com.id);
         const update = async () => await updateDoc(comRef, { isDeleted: true })
         update();
     }
@@ -92,7 +96,7 @@ function MainCommentList(com) {
         // If a User is Logged In
         if (user) {
             const replyRef = async () => {
-                const comRef = await addDoc(collection(db, "comment"),
+                const comRef = await addDoc(collection(db, CollectionsEnum.COMMENTS),
                     {
                         "commentorName": user.displayName,
                         "commentorID": user.uid,
@@ -104,6 +108,12 @@ function MainCommentList(com) {
                         "details": reply,
                         "replies": []
                     }
+                );
+                const userDataRef = doc(db, CollectionsEnum.USER_DATA, user.uid)
+                await setDoc(
+                    userDataRef,
+                    { userComments: arrayUnion(comRef.id) },
+                    { merge: true }
                 );
                 updateRootComment(comRef.id);
                 setActiveReply(false);
@@ -122,7 +132,7 @@ function MainCommentList(com) {
             setActiveUpvote(true);
             setVoteCount(activeDownvote ? voteCount + 2 : voteCount + 1);
             setActiveDownvote(false);
-            const comRef = doc(db, "comment", com.id);
+            const comRef = doc(db, CollectionsEnum.COMMENTS, com.id);
             const update = async () => await updateDoc(comRef, { upvotes: arrayUnion(user.uid) })
             const update2 = async () => await updateDoc(comRef, { downvotes: arrayRemove(user.uid) })
             update();
@@ -132,7 +142,7 @@ function MainCommentList(com) {
         else if (event == "unvoted") {
             setActiveUpvote(false);
             setVoteCount(voteCount - 1);
-            const comRef = doc(db, "comment", com.id);
+            const comRef = doc(db, CollectionsEnum.COMMENTS, com.id);
             const update = async () => await updateDoc(comRef, { upvotes: arrayRemove(user.uid) })
             update();
         }
@@ -144,7 +154,7 @@ function MainCommentList(com) {
             setActiveDownvote(true);
             setVoteCount(activeUpvote ? voteCount - 2 : voteCount - 1);
             setActiveUpvote(false);
-            const comRef = doc(db, "comment", com.id);
+            const comRef = doc(db, CollectionsEnum.COMMENTS, com.id);
             const update = async () => await updateDoc(comRef, { downvotes: arrayUnion(user.uid) })
             const update2 = async () => await updateDoc(comRef, { upvotes: arrayRemove(user.uid) })
             update();
@@ -154,7 +164,7 @@ function MainCommentList(com) {
         else if (event == "unvoted") {
             setActiveDownvote(false);
             setVoteCount(voteCount + 1);
-            const comRef = doc(db, "comment", com.id);
+            const comRef = doc(db, CollectionsEnum.COMMENTS, com.id);
             const update = async () => await updateDoc(comRef, { downvotes: arrayRemove(user.uid) })
             update();
         }
@@ -163,30 +173,31 @@ function MainCommentList(com) {
     // Up/Down Vote Clicking
     function handleVote(vote) {
         //If a User is Logged In
-        if (user) {
+        if (user && !commentData.isDeleted) {
             //for Upvote
             if (vote == "up")
                 activeUpvote ? updateCommentUpvote("unvoted") : updateCommentUpvote("voted");
             //for Downvote    
             else if (vote == "down")
                 activeDownvote ? updateCommentDownvote("unvoted") : updateCommentDownvote("voted");
+        }else if(commentData.isDeleted){
+            return
         }
         //If no User Logged In 
         else {
             navigate("/login");
         }
     }
-
     return (
         commentData
             ? <>
                 <div className={`flex flex-row h-auto rounded-lg ${activeDetail ? "bg-white bg-opacity-5" : ""}`}>
                     <div className="flex flex-col justify-center relative h-16 mr-2">
                         {/* Upvote Icon */}
-                        <IconContext.Provider value={{ color: activeUpvote ? "#FF4401" : upHover ? "#FF4401" : "FFFFFF" }}>
-                            <div className="relative" onMouseDown={() => handleVote("up")} onMouseEnter={() => setUpHover(true)} onMouseLeave={() => setUpHover(false)}>
-                                <div className={`absolute ${activeUpvote ? "bg-white bg-opacity-10" : upHover ? "bg-white bg-opacity-10" : ""} w-full h-1/2 max-h-3.5 mt-2 rounded-md cursor-pointer`}></div>
-                                <FiChevronUp className="text-3xl cursor-pointer" />
+                        <IconContext.Provider value={{ color: activeUpvote && !commentData.isDeleted ? "#FF4401" : upHover && !commentData.isDeleted ? "#FF4401" : commentData.isDeleted ? "#818384" : "FFFFFF" }}>
+                            <div className="relative" onMouseDown={() => handleVote("up")} onMouseEnter={() => commentData.isDeleted ? null : setUpHover(true)} onMouseLeave={() => setUpHover(false)}>
+                                <div className={`absolute ${activeUpvote ? "bg-white bg-opacity-10" : upHover ? "bg-white bg-opacity-10" : ""} w-full h-1/2 max-h-3.5 mt-2 rounded-md ${commentData.isDeleted ? "": "cursor-pointer"}`}></div>
+                                <FiChevronUp className="text-3xl" />
                             </div>
                         </IconContext.Provider>
 
@@ -194,9 +205,9 @@ function MainCommentList(com) {
                         <div className="w-full flex justify-center absolute">{voteCount}</div>
 
                         {/* Downvote Icon */}
-                        <IconContext.Provider value={{ color: activeDownvote ? "#7193ff" : downHover ? "#7193ff" : "FFFFFF" }}>
-                            <div className="relative" onMouseDown={() => handleVote("down")} onMouseEnter={() => setDownHover(true)} onMouseLeave={() => setDownHover(false)}>
-                                <div className={`absolute ${activeDownvote ? "bg-white bg-opacity-10" : downHover ? "bg-white bg-opacity-10" : ""} w-full h-1/2 max-h-3.5 mt-2 rounded-md cursor-pointer`}></div>
+                        <IconContext.Provider value={{ color: activeDownvote && !commentData.isDeleted ? "#7193ff" : downHover && !commentData.isDeleted ? "#7193ff" : commentData.isDeleted ? "#818384" : "FFFFFF" }}>
+                            <div className="relative" onMouseDown={() => handleVote("down")} onMouseEnter={() => commentData.isDeleted ? null : setDownHover(true)} onMouseLeave={() => setDownHover(false)}>
+                                <div className={`absolute ${activeDownvote ? "bg-white bg-opacity-10" : downHover ? "bg-white bg-opacity-10" : ""} w-full h-1/2 max-h-3.5 mt-2 rounded-md ${commentData.isDeleted ? "": "cursor-pointer"}`}></div>
                                 <FiChevronDown className="text-3xl p-0" />
                             </div>
                         </IconContext.Provider>
@@ -211,7 +222,7 @@ function MainCommentList(com) {
                                 <div className="text-xs font-bold mr-4"> {commentData.commentorName} </div>
 
                                 {/* Comment Reply Button */}
-                                <div className={`text-xs cursor-pointer mr-4 ${activeReply || commentData.isDeleted ? "hidden" : ""}`} onMouseDown={() => setActiveReply(true)}>
+                                <div className={`text-xs cursor-pointer mr-4 ${activeReply || commentData.isDeleted || postDeleteStatus || com.nestNum > 0 ? "hidden" : ""}`} onMouseDown={() => setActiveReply(true)}>
                                     Reply
                                 </div>
 
@@ -252,8 +263,8 @@ function MainCommentList(com) {
                                                 }
                                                 className="hover:text-red-500 hover:bg-gray-700"
                                             >
-                                                <HiOutlineTrash className="mr-2 text-lg"/>
-                                                Delete Comment 
+                                                <HiOutlineTrash className="mr-2 text-lg" />
+                                                Delete Comment
                                             </MenuItem>
                                         </MenuList>
                                     </Menu>
@@ -300,10 +311,10 @@ function MainCommentList(com) {
                     {/* Recursion Replies */}
                     <div className={`${activeReplyContents ? "" : "hidden"} w-full`}>
                         {
-                            commentData.replies
+                            commentData.replies && com.nestNum < 1
                                 ? commentData.replies.map((replyID) => {
                                     return <div className="pl-4" key={replyID}>
-                                        <MainCommentList id={replyID} parentId={commentData.id} />
+                                        <MainCommentList id={replyID} parentId={commentData.id} postIsDeleted={postDeleteStatus} nestNum={com.nestNum + 1}/>
                                     </div>
                                 }
                                 )

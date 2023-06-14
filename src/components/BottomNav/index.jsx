@@ -14,7 +14,7 @@ function BottomNav() {
             <IconLink onClick={() => { navigate('/') }}>
                 <Icon as={AiFillHome} boxSize={6} />
             </IconLink>
-            <IconLink>
+            <IconLink onClick={() => { navigate('/leaderboard') }}>
                 <Icon as={RiTrophyFill} boxSize={6} />
             </IconLink>
             <IconLink onClick={() => { navigate('/politicians') }}>
