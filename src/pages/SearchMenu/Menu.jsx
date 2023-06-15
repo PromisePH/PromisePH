@@ -15,7 +15,7 @@ function Menu() {
     const [user] = useAuthState(auth);
     let location = useLocation();
     useEffect(() => {
-        async function fetchData() {
+        const fetchData = async() => {
             setIsLoading(true);
             const q = query(collection(db, "posts"), where("isDeleted", "==", false));
             const postsSnapshot = await getDocs(q);
@@ -41,7 +41,7 @@ function Menu() {
                 </div>
                 :
                 postsData.length > 0 ?
-                    <main className='py-20 md:pb-0'>
+                    <main className='px-4 py-20 md:pb-0 '>
                         {
                             postsData.map((i) => {
                                 return <Post key={i.id} post={i} user={user} />
